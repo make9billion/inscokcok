@@ -110,4 +110,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(KnowledgeAnswer::class, 'manager_id');
     }
+
+    public function pointLedgerEntries(): HasMany
+    {
+        return $this->hasMany(PointLedgerEntry::class);
+    }
 }
