@@ -51,3 +51,9 @@ CMS excludes:
 - Do not use emojis in UI.
 - Use one SVG icon library consistently.
 - Use primary blue for interactive elements, not decoration.
+
+## Verification Rules
+
+- On Windows, run `powershell -ExecutionPolicy Bypass -File scripts/verify.ps1`.
+- Prefer `npm.cmd` and `npx.cmd` in PowerShell scripts.
+- Tests must not require a running local PostgreSQL server unless a task explicitly covers database integration.
