@@ -6,6 +6,7 @@ use App\Enums\UserRole;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -114,5 +115,15 @@ class User extends Authenticatable
     public function pointLedgerEntries(): HasMany
     {
         return $this->hasMany(PointLedgerEntry::class);
+    }
+
+    public function pointMallCart(): HasOne
+    {
+        return $this->hasOne(PointMallCart::class);
+    }
+
+    public function pointMallOrders(): HasMany
+    {
+        return $this->hasMany(PointMallOrder::class);
     }
 }

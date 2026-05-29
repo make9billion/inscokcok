@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Models;
+
+use App\Enums\PointMallOrderStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class PointMallOrder extends Model
+{
+    /** @use HasFactory<\Database\Factories\PointMallOrderFactory> */
+    use HasFactory;
+
+    protected $fillable = [
+        'user_id',
+        'status',
+        'order_number',
+        'total_points',
+        'recipient_name',
+        'recipient_phone',
+        'postal_code',
+        'address_line1',
+        'address_line2',
+        'delivery_memo',
+        'ordered_at',
+        'cancelled_at',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'status' => PointMallOrderStatus::class,
+            'ordered_at' => 'datetime',
+            'cancelled_at' => 'datetime',
+        ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(PointMallOrderItem::class);
+    }
+}
