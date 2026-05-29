@@ -95,4 +95,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(Consultation::class, 'assigned_planner_id');
     }
+
+    public function knowledgeQuestions(): HasMany
+    {
+        return $this->hasMany(KnowledgeQuestion::class);
+    }
+
+    public function assignedKnowledgeQuestions(): HasMany
+    {
+        return $this->hasMany(KnowledgeQuestion::class, 'assigned_manager_id');
+    }
+
+    public function knowledgeAnswers(): HasMany
+    {
+        return $this->hasMany(KnowledgeAnswer::class, 'manager_id');
+    }
 }
