@@ -17,6 +17,10 @@ Use browser verification to confirm the implemented screen is usable, responsive
 - Large insurance checkup button is visually prominent on the main page
 - Admin screens expose only the features in scope
 - Insurance product management is not present in admin CMS
+- Screens follow `DESIGN.MD`
+- No emoji appears in UI
+- Primary blue is used for interactive elements, not decoration
+- Icons come from one consistent SVG icon library
 
 ## Required Response Format
 
@@ -37,4 +41,3 @@ If changes are required:
 - Viewport:
 - Steps to reproduce:
 - Required fix:
-

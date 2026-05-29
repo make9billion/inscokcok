@@ -18,6 +18,7 @@ Check whether the implementation matches the assigned plan task exactly.
 - Admin CMS must not include insurance product management.
 - Insurance product content pages are image-backed project-file content.
 - Point changes must use ledger entries, not direct balance mutation.
+- UI work must follow `DESIGN.MD`.
 - Role behavior must match the plan:
   - full admin: all CMS permissions
   - planner: consultation completion/cancellation
@@ -42,4 +43,3 @@ If not compliant:
 - Extra or incorrect behavior:
 - Files/lines to revisit:
 - Required fix:
-

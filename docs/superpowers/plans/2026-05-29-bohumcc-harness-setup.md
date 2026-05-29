@@ -15,6 +15,7 @@
 - `.gitignore`: Ignore framework build outputs, dependency folders, environment files, and local Superpowers brainstorm files.
 - `.editorconfig`: Shared editor formatting defaults.
 - `README.md`: Project overview, setup commands, and verification workflow.
+- `DESIGN.MD`: User-authored design system. Preserve it and reference it from project documentation.
 - `composer.json`: Laravel PHP dependencies, created by Laravel installer or Composer.
 - `package.json`: Frontend dependencies and scripts, created by Laravel starter kit.
 - `.env.example`: Local environment template.
@@ -32,6 +33,7 @@
 - Work from `C:\project\bohumcc`.
 - The folder currently contains planning/harness files and `배너+폼_예시`.
 - Do not delete or overwrite `배너+폼_예시`.
+- Do not delete or overwrite `DESIGN.MD`.
 - Do not implement customer-facing business features in this plan.
 - If Composer, PHP, Node, or internet access is unavailable, report `BLOCKED` with the exact missing tool or failed command.
 

@@ -11,6 +11,7 @@ This project builds a full-custom insurance agency website, admin CMS, and point
 - Insurance product/service/checkup/company intro pages are image-backed content pages.
 - Event point amounts are editable in admin event management.
 - Consultation receipt rolling data on the main page is fake display data.
+- `DESIGN.MD` is the visual source of truth.
 
 ## Roles
 
@@ -44,3 +45,9 @@ CMS excludes:
 
 - insurance product management
 
+## UI Rules
+
+- Follow `DESIGN.MD` for color, typography, spacing, components, and motion.
+- Do not use emojis in UI.
+- Use one SVG icon library consistently.
+- Use primary blue for interactive elements, not decoration.

@@ -24,3 +24,5 @@ For UI tasks, verify:
 - form validation states
 - Korean text wrapping
 - no admin insurance product management entry
+- consistency with `DESIGN.MD`
+- no emoji usage in UI

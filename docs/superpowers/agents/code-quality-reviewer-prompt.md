@@ -13,6 +13,7 @@ Find maintainability, correctness, security, performance, and test-quality issue
 - Data integrity
 - Point ledger correctness
 - Korean user-facing copy consistency
+- Consistency with `DESIGN.MD` for UI work
 - Test coverage for risky behavior
 - Avoiding broad unrelated refactors
 - Avoiding admin insurance product management
@@ -36,4 +37,3 @@ If changes are required:
 - File/line references:
 - Why it matters:
 - Required fix:
-

@@ -52,6 +52,7 @@ This project is too large for one implementation plan. Implement it as separate 
 - `docs/superpowers/agents/spec-reviewer-prompt.md`: prompt template for spec compliance reviewers.
 - `docs/superpowers/agents/code-quality-reviewer-prompt.md`: prompt template for code quality reviewers.
 - `docs/superpowers/agents/ui-verification-reviewer-prompt.md`: prompt template for browser/UI reviewers.
+- `DESIGN.MD`: user-authored visual design system. Treat it as the source of truth for UI look and feel.
 - `harness/project-rules.md`: local working rules for this project.
 - `harness/verification.md`: canonical commands that must pass before work is called complete.
 - `scripts/verify.ps1`: Windows verification entry point.
@@ -149,6 +150,7 @@ Run backend tests, frontend build, Playwright checks, role access tests, point l
 ## Execution Rules
 
 - Use one implementation subagent per subproject task.
+- UI work must follow `DESIGN.MD`.
 - After each implementation task, run a spec compliance review.
 - After spec compliance passes, run a code quality review.
 - For UI-heavy tasks, run a UI verification review after code quality review.

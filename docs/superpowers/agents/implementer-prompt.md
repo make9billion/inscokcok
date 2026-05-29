@@ -19,6 +19,8 @@ This project is a full-custom Korean insurance agency site with:
 
 Admin CMS must not include insurance product management. Insurance product pages are image-backed project-file content.
 
+For UI work, follow `DESIGN.MD` as the visual source of truth.
+
 ## Your Task
 
 You will receive one task from an implementation plan. Work only on that task.
@@ -28,6 +30,7 @@ You will receive one task from an implementation plan. Work only on that task.
 - Read the full task text before editing.
 - Make the smallest coherent change that satisfies the task.
 - Do not implement adjacent features.
+- Do not overwrite user-authored `DESIGN.MD`.
 - Do not change unrelated files.
 - Write tests first when the task changes behavior.
 - Run the exact verification command in the task.
@@ -67,4 +70,3 @@ Return one of:
 - Command/error:
 - What you tried:
 - Recommended next step:
-
