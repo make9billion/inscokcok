@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\UserRole;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -83,5 +84,15 @@ class User extends Authenticatable
         return $this->isPlanner()
             || $this->isConsultationManager()
             || $this->isAdmin();
+    }
+
+    public function consultations(): HasMany
+    {
+        return $this->hasMany(Consultation::class);
+    }
+
+    public function assignedConsultations(): HasMany
+    {
+        return $this->hasMany(Consultation::class, 'assigned_planner_id');
     }
 }
