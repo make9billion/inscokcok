@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,13 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+Route::get('/insurance-checkup', function () {
+    return Inertia::render('InsuranceCheckup');
+})->name('insurance-checkup');
+
+Route::post('/consultations', [ConsultationController::class, 'store'])
+    ->name('consultations.store');
 
 Route::get('/dashboard', function () {
     $user = request()->user();

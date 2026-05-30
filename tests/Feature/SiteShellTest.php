@@ -24,8 +24,9 @@ class SiteShellTest extends TestCase
         $this->assertStringContainsString('진행 중인 이벤트', $source);
         $this->assertStringContainsString('보험지식인', $source);
         $this->assertStringContainsString('공지사항', $source);
-        $this->assertStringContainsString('aria-pressed={selectedProduct === product.name}', $source);
+        $this->assertStringContainsString('aria-pressed={form.data.interested_product === product.name}', $source);
         $this->assertStringContainsString('aria-label={`${title} 더보기`}', $source);
+        $this->assertStringContainsString("form.post(route('consultations.store')", $source);
         $this->assertStringContainsString('href="/customer/notices"', $source);
         $this->assertStringContainsString('href="/customer"', $source);
         $this->assertStringNotContainsString('href="/notices"', $source);

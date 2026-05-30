@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
     Bell,
@@ -12,7 +12,6 @@ import {
     ShieldCheck,
     Sparkles,
 } from 'lucide-react';
-import { useState } from 'react';
 
 import PublicLayout from '@/Layouts/PublicLayout';
 
@@ -24,20 +23,20 @@ const productOptions = [
 ];
 
 const rollingReceiptRows = [
-    { name: '김○연', product: '암보험', status: '상담사 배정 완료', time: '1분 전' },
-    { name: '박○훈', product: '질병/상해보험', status: '보장 분석 중', time: '4분 전' },
-    { name: '이○서', product: '치매/간병보험', status: '전화 상담 예약', time: '8분 전' },
-    { name: '최○민', product: '펫보험', status: '접수 확인', time: '12분 전' },
+    { name: '김*연', product: '암보험', status: '상담사 배정 완료', time: '1분 전' },
+    { name: '박*호', product: '질병/상해보험', status: '보장 분석 중', time: '4분 전' },
+    { name: '송*지', product: '치매/간병보험', status: '전화 상담 예약', time: '8분 전' },
+    { name: '최*민', product: '펫보험', status: '접수 확인', time: '12분 전' },
 ];
 
 const faqs = [
     {
         question: '보험점검은 어떤 내용을 확인하나요?',
-        answer: '가입 중인 보장의 중복, 부족한 진단비, 갱신 시점과 보험료 변화를 함께 봅니다.',
+        answer: '가입 중인 보장의 중복, 부족한 진단비, 갱신 시점과 보험료 변화를 함께 살펴봅니다.',
     },
     {
         question: '상담 신청 후 바로 연락이 오나요?',
-        answer: '운영 시간에는 접수 순서대로 배정되며, 원하는 시간대를 남기면 일정에 맞춰 안내합니다.',
+        answer: '운영 시간에는 접수 순서대로 배정되며, 원하시는 시간을 남기면 일정에 맞춰 안내합니다.',
     },
     {
         question: '포인트는 어디에 사용할 수 있나요?',
@@ -47,24 +46,24 @@ const faqs = [
 
 const pointMallProducts = [
     { title: '모바일 커피 쿠폰', points: '4,500P', tag: '교환 1위' },
-    { title: '편의점 금액권', points: '10,000P', tag: '실속형' },
+    { title: '편의점 금액권', points: '10,000P', tag: '인기' },
     { title: '건강검진 할인권', points: '18,000P', tag: '건강관리' },
 ];
 
 const events = [
     { title: '5월 보험점검 참여 이벤트', period: '2026.05.01 - 2026.05.31', reward: '최대 20,000P' },
-    { title: '펫보험 상담 후기 적립', period: '2026.05.10 - 2026.06.09', reward: '후기 승인 시 5,000P' },
+    { title: '펫보험 상담 후기 적립', period: '2026.05.10 - 2026.06.09', reward: '후기 작성 시 5,000P' },
 ];
 
 const qnaPreviews = [
     {
         category: '암보험',
         title: '비갱신형 진단비를 줄이면 보험료 차이가 큰가요?',
-        answer: '연령과 납입 기간에 따라 차이가 큽니다. 기존 보장과 새 설계를 같이 비교해야 합니다.',
+        answer: '연령과 가입 기간에 따라 차이가 큽니다. 기존 보장과 새 설계를 함께 비교해야 합니다.',
     },
     {
         category: '간병',
-        title: '부모님 간병보험은 몇 세까지 준비할 수 있나요?',
+        title: '부모님 간병보험은 몇 살까지 준비할 수 있나요?',
         answer: '상품별 가입 가능 나이와 고지 항목이 달라 사전 확인이 필요합니다.',
     },
     {
@@ -102,6 +101,10 @@ function SectionHeader({ eyebrow, title, description, href }) {
     );
 }
 
+function FieldError({ message }) {
+    return message ? <p className="mt-2 text-xs font-medium text-red-600">{message}</p> : null;
+}
+
 function BannerStrip({ icon: Icon, title, description, href }) {
     return (
         <Link
@@ -123,11 +126,35 @@ function BannerStrip({ icon: Icon, title, description, href }) {
 }
 
 export default function Welcome({ auth }) {
-    const [selectedProduct, setSelectedProduct] = useState(productOptions[0].name);
+    const { flash } = usePage().props;
+    const form = useForm({
+        type: 'product',
+        applicant_name: '',
+        phone: '',
+        interested_product: productOptions[0].name,
+        preferred_contact_time: '',
+        privacy_agreement: false,
+        third_party_agreement: false,
+    });
+
+    const submit = (event) => {
+        event.preventDefault();
+        form.post(route('consultations.store'), {
+            preserveScroll: true,
+            onSuccess: () =>
+                form.reset(
+                    'applicant_name',
+                    'phone',
+                    'preferred_contact_time',
+                    'privacy_agreement',
+                    'third_party_agreement',
+                ),
+        });
+    };
 
     return (
         <PublicLayout auth={auth}>
-            <Head title="보흠CC" />
+            <Head title="보험CC" />
 
             <section className="bg-white">
                 <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-7xl items-center gap-10 px-5 py-14 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
@@ -137,10 +164,10 @@ export default function Welcome({ auth }) {
                             보험을 더 명확하게
                         </p>
                         <h1 className="mt-4 max-w-2xl text-3xl font-bold leading-tight text-toss-grey900 sm:text-4xl lg:text-5xl">
-                            상담부터 보험점검까지 한 화면에서 차분하게 시작하세요.
+                            상담부터 보험점검까지 한 화면에서 차분하게 시작하세요
                         </h1>
                         <p className="mt-5 max-w-xl text-base leading-7 text-toss-grey600">
-                            필요한 보장만 고르고 연락처를 남기면 보흠CC 상담사가 현재 상황에 맞춰 안내합니다.
+                            필요한 보장만 고르고 연락처를 남기면 보험CC 상담사가 현재 상황에 맞춰 안내합니다.
                             복잡한 설명보다 먼저 확인해야 할 선택지를 보여드립니다.
                         </p>
 
@@ -154,10 +181,10 @@ export default function Welcome({ auth }) {
                                     <button
                                         key={product.name}
                                         type="button"
-                                        aria-pressed={selectedProduct === product.name}
-                                        onClick={() => setSelectedProduct(product.name)}
+                                        aria-pressed={form.data.interested_product === product.name}
+                                        onClick={() => form.setData('interested_product', product.name)}
                                         className={`rounded-lg border p-4 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-toss-blue ${
-                                            selectedProduct === product.name
+                                            form.data.interested_product === product.name
                                                 ? 'border-toss-blue bg-toss-blueLight'
                                                 : 'border-toss-grey200 bg-white hover:border-toss-blue hover:bg-toss-blueLight'
                                         }`}
@@ -184,37 +211,52 @@ export default function Welcome({ auth }) {
                         </div>
                     </div>
 
-                    <div className="rounded-lg border border-toss-grey200 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+                    <form
+                        onSubmit={submit}
+                        className="rounded-lg border border-toss-grey200 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
+                    >
                         <div className="flex items-center justify-between gap-4">
                             <div>
                                 <p className="text-sm font-semibold text-toss-blue">상담신청</p>
-                                <h2 className="mt-1 text-xl font-bold text-toss-grey900">상담 접수 미리보기</h2>
+                                <h2 className="mt-1 text-xl font-bold text-toss-grey900">상담 접수하기</h2>
                             </div>
                             <PhoneCall className="size-6 text-toss-grey700" strokeWidth={1.8} />
                         </div>
+
+                        {flash?.success && (
+                            <div className="mt-5 rounded-lg border border-toss-blue/20 bg-toss-blueLight px-4 py-3 text-sm font-semibold text-toss-blue">
+                                {flash.success}
+                            </div>
+                        )}
 
                         <div className="mt-6 space-y-4">
                             <label className="block">
                                 <span className="text-sm font-semibold text-toss-grey800">이름</span>
                                 <input
                                     type="text"
+                                    value={form.data.applicant_name}
+                                    onChange={(event) => form.setData('applicant_name', event.target.value)}
                                     placeholder="홍길동"
                                     className="mt-2 w-full rounded-lg border-toss-grey200 bg-toss-grey50 text-toss-grey800 placeholder:text-toss-grey500 focus:border-toss-blue focus:ring-toss-blue"
                                 />
+                                <FieldError message={form.errors.applicant_name} />
                             </label>
                             <label className="block">
                                 <span className="text-sm font-semibold text-toss-grey800">연락처</span>
                                 <input
                                     type="tel"
+                                    value={form.data.phone}
+                                    onChange={(event) => form.setData('phone', event.target.value)}
                                     placeholder="010-0000-0000"
                                     className="mt-2 w-full rounded-lg border-toss-grey200 bg-toss-grey50 text-toss-grey800 placeholder:text-toss-grey500 focus:border-toss-blue focus:ring-toss-blue"
                                 />
+                                <FieldError message={form.errors.phone} />
                             </label>
                             <label className="block">
                                 <span className="text-sm font-semibold text-toss-grey800">상담 희망 상품</span>
                                 <select
-                                    value={selectedProduct}
-                                    onChange={(event) => setSelectedProduct(event.target.value)}
+                                    value={form.data.interested_product}
+                                    onChange={(event) => form.setData('interested_product', event.target.value)}
                                     className="mt-2 w-full rounded-lg border-toss-grey200 bg-toss-grey50 text-toss-grey800 focus:border-toss-blue focus:ring-toss-blue"
                                 >
                                     {productOptions.map((product) => (
@@ -222,20 +264,48 @@ export default function Welcome({ auth }) {
                                     ))}
                                 </select>
                             </label>
+                            <label className="block">
+                                <span className="text-sm font-semibold text-toss-grey800">희망 연락 시간</span>
+                                <input
+                                    type="text"
+                                    value={form.data.preferred_contact_time}
+                                    onChange={(event) => form.setData('preferred_contact_time', event.target.value)}
+                                    placeholder="예: 평일 오후 2시 이후"
+                                    className="mt-2 w-full rounded-lg border-toss-grey200 bg-toss-grey50 text-toss-grey800 placeholder:text-toss-grey500 focus:border-toss-blue focus:ring-toss-blue"
+                                />
+                            </label>
                         </div>
 
+                        <label className="mt-5 flex items-start gap-3 text-sm leading-6 text-toss-grey700">
+                            <input
+                                type="checkbox"
+                                checked={form.data.privacy_agreement}
+                                onChange={(event) => form.setData('privacy_agreement', event.target.checked)}
+                                className="mt-1 rounded border-toss-grey300 text-toss-blue focus:ring-toss-blue"
+                            />
+                            개인정보 수집 및 이용에 동의합니다.
+                        </label>
+                        <FieldError message={form.errors.privacy_agreement} />
+
+                        <label className="mt-3 flex items-start gap-3 text-sm leading-6 text-toss-grey700">
+                            <input
+                                type="checkbox"
+                                checked={form.data.third_party_agreement}
+                                onChange={(event) => form.setData('third_party_agreement', event.target.checked)}
+                                className="mt-1 rounded border-toss-grey300 text-toss-blue focus:ring-toss-blue"
+                            />
+                            상담 배정을 위한 제3자 제공에 동의합니다.
+                        </label>
+
                         <button
-                            type="button"
-                            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-toss-grey900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-toss-grey800 focus:outline-none focus-visible:ring-2 focus-visible:ring-toss-grey900"
+                            type="submit"
+                            disabled={form.processing}
+                            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-toss-grey900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-toss-grey800 disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                            상담 접수하기
+                            {form.processing ? '접수 중' : '상담 접수하기'}
                             <CheckCircle2 className="size-4" strokeWidth={1.8} />
                         </button>
-
-                        <p className="mt-4 text-xs leading-5 text-toss-grey500">
-                            실제 접수 기능은 준비 중입니다. 남겨진 정보는 저장되지 않습니다.
-                        </p>
-                    </div>
+                    </form>
                 </div>
             </section>
 
@@ -328,7 +398,7 @@ export default function Welcome({ auth }) {
                     <SectionHeader
                         eyebrow="Event"
                         title="진행 중인 이벤트"
-                        description="상담과 보험점검을 더 가볍게 시작할 수 있는 혜택입니다."
+                        description="상담과 보험점검을 가볍게 시작할 수 있는 혜택입니다."
                         href="/events"
                     />
                     <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -390,7 +460,7 @@ export default function Welcome({ auth }) {
                         <div className="mt-6 rounded-lg border border-toss-grey200 bg-toss-grey50 p-5">
                             <p className="text-sm font-semibold text-toss-grey900">고객센터</p>
                             <p className="mt-2 text-sm leading-6 text-toss-grey600">
-                                상담 접수와 포인트 이용 문의는 운영 시간 내 순서대로 안내합니다.
+                                상담 접수와 포인트 이용 문의를 운영 시간 안에 순서대로 안내합니다.
                             </p>
                             <Link
                                 href="/customer"
