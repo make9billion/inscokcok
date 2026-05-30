@@ -2,45 +2,105 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
     Bell,
-    CheckCircle2,
     ChevronRight,
     Gift,
     MessageSquareText,
-    PhoneCall,
-    SearchCheck,
-    ShoppingBag,
     ShieldCheck,
+    ShoppingBag,
     Sparkles,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 import PublicLayout from '@/Layouts/PublicLayout';
 
-const productOptions = [
-    { name: '암보험', description: '진단비와 치료비 중심으로 확인' },
-    { name: '치매/간병보험', description: '장기 돌봄과 생활비 대비' },
-    { name: '질병/상해보험', description: '입원, 수술, 후유장해 보장' },
-    { name: '펫보험', description: '반려동물 병원비 부담 완화' },
+const heroSlides = [
+    {
+        label: '암보험',
+        product: '암보험',
+        kicker: '암 보장 한 번에 확인',
+        title: '암보험, 꼭 가입한 걸까요?',
+        description: '부족한 진단비와 중복 보장을 모아보고 내 상황에 맞는 암 보장을 확인하세요.',
+        tags: ['암 진단비', '중복보장 체크', '보장분석'],
+        tone: 'bg-[#edf7f7]',
+        accent: 'text-[#6676b8]',
+        badge: 'CANCER',
+    },
+    {
+        label: '종신보험',
+        product: '종신보험',
+        kicker: '가족을 위한 장기 플랜',
+        title: '종신보험, 오래갈 계획부터.',
+        description: '사망보장, 납입 여력, 가족 상황을 함께 보고 유지 가능한 방향으로 정리합니다.',
+        tags: ['가족보장', '납입관리', '상속 대비'],
+        tone: 'bg-[#eef3fb]',
+        accent: 'text-[#51657e]',
+        badge: 'LIFE',
+    },
+    {
+        label: '어린이보험',
+        product: '어린이보험',
+        kicker: '성장 단계별 보장',
+        title: '어린이보험, 필요한 때를 놓치지 않게.',
+        description: '태아부터 청소년기까지 치료비, 진단비, 생활 보장을 한눈에 비교합니다.',
+        tags: ['태아 상담', '성장기 보장', '부모 부담 절감'],
+        tone: 'bg-[#fff8ec]',
+        accent: 'text-[#c06d2b]',
+        badge: 'KIDS',
+    },
+    {
+        label: '펫보험',
+        product: '펫보험',
+        kicker: '반려생활 병원비 준비',
+        title: '펫보험, 병원비 걱정을 가볍게.',
+        description: '통원, 입원, 수술비 보장을 반려동물의 나이와 생활 패턴에 맞춰 비교합니다.',
+        tags: ['통원치료', '수술비', '반려생활'],
+        tone: 'bg-[#f8f5ff]',
+        accent: 'text-[#6b5bb8]',
+        badge: 'PET',
+    },
+    {
+        label: '변액보험',
+        product: '변액보험',
+        kicker: '목적과 기간을 먼저',
+        title: '변액보험, 이해하고 선택하세요.',
+        description: '투자 성향, 유지 기간, 수수료 구조를 함께 확인해 무리 없는 선택을 돕습니다.',
+        tags: ['장기 목적', '투자 성향', '수익률 평가'],
+        tone: 'bg-[#eef8ff]',
+        accent: 'text-[#2f76a8]',
+        badge: 'FUND',
+    },
+    {
+        label: '간병보험',
+        product: '간병보험',
+        kicker: '긴 돌봄의 시간을 대비',
+        title: '간병보험, 가족 부담까지 생각합니다.',
+        description: '간병비, 요양, 치매 관련 보장을 현재 가족 상황에 맞춰 현실적으로 정리합니다.',
+        tags: ['간병비', '치매보장', '부모님 상담'],
+        tone: 'bg-[#f0faf6]',
+        accent: 'text-[#39806c]',
+        badge: 'CARE',
+    },
 ];
 
 const rollingReceiptRows = [
-    { name: '김*연', product: '암보험', status: '상담사 배정 완료', time: '1분 전' },
-    { name: '박*호', product: '질병/상해보험', status: '보장 분석 중', time: '4분 전' },
-    { name: '송*지', product: '치매/간병보험', status: '전화 상담 예약', time: '8분 전' },
+    { name: '김*현', product: '암보험', status: '상담사 배정 완료', time: '1분 전' },
+    { name: '박*준', product: '질병/상해보험', status: '보장 분석 중', time: '4분 전' },
+    { name: '이*지', product: '간병보험', status: '전화 상담 예약', time: '8분 전' },
     { name: '최*민', product: '펫보험', status: '접수 확인', time: '12분 전' },
 ];
 
 const faqs = [
     {
-        question: '보험점검은 어떤 내용을 확인하나요?',
+        question: '보험진단은 어떤 내용을 확인하나요?',
         answer: '가입 중인 보장의 중복, 부족한 진단비, 갱신 시점과 보험료 변화를 함께 살펴봅니다.',
     },
     {
         question: '상담 신청 후 바로 연락이 오나요?',
-        answer: '운영 시간에는 접수 순서대로 배정되며, 원하시는 시간을 남기면 일정에 맞춰 안내합니다.',
+        answer: '운영 시간에는 접수 순서대로 배정되며, 원하는 시간을 남기면 일정에 맞춰 안내합니다.',
     },
     {
         question: '포인트는 어디에 사용할 수 있나요?',
-        answer: '상담 참여와 이벤트로 적립한 포인트는 포인트몰 상품 교환에 사용할 수 있습니다.',
+        answer: '상담 참여와 이벤트로 적립된 포인트는 포인트몰 상품 교환에 사용할 수 있습니다.',
     },
 ];
 
@@ -51,7 +111,7 @@ const pointMallProducts = [
 ];
 
 const events = [
-    { title: '5월 보험점검 참여 이벤트', period: '2026.05.01 - 2026.05.31', reward: '최대 20,000P' },
+    { title: '5월 보험진단 참여 이벤트', period: '2026.05.01 - 2026.05.31', reward: '최대 20,000P' },
     { title: '펫보험 상담 후기 적립', period: '2026.05.10 - 2026.06.09', reward: '후기 작성 시 5,000P' },
 ];
 
@@ -63,12 +123,12 @@ const qnaPreviews = [
     },
     {
         category: '간병',
-        title: '부모님 간병보험은 몇 살까지 준비할 수 있나요?',
+        title: '부모님 간병보험은 몇 세까지 준비할 수 있나요?',
         answer: '상품별 가입 가능 나이와 고지 항목이 달라 사전 확인이 필요합니다.',
     },
     {
         category: '펫보험',
-        title: '슬개골 보장도 선택할 수 있나요?',
+        title: '강아지와 고양이 보장을 선택할 수 있나요?',
         answer: '반려동물 나이와 병력에 따라 특약 선택 가능 여부가 달라집니다.',
     },
 ];
@@ -78,6 +138,16 @@ const notices = [
     { title: '상담 운영 시간 변경 안내', date: '2026.05.24' },
     { title: '포인트몰 일부 상품 교환 지연 안내', date: '2026.05.20' },
 ];
+
+const formatPhone = (value) => {
+    const rest = value.replace(/\D/g, '').replace(/^010/, '').slice(0, 8);
+    const middle = rest.slice(0, 4);
+    const last = rest.slice(4, 8);
+
+    if (!middle) return '010-';
+    if (!last) return `010-${middle}`;
+    return `010-${middle}-${last}`;
+};
 
 function SectionHeader({ eyebrow, title, description, href }) {
     return (
@@ -127,15 +197,36 @@ function BannerStrip({ icon: Icon, title, description, href }) {
 
 export default function Welcome({ auth }) {
     const { flash } = usePage().props;
+    const [activeSlide, setActiveSlide] = useState(0);
+    const [gender, setGender] = useState('male');
+    const activeProduct = heroSlides[activeSlide];
     const form = useForm({
         type: 'product',
         applicant_name: '',
-        phone: '',
-        interested_product: productOptions[0].name,
+        phone: '010-',
+        birth_date: '',
+        interested_product: activeProduct.product,
         preferred_contact_time: '',
         privacy_agreement: false,
         third_party_agreement: false,
     });
+
+    useEffect(() => {
+        const timer = window.setInterval(() => {
+            setActiveSlide((current) => {
+                const next = (current + 1) % heroSlides.length;
+                form.setData('interested_product', heroSlides[next].product);
+                return next;
+            });
+        }, 5200);
+
+        return () => window.clearInterval(timer);
+    }, []);
+
+    const selectSlide = (index) => {
+        setActiveSlide(index);
+        form.setData('interested_product', heroSlides[index].product);
+    };
 
     const submit = (event) => {
         event.preventDefault();
@@ -144,10 +235,9 @@ export default function Welcome({ auth }) {
             onSuccess: () =>
                 form.reset(
                     'applicant_name',
-                    'phone',
+                    'birth_date',
                     'preferred_contact_time',
                     'privacy_agreement',
-                    'third_party_agreement',
                 ),
         });
     };
@@ -156,157 +246,201 @@ export default function Welcome({ auth }) {
         <PublicLayout auth={auth}>
             <Head title="보험CC" />
 
-            <section className="bg-white">
-                <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-7xl items-center gap-10 px-5 py-14 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
-                    <div>
-                        <p className="inline-flex items-center gap-2 text-sm font-semibold text-toss-blue">
-                            <ShieldCheck className="size-4" strokeWidth={1.8} />
-                            보험을 더 명확하게
-                        </p>
-                        <h1 className="mt-4 max-w-2xl text-3xl font-bold leading-tight text-toss-grey900 sm:text-4xl lg:text-5xl">
-                            상담부터 보험점검까지 한 화면에서 차분하게 시작하세요
-                        </h1>
-                        <p className="mt-5 max-w-xl text-base leading-7 text-toss-grey600">
-                            필요한 보장만 고르고 연락처를 남기면 보험CC 상담사가 현재 상황에 맞춰 안내합니다.
-                            복잡한 설명보다 먼저 확인해야 할 선택지를 보여드립니다.
-                        </p>
+            <section className="hero-stage relative overflow-hidden bg-[#edf7f7]" aria-label="보험상품 상담 신청">
+                <div className="hero-viewport relative mx-auto min-h-[620px] max-w-[1320px] lg:h-[620px]">
+                    <div className="overflow-hidden lg:h-full">
+                        <div
+                            className="hero-track flex h-full transition-transform duration-500 ease-out"
+                            style={{ transform: `translateX(-${activeSlide * 100}%)` }}
+                        >
+                            {heroSlides.map((slide) => (
+                                <article
+                                    key={slide.label}
+                                    className={`relative min-h-[520px] w-full shrink-0 px-5 py-12 sm:px-10 lg:h-[620px] lg:px-[118px] lg:py-[72px] lg:pr-[470px] ${slide.tone}`}
+                                >
+                                    <div className="relative z-10 max-w-2xl">
+                                        <span className="text-xl font-black text-[#111111]">{slide.kicker}</span>
+                                        <h1 className="mt-8 text-4xl font-black leading-tight text-[#111111] lg:text-5xl">
+                                            {slide.title}
+                                        </h1>
+                                        <p className={`mt-4 max-w-2xl text-2xl font-black leading-snug lg:text-4xl ${slide.accent}`}>
+                                            {slide.description}
+                                        </p>
+                                        <div className="mt-7 flex flex-wrap gap-2">
+                                            {slide.tags.map((tag) => (
+                                                <span
+                                                    key={tag}
+                                                    className="rounded-full bg-white/80 px-4 py-2 text-sm font-bold text-[#555d73]"
+                                                >
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
 
-                        <div className="mt-8">
-                            <div className="flex items-center gap-2 text-sm font-semibold text-toss-grey800">
-                                <SearchCheck className="size-4 text-toss-blue" strokeWidth={1.8} />
-                                관심 상품 선택
-                            </div>
-                            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                                {productOptions.map((product) => (
-                                    <button
-                                        key={product.name}
-                                        type="button"
-                                        aria-pressed={form.data.interested_product === product.name}
-                                        onClick={() => form.setData('interested_product', product.name)}
-                                        className={`rounded-lg border p-4 text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-toss-blue ${
-                                            form.data.interested_product === product.name
-                                                ? 'border-toss-blue bg-toss-blueLight'
-                                                : 'border-toss-grey200 bg-white hover:border-toss-blue hover:bg-toss-blueLight'
-                                        }`}
-                                    >
-                                        <span className="block text-base font-semibold text-toss-grey900">
-                                            {product.name}
-                                        </span>
-                                        <span className="mt-1 block text-sm leading-5 text-toss-grey600">
-                                            {product.description}
-                                        </span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="mt-6">
-                            <Link
-                                href="/insurance-checkup"
-                                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-toss-blue px-5 py-4 text-base font-semibold text-white transition hover:bg-toss-blueHover focus:outline-none focus-visible:ring-2 focus-visible:ring-toss-blue sm:w-auto"
-                            >
-                                보험점검 바로가기
-                                <ArrowRight className="size-5" strokeWidth={1.8} />
-                            </Link>
+                                    <div className="pointer-events-none absolute bottom-10 right-[430px] hidden w-[210px] rounded-[34px] bg-white p-6 text-center shadow-[0_30px_80px_rgba(22,36,58,0.18)] lg:block">
+                                        <div className="mx-auto grid size-20 place-items-center rounded-full border-4 border-[#16243a] text-xl font-black text-[#16243a]">
+                                            <ShieldCheck className="size-9" strokeWidth={1.8} />
+                                        </div>
+                                        <strong className="mt-6 block text-lg font-black tracking-widest text-[#081a33]">
+                                            {slide.badge}
+                                        </strong>
+                                    </div>
+                                </article>
+                            ))}
                         </div>
                     </div>
 
-                    <form
-                        onSubmit={submit}
-                        className="rounded-lg border border-toss-grey200 bg-white p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
-                    >
-                        <div className="flex items-center justify-between gap-4">
-                            <div>
-                                <p className="text-sm font-semibold text-toss-blue">상담신청</p>
-                                <h2 className="mt-1 text-xl font-bold text-toss-grey900">상담 접수하기</h2>
-                            </div>
-                            <PhoneCall className="size-6 text-toss-grey700" strokeWidth={1.8} />
+                    <div className="hero-dots absolute bottom-7 left-5 z-10 flex gap-2 sm:left-10 lg:left-[118px] lg:bottom-14">
+                        {heroSlides.map((slide, index) => (
+                            <button
+                                key={slide.label}
+                                type="button"
+                                aria-label={`${slide.label} 배너 보기`}
+                                onClick={() => selectSlide(index)}
+                                className={`h-2.5 rounded-full transition-all ${
+                                    activeSlide === index ? 'w-7 bg-[#081a33]' : 'w-2.5 bg-[#c3c7c7]'
+                                }`}
+                            />
+                        ))}
+                    </div>
+
+                    <aside className="consult-panel relative z-20 mx-auto -mt-6 w-[min(100%-24px,430px)] rounded-[20px] border-4 border-[#081a33] bg-white/95 px-7 py-6 shadow-[0_18px_44px_rgba(22,36,58,0.11)] lg:absolute lg:right-[18px] lg:top-[66px] lg:mt-0 lg:w-[414px]">
+                        <div className="product-tabs grid grid-cols-3 gap-2" aria-label="보험상품 선택">
+                            {heroSlides.map((slide, index) => (
+                                <button
+                                    key={slide.label}
+                                    type="button"
+                                    aria-pressed={form.data.interested_product === slide.product}
+                                    onClick={() => selectSlide(index)}
+                                    className={`min-h-8 rounded-full border-2 border-[#081a33] px-2 text-xs font-black transition ${
+                                        form.data.interested_product === slide.product
+                                            ? 'bg-[#081a33] text-white'
+                                            : 'bg-white text-[#222222] hover:bg-[#081a33] hover:text-white'
+                                    }`}
+                                >
+                                    {slide.label}
+                                </button>
+                            ))}
                         </div>
 
-                        {flash?.success && (
-                            <div className="mt-5 rounded-lg border border-toss-blue/20 bg-toss-blueLight px-4 py-3 text-sm font-semibold text-toss-blue">
-                                {flash.success}
+                        <form onSubmit={submit} className="lead-form mt-5 grid gap-3">
+                            <div className="text-center">
+                                <strong className="inline-block border-b-4 border-[#333333] pb-1 text-2xl font-black text-[#333333]">
+                                    어떤 상품이 필요하신가요?
+                                </strong>
                             </div>
-                        )}
 
-                        <div className="mt-6 space-y-4">
-                            <label className="block">
-                                <span className="text-sm font-semibold text-toss-grey800">이름</span>
+                            {flash?.success && (
+                                <div className="rounded-lg border border-toss-blue/20 bg-toss-blueLight px-4 py-3 text-sm font-semibold text-toss-blue">
+                                    {flash.success}
+                                </div>
+                            )}
+
+                            <div className="grid gap-3 sm:grid-cols-[1fr_122px]">
+                                <label className="grid gap-1 text-xs font-bold text-[#555555]">
+                                    이름
+                                    <input
+                                        type="text"
+                                        value={form.data.applicant_name}
+                                        onChange={(event) => form.setData('applicant_name', event.target.value)}
+                                        placeholder="이름"
+                                        className="h-9 border-0 border-b border-[#d5d5d5] bg-transparent px-1 text-sm text-[#222222] focus:border-[#081a33] focus:ring-0"
+                                    />
+                                    <FieldError message={form.errors.applicant_name} />
+                                </label>
+
+                                <fieldset className="grid gap-1 text-xs font-bold text-[#555555]">
+                                    <legend className="sr-only">성별</legend>
+                                    <div className="relative mt-4 grid min-h-9 grid-cols-2 rounded-full border border-[#e4e4e4] bg-[#f2f2f2] p-1">
+                                        <span
+                                            className={`absolute left-1 top-1 h-[calc(100%-8px)] w-[calc(50%-4px)] rounded-full bg-[#081a33] shadow transition ${
+                                                gender === 'female' ? 'translate-x-full' : ''
+                                            }`}
+                                        />
+                                        {[
+                                            ['male', '남성'],
+                                            ['female', '여성'],
+                                        ].map(([value, label]) => (
+                                            <button
+                                                key={value}
+                                                type="button"
+                                                onClick={() => setGender(value)}
+                                                className={`relative z-10 rounded-full text-xs font-black transition ${
+                                                    gender === value ? 'text-white' : 'text-[#777777]'
+                                                }`}
+                                            >
+                                                {label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </fieldset>
+                            </div>
+
+                            <label className="grid gap-1 text-xs font-bold text-[#555555]">
+                                생년월일
                                 <input
-                                    type="text"
-                                    value={form.data.applicant_name}
-                                    onChange={(event) => form.setData('applicant_name', event.target.value)}
-                                    placeholder="홍길동"
-                                    className="mt-2 w-full rounded-lg border-toss-grey200 bg-toss-grey50 text-toss-grey800 placeholder:text-toss-grey500 focus:border-toss-blue focus:ring-toss-blue"
+                                    type="date"
+                                    value={form.data.birth_date}
+                                    onChange={(event) => form.setData('birth_date', event.target.value)}
+                                    className="h-9 border-0 border-b border-[#d5d5d5] bg-transparent px-1 text-sm text-[#222222] focus:border-[#081a33] focus:ring-0"
                                 />
-                                <FieldError message={form.errors.applicant_name} />
+                                <FieldError message={form.errors.birth_date} />
                             </label>
-                            <label className="block">
-                                <span className="text-sm font-semibold text-toss-grey800">연락처</span>
+
+                            <label className="grid gap-1 text-xs font-bold text-[#555555]">
+                                휴대폰번호
                                 <input
                                     type="tel"
                                     value={form.data.phone}
-                                    onChange={(event) => form.setData('phone', event.target.value)}
-                                    placeholder="010-0000-0000"
-                                    className="mt-2 w-full rounded-lg border-toss-grey200 bg-toss-grey50 text-toss-grey800 placeholder:text-toss-grey500 focus:border-toss-blue focus:ring-toss-blue"
+                                    inputMode="numeric"
+                                    autoComplete="tel"
+                                    onChange={(event) => form.setData('phone', formatPhone(event.target.value))}
+                                    onFocus={() => {
+                                        if (!form.data.phone.startsWith('010-')) {
+                                            form.setData('phone', '010-');
+                                        }
+                                    }}
+                                    className="h-9 border-0 border-b border-[#d5d5d5] bg-transparent px-1 text-sm text-[#222222] focus:border-[#081a33] focus:ring-0"
                                 />
                                 <FieldError message={form.errors.phone} />
                             </label>
-                            <label className="block">
-                                <span className="text-sm font-semibold text-toss-grey800">상담 희망 상품</span>
-                                <select
-                                    value={form.data.interested_product}
-                                    onChange={(event) => form.setData('interested_product', event.target.value)}
-                                    className="mt-2 w-full rounded-lg border-toss-grey200 bg-toss-grey50 text-toss-grey800 focus:border-toss-blue focus:ring-toss-blue"
-                                >
-                                    {productOptions.map((product) => (
-                                        <option key={product.name}>{product.name}</option>
-                                    ))}
-                                </select>
-                            </label>
-                            <label className="block">
-                                <span className="text-sm font-semibold text-toss-grey800">희망 연락 시간</span>
+
+                            <label className="mt-1 flex items-center gap-2 text-sm font-black text-[#222222]">
                                 <input
-                                    type="text"
-                                    value={form.data.preferred_contact_time}
-                                    onChange={(event) => form.setData('preferred_contact_time', event.target.value)}
-                                    placeholder="예: 평일 오후 2시 이후"
-                                    className="mt-2 w-full rounded-lg border-toss-grey200 bg-toss-grey50 text-toss-grey800 placeholder:text-toss-grey500 focus:border-toss-blue focus:ring-toss-blue"
+                                    type="checkbox"
+                                    checked={form.data.privacy_agreement}
+                                    onChange={(event) => form.setData('privacy_agreement', event.target.checked)}
+                                    className="size-6 rounded border-[#d5d5d5] text-[#081a33] focus:ring-[#081a33]"
                                 />
+                                개인정보 수집 및 이용동의
                             </label>
-                        </div>
+                            <FieldError message={form.errors.privacy_agreement} />
 
-                        <label className="mt-5 flex items-start gap-3 text-sm leading-6 text-toss-grey700">
-                            <input
-                                type="checkbox"
-                                checked={form.data.privacy_agreement}
-                                onChange={(event) => form.setData('privacy_agreement', event.target.checked)}
-                                className="mt-1 rounded border-toss-grey300 text-toss-blue focus:ring-toss-blue"
-                            />
-                            개인정보 수집 및 이용에 동의합니다.
-                        </label>
-                        <FieldError message={form.errors.privacy_agreement} />
-
-                        <label className="mt-3 flex items-start gap-3 text-sm leading-6 text-toss-grey700">
-                            <input
-                                type="checkbox"
-                                checked={form.data.third_party_agreement}
-                                onChange={(event) => form.setData('third_party_agreement', event.target.checked)}
-                                className="mt-1 rounded border-toss-grey300 text-toss-blue focus:ring-toss-blue"
-                            />
-                            상담 배정을 위한 제3자 제공에 동의합니다.
-                        </label>
-
-                        <button
-                            type="submit"
-                            disabled={form.processing}
-                            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-toss-grey900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-toss-grey800 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                            {form.processing ? '접수 중' : '상담 접수하기'}
-                            <CheckCircle2 className="size-4" strokeWidth={1.8} />
-                        </button>
-                    </form>
+                            <button
+                                type="submit"
+                                disabled={form.processing}
+                                className="min-h-12 rounded-lg bg-[#081a33] text-base font-black text-white transition hover:bg-[#0f2b52] disabled:opacity-60"
+                            >
+                                {form.processing ? '접수 중' : '빠른 상담신청'}
+                            </button>
+                            <p className="text-xs font-bold leading-5 text-[#4b4b4b]">
+                                입력하신 정보는 상담 목적 외에 사용하지 않습니다.
+                            </p>
+                        </form>
+                    </aside>
                 </div>
+            </section>
+
+            <section className="mx-auto my-12 grid max-w-6xl grid-cols-2 gap-3 px-5 sm:grid-cols-4 lg:grid-cols-8">
+                {[...heroSlides.map((slide) => slide.label), '보장분석', '포인트몰'].map((label) => (
+                    <button key={label} type="button" className="grid place-items-center gap-2">
+                        <span className="grid size-16 place-items-center rounded-full bg-[#eeeeee] text-xl font-black text-[#081a33] shadow-[inset_0_0_0_8px_#f7f7f7]">
+                            {label.slice(0, 1)}
+                        </span>
+                        <strong className="text-sm font-black text-[#333333]">{label}</strong>
+                    </button>
+                ))}
             </section>
 
             <section className="border-y border-toss-grey200 bg-toss-grey50">
@@ -314,7 +448,7 @@ export default function Welcome({ auth }) {
                     <div className="grid gap-4 md:grid-cols-2">
                         <BannerStrip
                             icon={Sparkles}
-                            title="오늘의 맞춤 보험점검"
+                            title="오늘의 맞춤 보험진단"
                             description="가입 내역을 정리하고 부족한 보장만 빠르게 확인하세요."
                             href="/insurance-checkup"
                         />
@@ -398,7 +532,7 @@ export default function Welcome({ auth }) {
                     <SectionHeader
                         eyebrow="Event"
                         title="진행 중인 이벤트"
-                        description="상담과 보험점검을 가볍게 시작할 수 있는 혜택입니다."
+                        description="상담과 보험진단을 가볍게 시작할 수 있는 혜택입니다."
                         href="/events"
                     />
                     <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -422,7 +556,7 @@ export default function Welcome({ auth }) {
                         <SectionHeader
                             eyebrow="Knowledge"
                             title="보험지식인"
-                            description="자주 올라오는 보험 질문을 짧게 정리했습니다."
+                            description="자주 헷갈리는 보험 질문을 쉽게 정리했습니다."
                             href="/knowledge"
                         />
                         <div className="mt-8 space-y-3">
