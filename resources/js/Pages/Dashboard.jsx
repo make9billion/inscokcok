@@ -16,8 +16,8 @@ export default function Dashboard({ summary, recentPointEntries = [] }) {
         {
             label: '보유 포인트',
             value: `${formatNumber(summary?.pointBalance)}P`,
-            href: '/point-mall',
-            action: '포인트몰 보기',
+            href: '/mypage/points',
+            action: '포인트 내역 보기',
         },
         {
             label: '상담 신청',
@@ -29,7 +29,7 @@ export default function Dashboard({ summary, recentPointEntries = [] }) {
             label: 'Q&A',
             value: `${formatNumber(summary?.questionCount)}건`,
             href: '/knowledge',
-            action: '지식센터 보기',
+            action: '지식인 보기',
         },
         {
             label: '주문 내역',
@@ -41,27 +41,19 @@ export default function Dashboard({ summary, recentPointEntries = [] }) {
 
     return (
         <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    내정보
-                </h2>
-            }
+            header={<h2 className="text-xl font-semibold leading-tight text-gray-800">마이페이지</h2>}
         >
-            <Head title="내정보" />
+            <Head title="마이페이지" />
 
             <div className="py-8">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="space-y-6 px-4 sm:px-0">
                         <div className="flex flex-col justify-between gap-4 border-b border-gray-200 pb-6 sm:flex-row sm:items-end">
                             <div>
-                                <p className="text-sm font-medium text-blue-600">
-                                    회원 대시보드
-                                </p>
-                                <h1 className="mt-2 text-2xl font-bold leading-8 text-gray-900">
-                                    내정보
-                                </h1>
+                                <p className="text-sm font-medium text-blue-600">회원 대시보드</p>
+                                <h1 className="mt-2 text-2xl font-bold leading-8 text-gray-900">마이페이지</h1>
                                 <p className="mt-2 text-sm leading-6 text-gray-600">
-                                    상담, 포인트, 주문 현황을 한곳에서 확인하세요.
+                                    상담, 포인트, 주문 현황을 한 곳에서 확인하세요.
                                 </p>
                             </div>
 
@@ -80,25 +72,25 @@ export default function Dashboard({ summary, recentPointEntries = [] }) {
                                     href={card.href}
                                     className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200 transition hover:-translate-y-0.5 hover:shadow-md"
                                 >
-                                    <div className="text-sm font-medium text-gray-600">
-                                        {card.label}
-                                    </div>
+                                    <div className="text-sm font-medium text-gray-600">{card.label}</div>
                                     <div className="mt-3 text-2xl font-bold tracking-normal text-gray-900">
                                         {card.value}
                                     </div>
-                                    <div className="mt-4 text-sm font-semibold text-blue-600">
-                                        {card.action}
-                                    </div>
+                                    <div className="mt-4 text-sm font-semibold text-blue-600">{card.action}</div>
                                 </Link>
                             ))}
                         </div>
 
                         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
                             <section className="rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
-                                <div className="border-b border-gray-100 px-5 py-4">
-                                    <h3 className="text-base font-semibold text-gray-900">
-                                        최근 포인트 내역
-                                    </h3>
+                                <div className="flex items-center justify-between gap-4 border-b border-gray-100 px-5 py-4">
+                                    <h3 className="text-base font-semibold text-gray-900">최근 포인트 내역</h3>
+                                    <Link
+                                        href="/mypage/points"
+                                        className="text-sm font-semibold text-blue-600 hover:text-blue-700"
+                                    >
+                                        전체보기
+                                    </Link>
                                 </div>
 
                                 {recentPointEntries.length > 0 ? (
@@ -126,9 +118,7 @@ export default function Dashboard({ summary, recentPointEntries = [] }) {
                                                     </div>
                                                     <div
                                                         className={`text-base font-bold tabular-nums ${
-                                                            isPositive
-                                                                ? 'text-blue-600'
-                                                                : 'text-gray-900'
+                                                            isPositive ? 'text-blue-600' : 'text-gray-900'
                                                         }`}
                                                     >
                                                         {isPositive ? '+' : ''}
@@ -146,9 +136,7 @@ export default function Dashboard({ summary, recentPointEntries = [] }) {
                             </section>
 
                             <section className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
-                                <h3 className="text-base font-semibold text-gray-900">
-                                    바로가기
-                                </h3>
+                                <h3 className="text-base font-semibold text-gray-900">바로가기</h3>
                                 <div className="mt-4 grid gap-2">
                                     <Link
                                         href="/insurance-checkup"
@@ -160,7 +148,7 @@ export default function Dashboard({ summary, recentPointEntries = [] }) {
                                         href="/knowledge"
                                         className="rounded border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-800 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
                                     >
-                                        지식 Q&A
+                                        지식인 Q&A
                                     </Link>
                                     <Link
                                         href="/point-mall"
