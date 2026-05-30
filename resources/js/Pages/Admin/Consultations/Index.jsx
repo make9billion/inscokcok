@@ -1,7 +1,42 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
+import { Search, X } from 'lucide-react';
+import { useState } from 'react';
 
-export default function Index({ consultations }) {
+const statusStyles = {
+    received: 'bg-blue-50 text-blue-700',
+    assigned: 'bg-indigo-50 text-indigo-700',
+    in_progress: 'bg-amber-50 text-amber-700',
+    completed: 'bg-emerald-50 text-emerald-700',
+    cancelled: 'bg-gray-100 text-gray-600',
+};
+
+export default function Index({ consultations, filters, statusOptions }) {
+    const [search, setSearch] = useState(filters.search ?? '');
+    const [status, setStatus] = useState(filters.status ?? '');
+
+    const applyFilters = (event) => {
+        event.preventDefault();
+
+        router.get(
+            route('admin.consultations.index'),
+            {
+                search: search || undefined,
+                status: status || undefined,
+            },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
+
+    const resetFilters = () => {
+        setSearch('');
+        setStatus('');
+        router.get(route('admin.consultations.index'), {}, { preserveState: true, replace: true });
+    };
+
     return (
         <AuthenticatedLayout
             header={<h2 className="text-xl font-semibold leading-tight text-gray-800">상담 관리</h2>}
@@ -12,8 +47,65 @@ export default function Index({ consultations }) {
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                     <div className="overflow-hidden rounded-lg bg-white shadow-sm">
                         <div className="border-b border-gray-100 px-5 py-4">
-                            <h3 className="text-base font-semibold text-gray-900">상담 접수 목록</h3>
-                            <p className="mt-1 text-sm text-gray-500">최근 접수된 상담 50건을 확인합니다.</p>
+                            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                                <div>
+                                    <h3 className="text-base font-semibold text-gray-900">상담 접수 목록</h3>
+                                    <p className="mt-1 text-sm text-gray-500">
+                                        최근 접수된 상담 50건을 확인하고 상태별로 빠르게 좁혀볼 수 있습니다.
+                                    </p>
+                                </div>
+
+                                <form onSubmit={applyFilters} className="flex flex-col gap-2 sm:flex-row">
+                                    <label className="sr-only" htmlFor="consultation-search">
+                                        이름, 연락처, 상품 검색
+                                    </label>
+                                    <div className="relative">
+                                        <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+                                        <input
+                                            id="consultation-search"
+                                            type="search"
+                                            value={search}
+                                            onChange={(event) => setSearch(event.target.value)}
+                                            placeholder="이름, 연락처, 상품"
+                                            className="h-10 w-full rounded-lg border-gray-300 pl-9 text-sm focus:border-toss-blue focus:ring-toss-blue sm:w-56"
+                                        />
+                                    </div>
+
+                                    <label className="sr-only" htmlFor="consultation-status">
+                                        상태
+                                    </label>
+                                    <select
+                                        id="consultation-status"
+                                        value={status}
+                                        onChange={(event) => setStatus(event.target.value)}
+                                        className="h-10 rounded-lg border-gray-300 text-sm focus:border-toss-blue focus:ring-toss-blue"
+                                    >
+                                        <option value="">전체 상태</option>
+                                        {statusOptions.map((option) => (
+                                            <option key={option.value} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    <button
+                                        type="submit"
+                                        className="h-10 rounded-lg bg-gray-900 px-4 text-sm font-semibold text-white transition hover:bg-gray-700"
+                                    >
+                                        검색
+                                    </button>
+                                    {(filters.search || filters.status) && (
+                                        <button
+                                            type="button"
+                                            onClick={resetFilters}
+                                            className="inline-flex h-10 items-center justify-center rounded-lg border border-gray-300 px-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                                            aria-label="필터 초기화"
+                                        >
+                                            <X className="size-4" />
+                                        </button>
+                                    )}
+                                </form>
+                            </div>
                         </div>
 
                         <div className="overflow-x-auto">
@@ -52,7 +144,11 @@ export default function Index({ consultations }) {
                                                 {consultation.interestedProduct ?? '보험점검'}
                                             </td>
                                             <td className="whitespace-nowrap px-5 py-4 text-sm">
-                                                <span className="rounded-lg bg-toss-blueLight px-2 py-1 font-semibold text-toss-blue">
+                                                <span
+                                                    className={`rounded-lg px-2 py-1 font-semibold ${
+                                                        statusStyles[consultation.status] ?? 'bg-gray-100 text-gray-700'
+                                                    }`}
+                                                >
                                                     {consultation.statusLabel}
                                                 </span>
                                             </td>
@@ -67,7 +163,7 @@ export default function Index({ consultations }) {
 
                         {consultations.length === 0 && (
                             <div className="px-5 py-12 text-center text-sm text-gray-500">
-                                아직 접수된 상담이 없습니다.
+                                조건에 맞는 상담 접수가 없습니다.
                             </div>
                         )}
                     </div>

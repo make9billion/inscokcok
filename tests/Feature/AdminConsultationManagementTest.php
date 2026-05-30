@@ -45,6 +45,34 @@ class AdminConsultationManagementTest extends TestCase
         );
     }
 
+    public function test_admin_can_filter_consultations_by_status_and_search_keyword(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $matching = Consultation::factory()->create([
+            'applicant_name' => '김필터',
+            'phone' => '010-2222-3333',
+            'status' => ConsultationStatus::Assigned,
+            'interested_product' => '간병보험',
+        ]);
+        Consultation::factory()->create([
+            'applicant_name' => '박제외',
+            'phone' => '010-9999-8888',
+            'status' => ConsultationStatus::Received,
+            'interested_product' => '암보험',
+        ]);
+
+        $response = $this->actingAs($admin)->get('/admin/consultations?status=assigned&search=필터');
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('Admin/Consultations/Index')
+            ->where('filters.status', 'assigned')
+            ->where('filters.search', '필터')
+            ->where('consultations.0.id', $matching->id)
+            ->has('consultations', 1)
+        );
+    }
+
     public function test_admin_can_update_consultation_status_and_log_change(): void
     {
         $admin = User::factory()->admin()->create();

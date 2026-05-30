@@ -21,12 +21,35 @@ class ConsultationManagementController extends Controller
     {
         $this->authorizeAdmin($request);
 
+        $validated = $request->validate([
+            'status' => ['nullable', new Enum(ConsultationStatus::class)],
+            'search' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        $status = $validated['status'] ?? null;
+        $search = trim((string) ($validated['search'] ?? ''));
+
         return Inertia::render('Admin/Consultations/Index', [
             'consultations' => Consultation::query()
+                ->when($status, fn ($query) => $query->where('status', $status))
+                ->when($search !== '', fn ($query) => $query->where(function ($query) use ($search) {
+                    $query
+                        ->where('applicant_name', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhere('interested_product', 'like', "%{$search}%");
+                }))
                 ->latest()
                 ->take(50)
                 ->get()
                 ->map(fn (Consultation $consultation) => $this->serializeConsultation($consultation)),
+            'filters' => [
+                'status' => $status,
+                'search' => $search,
+            ],
+            'statusOptions' => collect(ConsultationStatus::cases())->map(fn (ConsultationStatus $status) => [
+                'value' => $status->value,
+                'label' => $this->statusLabel($status),
+            ]),
         ]);
     }
 
