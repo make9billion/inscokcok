@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\Admin\ConsultationManagementController;
+use App\Http\Controllers\Admin\EventManagementController;
 use App\Http\Controllers\MemberPointController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -59,6 +60,10 @@ Route::middleware('auth')->group(function () {
         ->name('admin.consultations.show');
     Route::patch('/admin/consultations/{consultation}', [ConsultationManagementController::class, 'update'])
         ->name('admin.consultations.update');
+    Route::get('/admin/events', [EventManagementController::class, 'index'])
+        ->name('admin.events.index');
+    Route::patch('/admin/events/{event}', [EventManagementController::class, 'update'])
+        ->name('admin.events.update');
 });
 
 require __DIR__.'/auth.php';
