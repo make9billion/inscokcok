@@ -136,7 +136,7 @@ Build image-backed pages for:
 - cancer insurance
 - dementia/care insurance
 - disease/accident insurance
-- dementia insurance
+- dental insurance
 - pet insurance
 - child insurance
 - insurance checkup guide

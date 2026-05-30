@@ -3,6 +3,7 @@ import { ChevronDown, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
 import { primaryNavigation } from '@/Constants/siteNavigation';
+import logoUrl from '../../images/logo/logo.png';
 
 function DesktopNavigationItem({ item }) {
     if (!item.children) {
@@ -86,9 +87,9 @@ export default function SiteHeader({ auth }) {
             <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-6 lg:px-8">
                 <Link
                     href="/"
-                    className="rounded text-lg font-bold text-toss-grey900 focus:outline-none focus-visible:ring-2 focus-visible:ring-toss-blue"
+                    className="inline-flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-toss-blue"
                 >
-                    보흠CC
+                    <img src={logoUrl} alt="보험CC" className="h-9 w-auto" />
                 </Link>
 
                 <nav className="hidden items-center gap-1 lg:flex" aria-label="주요 메뉴">

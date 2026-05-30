@@ -46,7 +46,7 @@ Top-level desktop menu, in order:
   - 암보험 -> `/insurance/cancer`
   - 치매/간병보험 -> `/insurance/dementia-care`
   - 질병/상해보험 -> `/insurance/disease-accident`
-  - 치매보험 -> `/insurance/dementia`
+  - 치아보험 -> `/insurance/dental`
   - 펫보험 -> `/insurance/pet`
   - 어린이보험 -> `/insurance/child`
 - 보험점검 -> `/insurance-checkup`
@@ -259,4 +259,3 @@ Expected:
 - Laravel tests pass.
 - Vite build passes.
 - Playwright remains skipped until config exists.
-

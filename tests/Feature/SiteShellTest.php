@@ -37,4 +37,26 @@ class SiteShellTest extends TestCase
         $this->assertStringNotContainsString('href="/notices"', $source);
         $this->assertStringNotContainsString('href="/customer-center"', $source);
     }
+
+    public function test_insurance_product_navigation_uses_dental_insurance(): void
+    {
+        $source = file_get_contents(resource_path('js/Constants/siteNavigation.js'));
+
+        $this->assertStringContainsString('치아보험', $source);
+        $this->assertStringContainsString('/insurance/dental', $source);
+        $this->assertStringNotContainsString('치매보험', $source);
+        $this->assertStringNotContainsString('/insurance/dementia\'', $source);
+    }
+
+    public function test_static_image_insurance_pages_render(): void
+    {
+        $response = $this->get('/insurance/dental');
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('StaticImagePage')
+            ->where('title', '치아보험')
+            ->where('images.0', 'dental-insurance/01.png')
+        );
+    }
 }

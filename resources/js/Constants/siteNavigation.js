@@ -2,7 +2,7 @@ export const insuranceProductLinks = [
     { label: '암보험', href: '/insurance/cancer' },
     { label: '치매/간병보험', href: '/insurance/dementia-care' },
     { label: '질병/상해보험', href: '/insurance/disease-accident' },
-    { label: '치매보험', href: '/insurance/dementia' },
+    { label: '치아보험', href: '/insurance/dental' },
     { label: '펫보험', href: '/insurance/pet' },
     { label: '어린이보험', href: '/insurance/child' },
 ];
