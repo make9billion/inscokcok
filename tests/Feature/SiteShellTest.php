@@ -24,7 +24,16 @@ class SiteShellTest extends TestCase
         $this->assertStringContainsString('consult-panel', $source);
         $this->assertStringContainsString('product-tabs', $source);
         $this->assertStringContainsString('lead-form', $source);
-        $this->assertStringContainsString('어떤 상품이 필요하신가요?', $source);
+        $this->assertStringContainsString('암보험', $source);
+        $this->assertStringContainsString('치매/간병보험', $source);
+        $this->assertStringContainsString('질병/상해보험', $source);
+        $this->assertStringContainsString('치아보험', $source);
+        $this->assertStringContainsString('펫보험', $source);
+        $this->assertStringContainsString('어린이보험', $source);
+        $this->assertStringContainsString('보험점검', $source);
+        $this->assertStringContainsString('제3자 정보제공 동의', $source);
+        $this->assertStringNotContainsString('성별', $source);
+        $this->assertStringNotContainsString('생년월일', $source);
         $this->assertStringContainsString('form.post(route(\'consultations.store\')', $source);
         $this->assertStringContainsString('aria-pressed={form.data.interested_product === slide.product}', $source);
         $this->assertStringContainsString('실시간 상담 접수 현황', $source);

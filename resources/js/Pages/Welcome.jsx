@@ -26,26 +26,37 @@ const heroSlides = [
         badge: 'CANCER',
     },
     {
-        label: '종신보험',
-        product: '종신보험',
-        kicker: '가족을 위한 장기 플랜',
-        title: '종신보험, 오래갈 계획부터.',
-        description: '사망보장, 납입 여력, 가족 상황을 함께 보고 유지 가능한 방향으로 정리합니다.',
-        tags: ['가족보장', '납입관리', '상속 대비'],
-        tone: 'bg-[#eef3fb]',
-        accent: 'text-[#51657e]',
-        badge: 'LIFE',
+        label: '치매/간병보험',
+        product: '치매/간병보험',
+        kicker: '긴 돌봄의 시간을 대비',
+        title: '치매/간병보험, 가족 부담까지 생각합니다.',
+        description: '간병비, 요양, 치매 관련 보장을 현재 가족 상황에 맞춰 현실적으로 정리합니다.',
+        tags: ['간병비', '치매보장', '부모님 상담'],
+        tone: 'bg-[#f0faf6]',
+        accent: 'text-[#39806c]',
+        badge: 'CARE',
     },
     {
-        label: '어린이보험',
-        product: '어린이보험',
-        kicker: '성장 단계별 보장',
-        title: '어린이보험, 필요한 때를 놓치지 않게.',
-        description: '태아부터 청소년기까지 치료비, 진단비, 생활 보장을 한눈에 비교합니다.',
-        tags: ['태아 상담', '성장기 보장', '부모 부담 절감'],
+        label: '질병/상해보험',
+        product: '질병/상해보험',
+        kicker: '입원과 수술 보장 점검',
+        title: '질병과 상해, 빈틈없이 준비하세요.',
+        description: '입원비, 수술비, 후유장해 보장을 생활 패턴과 예산에 맞춰 비교합니다.',
+        tags: ['입원비', '수술비', '후유장해'],
+        tone: 'bg-[#eef3fb]',
+        accent: 'text-[#51657e]',
+        badge: 'HEALTH',
+    },
+    {
+        label: '치아보험',
+        product: '치아보험',
+        kicker: '치료비 부담을 가볍게',
+        title: '치아보험, 필요한 치료 중심으로.',
+        description: '보존치료, 보철치료, 임플란트 보장을 연령과 치료 계획에 맞춰 확인합니다.',
+        tags: ['보존치료', '보철치료', '임플란트'],
         tone: 'bg-[#fff8ec]',
         accent: 'text-[#c06d2b]',
-        badge: 'KIDS',
+        badge: 'DENTAL',
     },
     {
         label: '펫보험',
@@ -59,33 +70,22 @@ const heroSlides = [
         badge: 'PET',
     },
     {
-        label: '변액보험',
-        product: '변액보험',
-        kicker: '목적과 기간을 먼저',
-        title: '변액보험, 이해하고 선택하세요.',
-        description: '투자 성향, 유지 기간, 수수료 구조를 함께 확인해 무리 없는 선택을 돕습니다.',
-        tags: ['장기 목적', '투자 성향', '수익률 평가'],
+        label: '어린이보험',
+        product: '어린이보험',
+        kicker: '성장 단계별 보장',
+        title: '어린이보험, 필요한 때를 놓치지 않게.',
+        description: '태아부터 청소년기까지 치료비, 진단비, 생활 보장을 한눈에 비교합니다.',
+        tags: ['태아 상담', '성장기 보장', '부모 부담 절감'],
         tone: 'bg-[#eef8ff]',
         accent: 'text-[#2f76a8]',
-        badge: 'FUND',
-    },
-    {
-        label: '간병보험',
-        product: '간병보험',
-        kicker: '긴 돌봄의 시간을 대비',
-        title: '간병보험, 가족 부담까지 생각합니다.',
-        description: '간병비, 요양, 치매 관련 보장을 현재 가족 상황에 맞춰 현실적으로 정리합니다.',
-        tags: ['간병비', '치매보장', '부모님 상담'],
-        tone: 'bg-[#f0faf6]',
-        accent: 'text-[#39806c]',
-        badge: 'CARE',
+        badge: 'KIDS',
     },
 ];
 
 const rollingReceiptRows = [
     { name: '김*현', product: '암보험', status: '상담사 배정 완료', time: '1분 전' },
     { name: '박*준', product: '질병/상해보험', status: '보장 분석 중', time: '4분 전' },
-    { name: '이*지', product: '간병보험', status: '전화 상담 예약', time: '8분 전' },
+    { name: '이*지', product: '치매/간병보험', status: '전화 상담 예약', time: '8분 전' },
     { name: '최*민', product: '펫보험', status: '접수 확인', time: '12분 전' },
 ];
 
@@ -198,7 +198,6 @@ function BannerStrip({ icon: Icon, title, description, href }) {
 export default function Welcome({ auth }) {
     const { flash } = usePage().props;
     const [activeSlide, setActiveSlide] = useState(0);
-    const [gender, setGender] = useState('male');
     const activeProduct = heroSlides[activeSlide];
     const form = useForm({
         type: 'product',
@@ -235,9 +234,9 @@ export default function Welcome({ auth }) {
             onSuccess: () =>
                 form.reset(
                     'applicant_name',
-                    'birth_date',
                     'preferred_contact_time',
                     'privacy_agreement',
+                    'third_party_agreement',
                 ),
         });
     };
@@ -322,6 +321,12 @@ export default function Welcome({ auth }) {
                                     {slide.label}
                                 </button>
                             ))}
+                            <Link
+                                href="/insurance-checkup"
+                                className="col-span-3 inline-flex min-h-10 items-center justify-center rounded-full border-2 border-[#081a33] bg-[#eef3fb] px-3 text-sm font-black text-[#081a33] transition hover:bg-[#081a33] hover:text-white"
+                            >
+                                보험점검
+                            </Link>
                         </div>
 
                         <form onSubmit={submit} className="lead-form mt-5 grid gap-3">
@@ -337,55 +342,16 @@ export default function Welcome({ auth }) {
                                 </div>
                             )}
 
-                            <div className="grid gap-3 sm:grid-cols-[1fr_122px]">
-                                <label className="grid gap-1 text-xs font-bold text-[#555555]">
-                                    이름
-                                    <input
-                                        type="text"
-                                        value={form.data.applicant_name}
-                                        onChange={(event) => form.setData('applicant_name', event.target.value)}
-                                        placeholder="이름"
-                                        className="h-9 border-0 border-b border-[#d5d5d5] bg-transparent px-1 text-sm text-[#222222] focus:border-[#081a33] focus:ring-0"
-                                    />
-                                    <FieldError message={form.errors.applicant_name} />
-                                </label>
-
-                                <fieldset className="grid gap-1 text-xs font-bold text-[#555555]">
-                                    <legend className="sr-only">성별</legend>
-                                    <div className="relative mt-4 grid min-h-9 grid-cols-2 rounded-full border border-[#e4e4e4] bg-[#f2f2f2] p-1">
-                                        <span
-                                            className={`absolute left-1 top-1 h-[calc(100%-8px)] w-[calc(50%-4px)] rounded-full bg-[#081a33] shadow transition ${
-                                                gender === 'female' ? 'translate-x-full' : ''
-                                            }`}
-                                        />
-                                        {[
-                                            ['male', '남성'],
-                                            ['female', '여성'],
-                                        ].map(([value, label]) => (
-                                            <button
-                                                key={value}
-                                                type="button"
-                                                onClick={() => setGender(value)}
-                                                className={`relative z-10 rounded-full text-xs font-black transition ${
-                                                    gender === value ? 'text-white' : 'text-[#777777]'
-                                                }`}
-                                            >
-                                                {label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </fieldset>
-                            </div>
-
                             <label className="grid gap-1 text-xs font-bold text-[#555555]">
-                                생년월일
+                                이름
                                 <input
-                                    type="date"
-                                    value={form.data.birth_date}
-                                    onChange={(event) => form.setData('birth_date', event.target.value)}
+                                    type="text"
+                                    value={form.data.applicant_name}
+                                    onChange={(event) => form.setData('applicant_name', event.target.value)}
+                                    placeholder="이름"
                                     className="h-9 border-0 border-b border-[#d5d5d5] bg-transparent px-1 text-sm text-[#222222] focus:border-[#081a33] focus:ring-0"
                                 />
-                                <FieldError message={form.errors.birth_date} />
+                                <FieldError message={form.errors.applicant_name} />
                             </label>
 
                             <label className="grid gap-1 text-xs font-bold text-[#555555]">
@@ -416,6 +382,17 @@ export default function Welcome({ auth }) {
                                 개인정보 수집 및 이용동의
                             </label>
                             <FieldError message={form.errors.privacy_agreement} />
+
+                            <label className="flex items-center gap-2 text-sm font-black text-[#222222]">
+                                <input
+                                    type="checkbox"
+                                    checked={form.data.third_party_agreement}
+                                    onChange={(event) => form.setData('third_party_agreement', event.target.checked)}
+                                    className="size-6 rounded border-[#d5d5d5] text-[#081a33] focus:ring-[#081a33]"
+                                />
+                                제3자 정보제공 동의
+                            </label>
+                            <FieldError message={form.errors.third_party_agreement} />
 
                             <button
                                 type="submit"
