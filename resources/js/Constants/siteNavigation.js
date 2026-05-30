@@ -29,5 +29,4 @@ export const primaryNavigation = [
         href: '/customer',
         children: customerCenterLinks,
     },
-    { label: '내정보', href: '/mypage' },
 ];

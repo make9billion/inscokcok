@@ -47,6 +47,18 @@ class SiteShellTest extends TestCase
         $this->assertStringNotContainsString('href="/customer-center"', $source);
     }
 
+    public function test_site_navigation_excludes_my_info_top_level_link(): void
+    {
+        $navigation = file_get_contents(resource_path('js/Constants/siteNavigation.js'));
+        $header = file_get_contents(resource_path('js/Components/SiteHeader.jsx'));
+
+        $this->assertStringNotContainsString('내정보', $navigation);
+        $this->assertStringNotContainsString("href: '/mypage'", $navigation);
+        $this->assertStringContainsString('마이페이지', $header);
+        $this->assertStringNotContainsString('대시보드', $header);
+        $this->assertStringNotContainsString('profile.edit', $header);
+    }
+
     public function test_insurance_product_navigation_uses_dental_insurance(): void
     {
         $source = file_get_contents(resource_path('js/Constants/siteNavigation.js'));

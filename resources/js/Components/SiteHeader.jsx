@@ -51,10 +51,7 @@ function AuthLinks({ auth, mobile = false }) {
         return (
             <div className={mobile ? 'space-y-1' : 'flex items-center gap-1'}>
                 <Link href={route('dashboard')} className={baseClass}>
-                    대시보드
-                </Link>
-                <Link href={route('profile.edit')} className={baseClass}>
-                    내정보
+                    마이페이지
                 </Link>
             </div>
         );
