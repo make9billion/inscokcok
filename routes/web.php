@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\EventManagementController;
 use App\Http\Controllers\Admin\KnowledgeAnswerController;
 use App\Http\Controllers\KnowledgeQuestionController;
 use App\Http\Controllers\MemberPointController;
+use App\Http\Controllers\PointMallController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -27,6 +28,8 @@ Route::get('/insurance-checkup', function () {
 Route::post('/consultations', [ConsultationController::class, 'store'])
     ->name('consultations.store');
 Route::get('/knowledge', [KnowledgeQuestionController::class, 'index'])->name('knowledge.index');
+Route::get('/point-mall', [PointMallController::class, 'index'])->name('point-mall.index');
+Route::get('/point-mall/products/{slug}', [PointMallController::class, 'show'])->name('point-mall.products.show');
 
 Route::get('/dashboard', function () {
     $user = request()->user();
