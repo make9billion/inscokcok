@@ -15,7 +15,26 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    $user = request()->user();
+
+    return Inertia::render('Dashboard', [
+        'summary' => [
+            'pointBalance' => (int) $user->pointLedgerEntries()->sum('points'),
+            'consultationCount' => $user->consultations()->count(),
+            'questionCount' => $user->knowledgeQuestions()->count(),
+            'orderCount' => $user->pointMallOrders()->count(),
+        ],
+        'recentPointEntries' => $user->pointLedgerEntries()
+            ->latest()
+            ->take(5)
+            ->get(['type', 'points', 'memo', 'created_at'])
+            ->map(fn ($entry) => [
+                'type' => $entry->type->value,
+                'points' => $entry->points,
+                'memo' => $entry->memo,
+                'createdAt' => $entry->created_at?->format('Y-m-d'),
+            ]),
+    ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
