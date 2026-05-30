@@ -49,6 +49,8 @@ class KnowledgeQuestionController extends Controller
     {
         abort_unless($request->user()?->id === $question->user_id, 403);
 
+        $question->load('answer.manager');
+
         return Inertia::render('Knowledge/Show', [
             'question' => [
                 'id' => $question->id,
@@ -57,6 +59,11 @@ class KnowledgeQuestionController extends Controller
                 'title' => $question->title,
                 'body' => $question->body,
                 'createdAt' => $question->created_at?->format('Y-m-d H:i'),
+                'answer' => $question->answer ? [
+                    'body' => $question->answer->body,
+                    'managerName' => $question->answer->manager?->name,
+                    'createdAt' => $question->answer->created_at?->format('Y-m-d H:i'),
+                ] : null,
             ],
         ]);
     }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\Admin\ConsultationManagementController;
 use App\Http\Controllers\Admin\EventManagementController;
+use App\Http\Controllers\Admin\KnowledgeAnswerController;
 use App\Http\Controllers\KnowledgeQuestionController;
 use App\Http\Controllers\MemberPointController;
 use App\Http\Controllers\ProfileController;
@@ -70,6 +71,10 @@ Route::middleware('auth')->group(function () {
         ->name('admin.events.index');
     Route::patch('/admin/events/{event}', [EventManagementController::class, 'update'])
         ->name('admin.events.update');
+    Route::get('/admin/knowledge', [KnowledgeAnswerController::class, 'index'])
+        ->name('admin.knowledge.index');
+    Route::post('/admin/knowledge/{question}/answer', [KnowledgeAnswerController::class, 'store'])
+        ->name('admin.knowledge.answers.store');
 });
 
 require __DIR__.'/auth.php';
