@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\PointLedgerType;
+use App\Models\Consultation;
 use App\Models\Event;
 use App\Models\PointLedgerEntry;
 use App\Models\User;
@@ -11,17 +12,7 @@ class PointLedgerService
 {
     public function grantSignupBonus(User $user): ?PointLedgerEntry
     {
-        $event = Event::query()
-            ->where('slug', 'signup_bonus')
-            ->where('trigger_type', 'member.registered')
-            ->where('is_active', true)
-            ->where(fn ($query) => $query
-                ->whereNull('starts_at')
-                ->orWhere('starts_at', '<=', now()))
-            ->where(fn ($query) => $query
-                ->whereNull('ends_at')
-                ->orWhere('ends_at', '>=', now()))
-            ->first();
+        $event = $this->activeEvent('signup_bonus', 'member.registered');
 
         if (! $event) {
             return null;
@@ -44,5 +35,52 @@ class PointLedgerService
             'idempotency_key' => $idempotencyKey,
             'memo' => $event->name,
         ]);
+    }
+
+    public function grantConsultationCompletedBonus(Consultation $consultation): ?PointLedgerEntry
+    {
+        if (! $consultation->user_id) {
+            return null;
+        }
+
+        $event = $this->activeEvent('consultation_completed_bonus', 'consultation.completed');
+
+        if (! $event) {
+            return null;
+        }
+
+        $idempotencyKey = 'consultation-completed:'.$consultation->id;
+
+        if (PointLedgerEntry::query()->where('idempotency_key', $idempotencyKey)->exists()) {
+            return null;
+        }
+
+        $user = $consultation->user;
+        $currentBalance = (int) $user->pointLedgerEntries()->sum('points');
+
+        return PointLedgerEntry::create([
+            'user_id' => $user->id,
+            'event_id' => $event->id,
+            'type' => PointLedgerType::Earned,
+            'points' => $event->point_amount,
+            'balance_after' => $currentBalance + $event->point_amount,
+            'idempotency_key' => $idempotencyKey,
+            'memo' => $event->name,
+        ]);
+    }
+
+    private function activeEvent(string $slug, string $triggerType): ?Event
+    {
+        return Event::query()
+            ->where('slug', $slug)
+            ->where('trigger_type', $triggerType)
+            ->where('is_active', true)
+            ->where(fn ($query) => $query
+                ->whereNull('starts_at')
+                ->orWhere('starts_at', '<=', now()))
+            ->where(fn ($query) => $query
+                ->whereNull('ends_at')
+                ->orWhere('ends_at', '>=', now()))
+            ->first();
     }
 }

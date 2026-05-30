@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Consultation;
 use App\Models\ConsultationStatusLog;
 use App\Models\User;
+use App\Services\PointLedgerService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Enum;
@@ -52,8 +53,11 @@ class ConsultationManagementController extends Controller
         ]);
     }
 
-    public function update(Request $request, Consultation $consultation): RedirectResponse
-    {
+    public function update(
+        Request $request,
+        Consultation $consultation,
+        PointLedgerService $pointLedger
+    ): RedirectResponse {
         $this->authorizeAdmin($request);
 
         $validated = $request->validate([
@@ -79,6 +83,10 @@ class ConsultationManagementController extends Controller
             'to_status' => $toStatus,
             'memo' => $validated['memo'] ?? null,
         ]);
+
+        if ($toStatus === ConsultationStatus::Completed) {
+            $pointLedger->grantConsultationCompletedBonus($consultation->refresh());
+        }
 
         return redirect()
             ->route('admin.consultations.show', $consultation)
