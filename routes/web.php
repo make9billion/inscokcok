@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ConsultationController;
+use App\Http\Controllers\Admin\ConsultationManagementController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -49,6 +50,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/admin/consultations', [ConsultationManagementController::class, 'index'])
+        ->name('admin.consultations.index');
+    Route::get('/admin/consultations/{consultation}', [ConsultationManagementController::class, 'show'])
+        ->name('admin.consultations.show');
+    Route::patch('/admin/consultations/{consultation}', [ConsultationManagementController::class, 'update'])
+        ->name('admin.consultations.update');
 });
 
 require __DIR__.'/auth.php';
