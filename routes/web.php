@@ -3,6 +3,7 @@
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\Admin\ConsultationManagementController;
 use App\Http\Controllers\Admin\EventManagementController;
+use App\Http\Controllers\KnowledgeQuestionController;
 use App\Http\Controllers\MemberPointController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -24,6 +25,7 @@ Route::get('/insurance-checkup', function () {
 
 Route::post('/consultations', [ConsultationController::class, 'store'])
     ->name('consultations.store');
+Route::get('/knowledge', [KnowledgeQuestionController::class, 'index'])->name('knowledge.index');
 
 Route::get('/dashboard', function () {
     $user = request()->user();
@@ -53,6 +55,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/mypage/points', [MemberPointController::class, 'index'])->name('mypage.points');
+    Route::post('/knowledge/questions', [KnowledgeQuestionController::class, 'store'])
+        ->name('knowledge.questions.store');
+    Route::get('/knowledge/questions/{question}', [KnowledgeQuestionController::class, 'show'])
+        ->name('knowledge.questions.show');
 
     Route::get('/admin/consultations', [ConsultationManagementController::class, 'index'])
         ->name('admin.consultations.index');
