@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ConsultationController;
+use App\Http\Controllers\Admin\ContentManagementController;
 use App\Http\Controllers\Admin\ConsultationManagementController;
 use App\Http\Controllers\Admin\EventManagementController;
 use App\Http\Controllers\Admin\KnowledgeAnswerController;
@@ -141,6 +142,12 @@ Route::middleware('auth')->group(function () {
         ->name('admin.knowledge.index');
     Route::post('/admin/knowledge/{question}/answer', [KnowledgeAnswerController::class, 'store'])
         ->name('admin.knowledge.answers.store');
+    Route::get('/admin/cms', [ContentManagementController::class, 'index'])
+        ->name('admin.cms.index');
+    Route::post('/admin/cms', [ContentManagementController::class, 'store'])
+        ->name('admin.cms.store');
+    Route::patch('/admin/cms/{content}', [ContentManagementController::class, 'update'])
+        ->name('admin.cms.update');
     Route::get('/admin/point-mall/products', [PointMallProductManagementController::class, 'index'])
         ->name('admin.point-mall.products.index');
     Route::patch('/admin/point-mall/products/{product}', [PointMallProductManagementController::class, 'update'])

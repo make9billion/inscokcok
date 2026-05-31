@@ -9,9 +9,7 @@ export default function Show({ auth, product }) {
 
     const submit = (event) => {
         event.preventDefault();
-        form.post(route('point-mall.products.cart.store', product.slug), {
-            preserveScroll: true,
-        });
+        form.post(route('point-mall.products.cart.store', product.slug), { preserveScroll: true });
     };
 
     return (
@@ -20,10 +18,7 @@ export default function Show({ auth, product }) {
 
             <section className="bg-white">
                 <div className="mx-auto max-w-5xl px-5 py-12 sm:px-6 lg:px-8">
-                    <Link
-                        href="/point-mall"
-                        className="inline-flex items-center gap-2 text-sm font-semibold text-toss-grey600 transition hover:text-toss-grey900"
-                    >
+                    <Link href="/point-mall" className="inline-flex items-center gap-2 text-sm font-semibold text-toss-grey600 transition hover:text-toss-grey900">
                         <ArrowLeft className="size-4" strokeWidth={1.8} />
                         포인트몰
                     </Link>
@@ -43,22 +38,16 @@ export default function Show({ auth, product }) {
                             <div className="mt-6 rounded-lg border border-toss-grey200 bg-white p-5">
                                 <div className="flex items-center justify-between gap-4">
                                     <span className="text-sm font-semibold text-toss-grey600">교환 포인트</span>
-                                    <span className="text-2xl font-bold tabular-nums text-toss-grey900">
-                                        {formatNumber(product.pointPrice)}P
-                                    </span>
+                                    <span className="text-2xl font-bold tabular-nums text-toss-grey900">{formatNumber(product.pointPrice)}P</span>
                                 </div>
                                 <div className="mt-4 flex items-center justify-between gap-4 border-t border-toss-grey200 pt-4">
                                     <span className="text-sm font-semibold text-toss-grey600">재고</span>
-                                    <span className="text-sm font-bold tabular-nums text-toss-grey900">
-                                        {formatNumber(product.stockQuantity)}개
-                                    </span>
+                                    <span className="text-sm font-bold tabular-nums text-toss-grey900">{formatNumber(product.stockQuantity)}개</span>
                                 </div>
                                 <div className="mt-4 flex items-center justify-between gap-4 border-t border-toss-grey200 pt-4">
                                     <span className="text-sm font-semibold text-toss-grey600">배송비</span>
                                     <span className="text-sm font-bold tabular-nums text-toss-grey900">
-                                        {product.deliveryType === 'paid'
-                                            ? `${formatNumber(product.deliveryFee)}원`
-                                            : '무료배송'}
+                                        {product.deliveryType === 'paid' ? `${formatNumber(product.deliveryFee)}원` : '무료배송'}
                                     </span>
                                 </div>
                             </div>
@@ -75,9 +64,7 @@ export default function Show({ auth, product }) {
                                         className="rounded-lg border-toss-grey300 text-sm focus:border-toss-blue focus:ring-toss-blue"
                                     />
                                 </label>
-                                {form.errors.quantity && (
-                                    <p className="text-sm font-semibold text-red-600">{form.errors.quantity}</p>
-                                )}
+                                {form.errors.quantity && <p className="text-sm font-semibold text-red-600">{form.errors.quantity}</p>}
                                 {auth?.user ? (
                                     <button
                                         type="submit"
@@ -87,10 +74,7 @@ export default function Show({ auth, product }) {
                                         장바구니 담기
                                     </button>
                                 ) : (
-                                    <Link
-                                        href={route('login')}
-                                        className="w-full rounded-lg bg-toss-grey900 px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-toss-grey700"
-                                    >
+                                    <Link href={route('login')} className="w-full rounded-lg bg-toss-grey900 px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-toss-grey700">
                                         로그인 후 담기
                                     </Link>
                                 )}

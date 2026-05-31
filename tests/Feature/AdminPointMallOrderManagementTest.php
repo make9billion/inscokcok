@@ -48,6 +48,30 @@ class AdminPointMallOrderManagementTest extends TestCase
         );
     }
 
+    public function test_admin_can_filter_point_mall_orders_by_status_and_search(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $member = User::factory()->create(['name' => 'Target member']);
+        $matched = PointMallOrder::factory()->for($member)->create([
+            'status' => PointMallOrderStatus::Pending,
+            'order_number' => 'PMFILTER001',
+        ]);
+        PointMallOrder::factory()->create([
+            'status' => PointMallOrderStatus::Delivered,
+            'order_number' => 'PMOTHER001',
+        ]);
+
+        $response = $this->actingAs($admin)->get('/admin/point-mall/orders?status=pending&search=Target');
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->where('orders.0.id', $matched->id)
+            ->where('orders.0.orderNumber', 'PMFILTER001')
+            ->where('filters.status', 'pending')
+            ->where('filters.search', 'Target')
+        );
+    }
+
     public function test_admin_can_update_order_status(): void
     {
         $admin = User::factory()->admin()->create();

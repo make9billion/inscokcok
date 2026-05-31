@@ -11,22 +11,15 @@ function CancelButton({ order }) {
     }
 
     const submit = () => {
-        if (!window.confirm('주문을 취소하고 사용 포인트를 환불할까요?')) {
+        if (!window.confirm('주문을 취소할까요?')) {
             return;
         }
 
-        form.post(route('mypage.point-mall.orders.cancel', order.id), {
-            preserveScroll: true,
-        });
+        form.post(route('mypage.point-mall.orders.cancel', order.id), { preserveScroll: true });
     };
 
     return (
-        <button
-            type="button"
-            onClick={submit}
-            disabled={form.processing}
-            className="rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-60"
-        >
+        <button type="button" onClick={submit} disabled={form.processing} className="rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-60">
             주문취소
         </button>
     );
@@ -36,9 +29,7 @@ export default function PointMallOrders({ orders }) {
     const { flash, errors } = usePage().props;
 
     return (
-        <AuthenticatedLayout
-            header={<h2 className="text-xl font-semibold leading-tight text-gray-800">포인트몰 주문내역</h2>}
-        >
+        <AuthenticatedLayout header={<h2 className="text-xl font-semibold leading-tight text-gray-800">포인트몰 주문내역</h2>}>
             <Head title="포인트몰 주문내역" />
 
             <div className="py-8">
@@ -54,9 +45,7 @@ export default function PointMallOrders({ orders }) {
                             </Link>
                         </div>
                         {flash?.success && (
-                            <div className="mt-4 rounded-lg bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700">
-                                {flash.success}
-                            </div>
+                            <div className="mt-4 rounded-lg bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700">{flash.success}</div>
                         )}
                         {(errors?.order || errors?.status) && (
                             <div className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
@@ -71,19 +60,15 @@ export default function PointMallOrders({ orders }) {
                                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                     <div>
                                         <p className="text-sm font-semibold text-blue-600">{order.orderNumber}</p>
-                                        <h2 className="mt-1 text-lg font-bold text-gray-900">{order.orderedAt}</h2>
+                                        <h2 className="mt-1 text-lg font-bold text-gray-900">{order.orderedAt ?? '결제대기'}</h2>
                                         <p className="mt-1 text-sm text-gray-500">상태 {order.statusLabel}</p>
-                                        {order.cancelledAt && (
-                                            <p className="mt-1 text-sm text-gray-500">취소일 {order.cancelledAt}</p>
-                                        )}
+                                        {order.cancelledAt && <p className="mt-1 text-sm text-gray-500">취소일 {order.cancelledAt}</p>}
                                     </div>
                                     <div className="text-sm text-gray-700 sm:text-right">
                                         <p>상품 포인트 {formatNumber(order.totalPoints)}P</p>
-                                        <p>사용 포인트 {formatNumber(order.usedPoints)}P</p>
+                                        <p>사용 예정 포인트 {formatNumber(order.usedPoints)}P</p>
                                         <p>배송비 {formatNumber(order.deliveryFee)}원</p>
-                                        <p className="font-bold text-gray-900">
-                                            추가 결제 {formatNumber(order.cashPaymentAmount)}원
-                                        </p>
+                                        <p className="font-bold text-gray-900">추가 결제 {formatNumber(order.cashPaymentAmount)}원</p>
                                         <div className="mt-3 flex justify-start sm:justify-end">
                                             <CancelButton order={order} />
                                         </div>

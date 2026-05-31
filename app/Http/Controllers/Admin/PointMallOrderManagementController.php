@@ -22,10 +22,26 @@ class PointMallOrderManagementController extends Controller
         return Inertia::render('Admin/PointMall/Orders', [
             'orders' => PointMallOrder::query()
                 ->with(['user', 'items'])
+                ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
+                ->when($request->filled('search'), function ($query) use ($request) {
+                    $keyword = $request->string('search')->toString();
+
+                    $query->where(function ($query) use ($keyword) {
+                        $query->where('order_number', 'like', "%{$keyword}%")
+                            ->orWhere('recipient_name', 'like', "%{$keyword}%")
+                            ->orWhereHas('user', fn ($userQuery) => $userQuery
+                                ->where('name', 'like', "%{$keyword}%")
+                                ->orWhere('email', 'like', "%{$keyword}%"));
+                    });
+                })
                 ->latest()
                 ->take(100)
                 ->get()
                 ->map(fn (PointMallOrder $order) => $this->serializeOrder($order)),
+            'filters' => [
+                'status' => $request->string('status')->toString(),
+                'search' => $request->string('search')->toString(),
+            ],
             'statusOptions' => collect([
                 PointMallOrderStatus::Pending,
                 PointMallOrderStatus::Paid,

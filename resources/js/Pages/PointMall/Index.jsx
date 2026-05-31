@@ -25,18 +25,12 @@ export default function Index({ auth, categories, products }) {
 
                         <div className="flex flex-wrap gap-2">
                             {categories.map((category) => (
-                                <span
-                                    key={category.id}
-                                    className="rounded-lg bg-toss-grey100 px-3 py-2 text-sm font-semibold text-toss-grey700"
-                                >
+                                <span key={category.id} className="rounded-lg bg-toss-grey100 px-3 py-2 text-sm font-semibold text-toss-grey700">
                                     {category.name}
                                 </span>
                             ))}
                             {auth?.user && (
-                                <Link
-                                    href="/point-mall/cart"
-                                    className="rounded-lg bg-toss-grey900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-toss-grey700"
-                                >
+                                <Link href="/point-mall/cart" className="rounded-lg bg-toss-grey900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-toss-grey700">
                                     장바구니
                                 </Link>
                             )}
@@ -54,25 +48,17 @@ export default function Index({ auth, categories, products }) {
                                     <ShoppingBag className="size-9" strokeWidth={1.6} />
                                 </div>
                                 <div className="mt-5 flex items-center justify-between gap-3">
-                                    <span className="text-xs font-semibold text-toss-blue">
-                                        {product.categoryName}
-                                    </span>
-                                    <span className="text-xs text-toss-grey500">
-                                        재고 {formatNumber(product.stockQuantity)}
-                                    </span>
+                                    <span className="text-xs font-semibold text-toss-blue">{product.categoryName}</span>
+                                    <span className="text-xs text-toss-grey500">재고 {formatNumber(product.stockQuantity)}</span>
                                 </div>
                                 <h2 className="mt-2 text-lg font-bold text-toss-grey900">{product.name}</h2>
                                 <p className="mt-2 min-h-10 text-sm leading-5 text-toss-grey600">
                                     {product.summary ?? '포인트로 교환할 수 있는 상품입니다.'}
                                 </p>
                                 <div className="mt-4 flex items-end justify-between gap-3">
-                                    <p className="text-xl font-bold tabular-nums text-toss-grey900">
-                                        {formatNumber(product.pointPrice)}P
-                                    </p>
+                                    <p className="text-xl font-bold tabular-nums text-toss-grey900">{formatNumber(product.pointPrice)}P</p>
                                     <p className="text-xs font-semibold text-toss-grey500">
-                                        {product.deliveryType === 'paid'
-                                            ? `배송비 ${formatNumber(product.deliveryFee)}원`
-                                            : '무료배송'}
+                                        {product.deliveryType === 'paid' ? `배송비 ${formatNumber(product.deliveryFee)}원` : '무료배송'}
                                     </p>
                                 </div>
                             </Link>

@@ -16,9 +16,7 @@ export default function Cart({ auth, cart }) {
 
     const checkout = (event) => {
         event.preventDefault();
-        form.post(route('point-mall.cart.checkout'), {
-            preserveScroll: true,
-        });
+        form.post(route('point-mall.cart.checkout'), { preserveScroll: true });
     };
 
     return (
@@ -86,7 +84,7 @@ export default function Cart({ auth, cart }) {
                                         <dd className="font-bold tabular-nums text-toss-grey900">{formatNumber(cart.summary.totalPoints)}P</dd>
                                     </div>
                                     <div className="flex justify-between">
-                                        <dt className="text-toss-grey600">사용 포인트</dt>
+                                        <dt className="text-toss-grey600">사용 예정 포인트</dt>
                                         <dd className="font-bold tabular-nums text-toss-grey900">{formatNumber(cart.summary.usedPoints)}P</dd>
                                     </div>
                                     <div className="flex justify-between">
@@ -124,9 +122,7 @@ export default function Cart({ auth, cart }) {
                                                 onChange={(event) => form.setData(field, event.target.value)}
                                                 className="rounded-lg border-toss-grey300 text-sm focus:border-toss-blue focus:ring-toss-blue"
                                             />
-                                            {form.errors[field] && (
-                                                <span className="text-xs font-semibold text-red-600">{form.errors[field]}</span>
-                                            )}
+                                            {form.errors[field] && <span className="text-xs font-semibold text-red-600">{form.errors[field]}</span>}
                                         </label>
                                     ))}
                                 </div>
@@ -136,7 +132,7 @@ export default function Cart({ auth, cart }) {
                                     disabled={form.processing}
                                     className="mt-5 w-full rounded-lg bg-toss-grey900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-toss-grey700 disabled:opacity-60"
                                 >
-                                    포인트와 추가결제로 구매
+                                    주문하기
                                 </button>
                             </form>
                         </div>
