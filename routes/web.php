@@ -11,8 +11,10 @@ use App\Http\Controllers\KnowledgeQuestionController;
 use App\Http\Controllers\MemberPointController;
 use App\Http\Controllers\PointMallController;
 use App\Http\Controllers\ProfileController;
+use App\Models\SiteContent;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
 $staticImagePage = fn (string $title, string $folder, int $count, ?string $description = null): array => [
@@ -24,11 +26,32 @@ $staticImagePage = fn (string $title, string $folder, int $count, ?string $descr
     ];
 
 Route::get('/', function () {
+    $publishedContents = Schema::hasTable('site_contents')
+        ? SiteContent::query()
+            ->where('is_published', true)
+            ->orderBy('sort_order')
+            ->latest()
+            ->get()
+            ->groupBy('type')
+        : collect();
+    $serializeContent = fn (SiteContent $content) => [
+        'id' => $content->id,
+        'title' => $content->title,
+        'body' => $content->body,
+        'linkUrl' => $content->link_url,
+        'publishedAt' => $content->published_at?->format('Y.m.d') ?? $content->created_at?->format('Y.m.d'),
+    ];
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
+        'cms' => [
+            'notices' => ($publishedContents->get('notice') ?? collect())->take(5)->map($serializeContent)->values(),
+            'faqs' => ($publishedContents->get('faq') ?? collect())->take(5)->map($serializeContent)->values(),
+            'mainBanners' => ($publishedContents->get('main_banner') ?? collect())->take(2)->map($serializeContent)->values(),
+        ],
     ]);
 });
 

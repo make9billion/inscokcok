@@ -2,10 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Models\SiteContent;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class SiteShellTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_homepage_renders_insurance_site_shell(): void
     {
         $response = $this->get('/');
@@ -13,6 +17,54 @@ class SiteShellTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page->component('Welcome'));
         $response->assertSee('data-page', false);
+    }
+
+    public function test_homepage_receives_published_cms_contents(): void
+    {
+        SiteContent::create([
+            'type' => 'notice',
+            'title' => 'CMS notice',
+            'body' => 'Notice body',
+            'link_url' => '/customer/notices/cms',
+            'sort_order' => 1,
+            'is_published' => true,
+            'published_at' => now(),
+        ]);
+        SiteContent::create([
+            'type' => 'faq',
+            'title' => 'CMS question',
+            'body' => 'CMS answer',
+            'sort_order' => 1,
+            'is_published' => true,
+            'published_at' => now(),
+        ]);
+        SiteContent::create([
+            'type' => 'main_banner',
+            'title' => 'CMS banner',
+            'body' => 'Banner body',
+            'link_url' => '/insurance-checkup',
+            'sort_order' => 1,
+            'is_published' => true,
+            'published_at' => now(),
+        ]);
+        SiteContent::create([
+            'type' => 'notice',
+            'title' => 'Hidden notice',
+            'sort_order' => 2,
+            'is_published' => false,
+        ]);
+
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->where('cms.notices.0.title', 'CMS notice')
+            ->where('cms.notices.0.linkUrl', '/customer/notices/cms')
+            ->where('cms.faqs.0.title', 'CMS question')
+            ->where('cms.faqs.0.body', 'CMS answer')
+            ->where('cms.mainBanners.0.title', 'CMS banner')
+            ->missing('cms.notices.1')
+        );
     }
 
     public function test_homepage_source_contains_reference_style_hero_and_sections(): void

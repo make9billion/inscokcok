@@ -195,10 +195,24 @@ function BannerStrip({ icon: Icon, title, description, href }) {
     );
 }
 
-export default function Welcome({ auth }) {
+export default function Welcome({ auth, cms = {} }) {
     const { flash } = usePage().props;
     const [activeSlide, setActiveSlide] = useState(0);
     const activeProduct = heroSlides[activeSlide];
+    const cmsNotices = cms.notices?.length
+        ? cms.notices.map((notice) => ({
+              title: notice.title,
+              date: notice.publishedAt ?? '',
+              href: notice.linkUrl ?? '/customer/notices',
+          }))
+        : notices.map((notice) => ({ ...notice, href: '/customer/notices' }));
+    const cmsFaqs = cms.faqs?.length
+        ? cms.faqs.map((faq) => ({
+              question: faq.title,
+              answer: faq.body ?? '',
+          }))
+        : faqs;
+    const cmsMainBanner = cms.mainBanners?.[0] ?? null;
     const form = useForm({
         type: 'product',
         applicant_name: '',
@@ -423,6 +437,14 @@ export default function Welcome({ auth }) {
             <section className="border-y border-toss-grey200 bg-toss-grey50">
                 <div className="mx-auto max-w-7xl px-5 py-6 sm:px-6 lg:px-8">
                     <div className="grid gap-4 md:grid-cols-2">
+                        {cmsMainBanner && (
+                            <BannerStrip
+                                icon={Bell}
+                                title={cmsMainBanner.title}
+                                description={cmsMainBanner.body ?? ''}
+                                href={cmsMainBanner.linkUrl ?? '/customer'}
+                            />
+                        )}
                         <BannerStrip
                             icon={Sparkles}
                             title="오늘의 맞춤 보험진단"
@@ -469,7 +491,7 @@ export default function Welcome({ auth }) {
                         description="상담 전에 가장 많이 확인하는 내용을 모았습니다."
                     />
                     <div className="space-y-3">
-                        {faqs.map((faq) => (
+                        {cmsFaqs.map((faq) => (
                             <div key={faq.question} className="rounded-lg border border-toss-grey200 bg-white p-5">
                                 <h3 className="text-base font-semibold text-toss-grey900">{faq.question}</h3>
                                 <p className="mt-2 text-sm leading-6 text-toss-grey600">{faq.answer}</p>
@@ -553,10 +575,10 @@ export default function Welcome({ auth }) {
                     <div>
                         <SectionHeader eyebrow="Notice" title="공지사항" href="/customer/notices" />
                         <div className="mt-8 divide-y divide-toss-grey200 rounded-lg border border-toss-grey200 bg-white">
-                            {notices.map((notice) => (
+                            {cmsNotices.map((notice) => (
                                 <Link
                                     key={notice.title}
-                                    href="/customer/notices"
+                                    href={notice.href}
                                     className="flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-toss-grey50"
                                 >
                                     <span className="flex items-center gap-3">
