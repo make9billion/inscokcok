@@ -34,7 +34,7 @@ export default function Dashboard({ summary, recentPointEntries = [] }) {
         {
             label: '주문 내역',
             value: `${formatNumber(summary?.orderCount)}건`,
-            href: '/point-mall',
+            href: '/mypage/point-mall/orders',
             action: '주문 확인',
         },
     ];
@@ -50,7 +50,7 @@ export default function Dashboard({ summary, recentPointEntries = [] }) {
                     <div className="space-y-6 px-4 sm:px-0">
                         <div className="flex flex-col justify-between gap-4 border-b border-gray-200 pb-6 sm:flex-row sm:items-end">
                             <div>
-                                <p className="text-sm font-medium text-blue-600">회원 대시보드</p>
+                                <p className="text-sm font-medium text-blue-600">회원 마이페이지</p>
                                 <h1 className="mt-2 text-2xl font-bold leading-8 text-gray-900">마이페이지</h1>
                                 <p className="mt-2 text-sm leading-6 text-gray-600">
                                     상담, 포인트, 주문 현황을 한 곳에서 확인하세요.
@@ -155,6 +155,12 @@ export default function Dashboard({ summary, recentPointEntries = [] }) {
                                         className="rounded border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-800 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
                                     >
                                         포인트몰
+                                    </Link>
+                                    <Link
+                                        href="/mypage/point-mall/orders"
+                                        className="rounded border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-800 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
+                                    >
+                                        포인트몰 주문내역
                                     </Link>
                                     <Link
                                         href="/profile"

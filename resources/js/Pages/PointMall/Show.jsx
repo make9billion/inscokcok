@@ -1,10 +1,19 @@
 import PublicLayout from '@/Layouts/PublicLayout';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
 
 const formatNumber = (value) => new Intl.NumberFormat('ko-KR').format(value ?? 0);
 
 export default function Show({ auth, product }) {
+    const form = useForm({ quantity: 1 });
+
+    const submit = (event) => {
+        event.preventDefault();
+        form.post(route('point-mall.products.cart.store', product.slug), {
+            preserveScroll: true,
+        });
+    };
+
     return (
         <PublicLayout auth={auth}>
             <Head title={product.name} />
@@ -44,15 +53,48 @@ export default function Show({ auth, product }) {
                                         {formatNumber(product.stockQuantity)}개
                                     </span>
                                 </div>
+                                <div className="mt-4 flex items-center justify-between gap-4 border-t border-toss-grey200 pt-4">
+                                    <span className="text-sm font-semibold text-toss-grey600">배송비</span>
+                                    <span className="text-sm font-bold tabular-nums text-toss-grey900">
+                                        {product.deliveryType === 'paid'
+                                            ? `${formatNumber(product.deliveryFee)}원`
+                                            : '무료배송'}
+                                    </span>
+                                </div>
                             </div>
 
-                            <button
-                                type="button"
-                                disabled
-                                className="mt-5 w-full rounded-lg bg-toss-grey900 px-5 py-3 text-sm font-semibold text-white opacity-60"
-                            >
-                                장바구니 준비 중
-                            </button>
+                            <form onSubmit={submit} className="mt-5 grid gap-3">
+                                <label className="grid gap-2 text-sm font-semibold text-toss-grey700">
+                                    수량
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max={product.stockQuantity}
+                                        value={form.data.quantity}
+                                        onChange={(event) => form.setData('quantity', Number(event.target.value))}
+                                        className="rounded-lg border-toss-grey300 text-sm focus:border-toss-blue focus:ring-toss-blue"
+                                    />
+                                </label>
+                                {form.errors.quantity && (
+                                    <p className="text-sm font-semibold text-red-600">{form.errors.quantity}</p>
+                                )}
+                                {auth?.user ? (
+                                    <button
+                                        type="submit"
+                                        disabled={form.processing || product.stockQuantity < 1}
+                                        className="w-full rounded-lg bg-toss-grey900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-toss-grey700 disabled:opacity-60"
+                                    >
+                                        장바구니 담기
+                                    </button>
+                                ) : (
+                                    <Link
+                                        href={route('login')}
+                                        className="w-full rounded-lg bg-toss-grey900 px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-toss-grey700"
+                                    >
+                                        로그인 후 담기
+                                    </Link>
+                                )}
+                            </form>
                         </div>
                     </div>
 

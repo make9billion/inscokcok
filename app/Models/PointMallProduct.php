@@ -22,6 +22,8 @@ class PointMallProduct extends Model
         'image_path',
         'point_price',
         'stock_quantity',
+        'delivery_type',
+        'delivery_fee',
         'is_featured',
         'is_active',
     ];
@@ -31,6 +33,7 @@ class PointMallProduct extends Model
         return [
             'is_featured' => 'boolean',
             'is_active' => 'boolean',
+            'delivery_fee' => 'integer',
         ];
     }
 

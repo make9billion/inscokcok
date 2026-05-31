@@ -32,6 +32,14 @@ export default function Index({ auth, categories, products }) {
                                     {category.name}
                                 </span>
                             ))}
+                            {auth?.user && (
+                                <Link
+                                    href="/point-mall/cart"
+                                    className="rounded-lg bg-toss-grey900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-toss-grey700"
+                                >
+                                    장바구니
+                                </Link>
+                            )}
                         </div>
                     </div>
 
@@ -57,9 +65,16 @@ export default function Index({ auth, categories, products }) {
                                 <p className="mt-2 min-h-10 text-sm leading-5 text-toss-grey600">
                                     {product.summary ?? '포인트로 교환할 수 있는 상품입니다.'}
                                 </p>
-                                <p className="mt-4 text-xl font-bold tabular-nums text-toss-grey900">
-                                    {formatNumber(product.pointPrice)}P
-                                </p>
+                                <div className="mt-4 flex items-end justify-between gap-3">
+                                    <p className="text-xl font-bold tabular-nums text-toss-grey900">
+                                        {formatNumber(product.pointPrice)}P
+                                    </p>
+                                    <p className="text-xs font-semibold text-toss-grey500">
+                                        {product.deliveryType === 'paid'
+                                            ? `배송비 ${formatNumber(product.deliveryFee)}원`
+                                            : '무료배송'}
+                                    </p>
+                                </div>
                             </Link>
                         ))}
                     </div>

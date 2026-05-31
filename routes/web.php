@@ -4,6 +4,7 @@ use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\Admin\ConsultationManagementController;
 use App\Http\Controllers\Admin\EventManagementController;
 use App\Http\Controllers\Admin\KnowledgeAnswerController;
+use App\Http\Controllers\Admin\PointMallProductManagementController;
 use App\Http\Controllers\KnowledgeQuestionController;
 use App\Http\Controllers\MemberPointController;
 use App\Http\Controllers\PointMallController;
@@ -111,6 +112,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/mypage/points', [MemberPointController::class, 'index'])->name('mypage.points');
+    Route::get('/mypage/point-mall/orders', [PointMallController::class, 'orders'])
+        ->name('mypage.point-mall.orders');
+    Route::get('/point-mall/cart', [PointMallController::class, 'cart'])->name('point-mall.cart.show');
+    Route::post('/point-mall/cart/checkout', [PointMallController::class, 'checkout'])
+        ->name('point-mall.cart.checkout');
+    Route::post('/point-mall/products/{slug}/cart', [PointMallController::class, 'addToCart'])
+        ->name('point-mall.products.cart.store');
     Route::post('/knowledge/questions', [KnowledgeQuestionController::class, 'store'])
         ->name('knowledge.questions.store');
     Route::get('/knowledge/questions/{question}', [KnowledgeQuestionController::class, 'show'])
@@ -130,6 +138,10 @@ Route::middleware('auth')->group(function () {
         ->name('admin.knowledge.index');
     Route::post('/admin/knowledge/{question}/answer', [KnowledgeAnswerController::class, 'store'])
         ->name('admin.knowledge.answers.store');
+    Route::get('/admin/point-mall/products', [PointMallProductManagementController::class, 'index'])
+        ->name('admin.point-mall.products.index');
+    Route::patch('/admin/point-mall/products/{product}/delivery', [PointMallProductManagementController::class, 'updateDelivery'])
+        ->name('admin.point-mall.products.delivery.update');
 });
 
 require __DIR__.'/auth.php';

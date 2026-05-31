@@ -6,6 +6,7 @@ use App\Enums\PointLedgerType;
 use App\Models\Consultation;
 use App\Models\Event;
 use App\Models\PointLedgerEntry;
+use App\Models\PointMallOrder;
 use App\Models\User;
 
 class PointLedgerService
@@ -66,6 +67,32 @@ class PointLedgerService
             'balance_after' => $currentBalance + $event->point_amount,
             'idempotency_key' => $idempotencyKey,
             'memo' => $event->name,
+        ]);
+    }
+
+    public function spendForPointMallOrder(PointMallOrder $order): ?PointLedgerEntry
+    {
+        if ($order->used_points <= 0) {
+            return null;
+        }
+
+        $idempotencyKey = 'point-mall-order-spent:'.$order->id;
+
+        if (PointLedgerEntry::query()->where('idempotency_key', $idempotencyKey)->exists()) {
+            return null;
+        }
+
+        $user = $order->user;
+        $currentBalance = (int) $user->pointLedgerEntries()->sum('points');
+
+        return PointLedgerEntry::create([
+            'user_id' => $user->id,
+            'order_id' => $order->id,
+            'type' => PointLedgerType::Spent,
+            'points' => -$order->used_points,
+            'balance_after' => $currentBalance - $order->used_points,
+            'idempotency_key' => $idempotencyKey,
+            'memo' => '포인트몰 주문 결제',
         ]);
     }
 
