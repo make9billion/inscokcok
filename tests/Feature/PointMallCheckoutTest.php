@@ -8,6 +8,8 @@ use App\Models\PointLedgerEntry;
 use App\Models\PointMallCart;
 use App\Models\PointMallCartItem;
 use App\Models\PointMallCategory;
+use App\Models\PointMallOrder;
+use App\Models\PointMallOrderItem;
 use App\Models\PointMallProduct;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -126,5 +128,66 @@ class PointMallCheckoutTest extends TestCase
 
         $response->assertRedirect('/point-mall/cart');
         $response->assertSessionHasErrors('cart');
+    }
+
+    public function test_member_can_cancel_paid_order_and_receive_point_refund_and_stock_restore(): void
+    {
+        $user = User::factory()->create();
+        $product = PointMallProduct::factory()->create([
+            'stock_quantity' => 3,
+        ]);
+        $order = PointMallOrder::factory()->for($user)->create([
+            'status' => PointMallOrderStatus::Paid,
+            'total_points' => 5000,
+            'used_points' => 4000,
+            'delivery_fee' => 3000,
+            'cash_payment_amount' => 4000,
+            'ordered_at' => now(),
+        ]);
+
+        PointMallOrderItem::create([
+            'point_mall_order_id' => $order->id,
+            'point_mall_product_id' => $product->id,
+            'product_name' => $product->name,
+            'point_price' => 5000,
+            'quantity' => 2,
+            'line_total_points' => 10000,
+        ]);
+
+        PointLedgerEntry::factory()->for($user)->create([
+            'type' => PointLedgerType::Spent,
+            'points' => -4000,
+            'balance_after' => 0,
+            'order_id' => $order->id,
+            'idempotency_key' => 'point-mall-order-spent:'.$order->id,
+        ]);
+
+        $response = $this->actingAs($user)->post("/mypage/point-mall/orders/{$order->id}/cancel");
+
+        $response->assertRedirect('/mypage/point-mall/orders');
+        $this->assertSame(PointMallOrderStatus::Refunded, $order->fresh()->status);
+        $this->assertNotNull($order->fresh()->cancelled_at);
+        $this->assertSame(5, $product->fresh()->stock_quantity);
+        $this->assertDatabaseHas('point_ledger_entries', [
+            'user_id' => $user->id,
+            'order_id' => $order->id,
+            'type' => PointLedgerType::Refunded->value,
+            'points' => 4000,
+            'balance_after' => 0,
+            'idempotency_key' => 'point-mall-order-refund:'.$order->id,
+        ]);
+    }
+
+    public function test_member_cannot_cancel_another_members_order(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $order = PointMallOrder::factory()->for($otherUser)->create([
+            'status' => PointMallOrderStatus::Paid,
+        ]);
+
+        $this->actingAs($user)
+            ->post("/mypage/point-mall/orders/{$order->id}/cancel")
+            ->assertNotFound();
     }
 }

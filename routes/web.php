@@ -4,6 +4,7 @@ use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\Admin\ConsultationManagementController;
 use App\Http\Controllers\Admin\EventManagementController;
 use App\Http\Controllers\Admin\KnowledgeAnswerController;
+use App\Http\Controllers\Admin\PointMallOrderManagementController;
 use App\Http\Controllers\Admin\PointMallProductManagementController;
 use App\Http\Controllers\KnowledgeQuestionController;
 use App\Http\Controllers\MemberPointController;
@@ -114,6 +115,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/mypage/points', [MemberPointController::class, 'index'])->name('mypage.points');
     Route::get('/mypage/point-mall/orders', [PointMallController::class, 'orders'])
         ->name('mypage.point-mall.orders');
+    Route::post('/mypage/point-mall/orders/{order}/cancel', [PointMallController::class, 'cancelOrder'])
+        ->name('mypage.point-mall.orders.cancel');
     Route::get('/point-mall/cart', [PointMallController::class, 'cart'])->name('point-mall.cart.show');
     Route::post('/point-mall/cart/checkout', [PointMallController::class, 'checkout'])
         ->name('point-mall.cart.checkout');
@@ -140,8 +143,16 @@ Route::middleware('auth')->group(function () {
         ->name('admin.knowledge.answers.store');
     Route::get('/admin/point-mall/products', [PointMallProductManagementController::class, 'index'])
         ->name('admin.point-mall.products.index');
+    Route::patch('/admin/point-mall/products/{product}', [PointMallProductManagementController::class, 'update'])
+        ->name('admin.point-mall.products.update');
     Route::patch('/admin/point-mall/products/{product}/delivery', [PointMallProductManagementController::class, 'updateDelivery'])
         ->name('admin.point-mall.products.delivery.update');
+    Route::get('/admin/point-mall/orders', [PointMallOrderManagementController::class, 'index'])
+        ->name('admin.point-mall.orders.index');
+    Route::patch('/admin/point-mall/orders/{order}/status', [PointMallOrderManagementController::class, 'updateStatus'])
+        ->name('admin.point-mall.orders.status.update');
+    Route::post('/admin/point-mall/orders/{order}/cancel', [PointMallOrderManagementController::class, 'cancel'])
+        ->name('admin.point-mall.orders.cancel');
 });
 
 require __DIR__.'/auth.php';

@@ -76,4 +76,42 @@ class AdminPointMallProductManagementTest extends TestCase
         $this->assertSame('free', $product->delivery_type);
         $this->assertSame(0, $product->delivery_fee);
     }
+
+    public function test_admin_can_update_point_mall_product_details(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $product = PointMallProduct::factory()->create([
+            'name' => 'Old product',
+            'summary' => 'Old summary',
+            'point_price' => 1000,
+            'stock_quantity' => 1,
+            'delivery_type' => 'free',
+            'delivery_fee' => 0,
+            'is_featured' => false,
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->patch("/admin/point-mall/products/{$product->id}", [
+            'name' => 'Updated product',
+            'summary' => 'Updated summary',
+            'point_price' => 2500,
+            'stock_quantity' => 12,
+            'delivery_type' => 'paid',
+            'delivery_fee' => 3500,
+            'is_featured' => true,
+            'is_active' => false,
+        ]);
+
+        $response->assertRedirect('/admin/point-mall/products');
+
+        $product->refresh();
+        $this->assertSame('Updated product', $product->name);
+        $this->assertSame('Updated summary', $product->summary);
+        $this->assertSame(2500, $product->point_price);
+        $this->assertSame(12, $product->stock_quantity);
+        $this->assertSame('paid', $product->delivery_type);
+        $this->assertSame(3500, $product->delivery_fee);
+        $this->assertTrue($product->is_featured);
+        $this->assertFalse($product->is_active);
+    }
 }

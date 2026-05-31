@@ -10,6 +10,7 @@ use App\Models\PointMallOrder;
 use App\Models\PointMallOrderItem;
 use App\Models\PointMallProduct;
 use App\Services\PointLedgerService;
+use App\Services\PointMallOrderService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -171,22 +172,23 @@ class PointMallController extends Controller
                 ->latest()
                 ->take(50)
                 ->get()
-                ->map(fn (PointMallOrder $order) => [
-                    'id' => $order->id,
-                    'orderNumber' => $order->order_number,
-                    'status' => $order->status->value,
-                    'totalPoints' => $order->total_points,
-                    'usedPoints' => $order->used_points,
-                    'deliveryFee' => $order->delivery_fee,
-                    'cashPaymentAmount' => $order->cash_payment_amount,
-                    'orderedAt' => $order->ordered_at?->format('Y-m-d H:i'),
-                    'items' => $order->items->map(fn (PointMallOrderItem $item) => [
-                        'name' => $item->product_name,
-                        'quantity' => $item->quantity,
-                        'lineTotalPoints' => $item->line_total_points,
-                    ]),
-                ]),
+                ->map(fn (PointMallOrder $order) => $this->serializeOrder($order)),
         ]);
+    }
+
+    public function cancelOrder(Request $request, PointMallOrder $order, PointMallOrderService $orders): RedirectResponse
+    {
+        abort_unless($order->user_id === $request->user()->id, 404);
+
+        if ($order->status !== PointMallOrderStatus::Paid) {
+            return back()->withErrors(['order' => '주문 접수 상태에서만 직접 취소할 수 있습니다.']);
+        }
+
+        $orders->cancelAndRefund($order);
+
+        return redirect()
+            ->route('mypage.point-mall.orders')
+            ->with('success', '주문이 취소되었고 사용 포인트가 환불되었습니다.');
     }
 
     private function serializeProduct(PointMallProduct $product): array
@@ -204,6 +206,43 @@ class PointMallController extends Controller
             'isFeatured' => $product->is_featured,
             'categoryName' => $product->category?->name,
         ];
+    }
+
+    private function serializeOrder(PointMallOrder $order): array
+    {
+        return [
+            'id' => $order->id,
+            'orderNumber' => $order->order_number,
+            'status' => $order->status->value,
+            'statusLabel' => $this->statusLabel($order->status),
+            'totalPoints' => $order->total_points,
+            'usedPoints' => $order->used_points,
+            'deliveryFee' => $order->delivery_fee,
+            'cashPaymentAmount' => $order->cash_payment_amount,
+            'orderedAt' => $order->ordered_at?->format('Y-m-d H:i'),
+            'cancelledAt' => $order->cancelled_at?->format('Y-m-d H:i'),
+            'canCancel' => $order->status === PointMallOrderStatus::Paid,
+            'cashRefundNotice' => $order->cash_payment_amount > 0
+                && in_array($order->status, [PointMallOrderStatus::Cancelled, PointMallOrderStatus::Refunded], true),
+            'items' => $order->items->map(fn (PointMallOrderItem $item) => [
+                'name' => $item->product_name,
+                'quantity' => $item->quantity,
+                'lineTotalPoints' => $item->line_total_points,
+            ]),
+        ];
+    }
+
+    private function statusLabel(PointMallOrderStatus $status): string
+    {
+        return match ($status) {
+            PointMallOrderStatus::Pending => '결제대기',
+            PointMallOrderStatus::Paid => '주문접수',
+            PointMallOrderStatus::Preparing => '상품준비중',
+            PointMallOrderStatus::Shipped => '배송중',
+            PointMallOrderStatus::Delivered => '배송완료',
+            PointMallOrderStatus::Cancelled => '취소완료',
+            PointMallOrderStatus::Refunded => '환불완료',
+        };
     }
 
     private function cartFor(Request $request): PointMallCart
