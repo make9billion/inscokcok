@@ -21,6 +21,13 @@ class PointMallOrder extends Model
         'used_points',
         'delivery_fee',
         'cash_payment_amount',
+        'payment_provider',
+        'payment_status',
+        'payment_order_id',
+        'payment_key',
+        'payment_method',
+        'payment_requested_at',
+        'payment_approved_at',
         'recipient_name',
         'recipient_phone',
         'postal_code',
@@ -35,6 +42,8 @@ class PointMallOrder extends Model
     {
         return [
             'status' => PointMallOrderStatus::class,
+            'payment_requested_at' => 'datetime',
+            'payment_approved_at' => 'datetime',
             'ordered_at' => 'datetime',
             'cancelled_at' => 'datetime',
             'total_points' => 'integer',

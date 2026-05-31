@@ -63,6 +63,59 @@ class AdminPointMallOrderManagementTest extends TestCase
         $this->assertSame(PointMallOrderStatus::Preparing, $order->fresh()->status);
     }
 
+    public function test_admin_marking_pending_order_paid_spends_reserved_points(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $member = User::factory()->create();
+        $order = PointMallOrder::factory()->for($member)->create([
+            'status' => PointMallOrderStatus::Pending,
+            'used_points' => 3000,
+            'cash_payment_amount' => 2000,
+            'payment_status' => 'ready',
+        ]);
+
+        PointLedgerEntry::factory()->for($member)->create([
+            'type' => PointLedgerType::Earned,
+            'points' => 5000,
+            'balance_after' => 5000,
+        ]);
+
+        $response = $this->actingAs($admin)->patch("/admin/point-mall/orders/{$order->id}/status", [
+            'status' => PointMallOrderStatus::Paid->value,
+        ]);
+
+        $response->assertRedirect('/admin/point-mall/orders');
+        $order->refresh();
+        $this->assertSame(PointMallOrderStatus::Paid, $order->status);
+        $this->assertSame('paid', $order->payment_status);
+        $this->assertNotNull($order->payment_approved_at);
+        $this->assertDatabaseHas('point_ledger_entries', [
+            'user_id' => $member->id,
+            'order_id' => $order->id,
+            'type' => PointLedgerType::Spent->value,
+            'points' => -3000,
+            'balance_after' => 2000,
+        ]);
+    }
+
+    public function test_admin_cannot_move_pending_order_directly_to_shipping_status(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $order = PointMallOrder::factory()->create([
+            'status' => PointMallOrderStatus::Pending,
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->from('/admin/point-mall/orders')
+            ->patch("/admin/point-mall/orders/{$order->id}/status", [
+                'status' => PointMallOrderStatus::Preparing->value,
+            ]);
+
+        $response->assertRedirect('/admin/point-mall/orders');
+        $response->assertSessionHasErrors('status');
+        $this->assertSame(PointMallOrderStatus::Pending, $order->fresh()->status);
+    }
+
     public function test_admin_can_cancel_order_and_refund_points(): void
     {
         $admin = User::factory()->admin()->create();

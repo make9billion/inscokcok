@@ -122,14 +122,21 @@ class PointMallController extends Controller
         $summary = $this->cartSummary($cart, $user);
 
         $order = DB::transaction(function () use ($cart, $pointLedger, $summary, $user, $validated) {
+            $requiresCashPayment = $summary['cashPaymentAmount'] > 0;
+            $orderNumber = 'PM'.now()->format('YmdHis').Str::upper(Str::random(6));
+
             $order = PointMallOrder::create([
                 'user_id' => $user->id,
-                'status' => PointMallOrderStatus::Paid,
-                'order_number' => 'PM'.now()->format('YmdHis').Str::upper(Str::random(6)),
+                'status' => $requiresCashPayment ? PointMallOrderStatus::Pending : PointMallOrderStatus::Paid,
+                'order_number' => $orderNumber,
                 'total_points' => $summary['totalPoints'],
                 'used_points' => $summary['usedPoints'],
                 'delivery_fee' => $summary['deliveryFee'],
                 'cash_payment_amount' => $summary['cashPaymentAmount'],
+                'payment_provider' => $requiresCashPayment ? 'toss_payments' : null,
+                'payment_status' => $requiresCashPayment ? 'ready' : 'not_required',
+                'payment_order_id' => $requiresCashPayment ? $orderNumber : null,
+                'payment_requested_at' => $requiresCashPayment ? now() : null,
                 'recipient_name' => $validated['recipient_name'],
                 'recipient_phone' => $validated['recipient_phone'],
                 'postal_code' => $validated['postal_code'],
@@ -152,7 +159,9 @@ class PointMallController extends Controller
                 $item->product->decrement('stock_quantity', $item->quantity);
             }
 
-            $pointLedger->spendForPointMallOrder($order);
+            if (! $requiresCashPayment) {
+                $pointLedger->spendForPointMallOrder($order);
+            }
             $cart->items()->delete();
 
             return $order;
@@ -180,7 +189,7 @@ class PointMallController extends Controller
     {
         abort_unless($order->user_id === $request->user()->id, 404);
 
-        if ($order->status !== PointMallOrderStatus::Paid) {
+        if (! in_array($order->status, [PointMallOrderStatus::Pending, PointMallOrderStatus::Paid], true)) {
             return back()->withErrors(['order' => '주문 접수 상태에서만 직접 취소할 수 있습니다.']);
         }
 
@@ -219,9 +228,12 @@ class PointMallController extends Controller
             'usedPoints' => $order->used_points,
             'deliveryFee' => $order->delivery_fee,
             'cashPaymentAmount' => $order->cash_payment_amount,
+            'paymentStatus' => $order->payment_status,
+            'paymentProvider' => $order->payment_provider,
+            'paymentOrderId' => $order->payment_order_id,
             'orderedAt' => $order->ordered_at?->format('Y-m-d H:i'),
             'cancelledAt' => $order->cancelled_at?->format('Y-m-d H:i'),
-            'canCancel' => $order->status === PointMallOrderStatus::Paid,
+            'canCancel' => in_array($order->status, [PointMallOrderStatus::Pending, PointMallOrderStatus::Paid], true),
             'cashRefundNotice' => $order->cash_payment_amount > 0
                 && in_array($order->status, [PointMallOrderStatus::Cancelled, PointMallOrderStatus::Refunded], true),
             'items' => $order->items->map(fn (PointMallOrderItem $item) => [

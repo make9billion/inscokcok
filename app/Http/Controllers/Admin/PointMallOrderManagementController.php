@@ -27,6 +27,7 @@ class PointMallOrderManagementController extends Controller
                 ->get()
                 ->map(fn (PointMallOrder $order) => $this->serializeOrder($order)),
             'statusOptions' => collect([
+                PointMallOrderStatus::Pending,
                 PointMallOrderStatus::Paid,
                 PointMallOrderStatus::Preparing,
                 PointMallOrderStatus::Shipped,
@@ -38,12 +39,13 @@ class PointMallOrderManagementController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, PointMallOrder $order): RedirectResponse
+    public function updateStatus(Request $request, PointMallOrder $order, PointMallOrderService $orders): RedirectResponse
     {
         $this->authorizeAdmin($request);
 
         $validated = $request->validate([
             'status' => ['required', Rule::in([
+                PointMallOrderStatus::Pending->value,
                 PointMallOrderStatus::Paid->value,
                 PointMallOrderStatus::Preparing->value,
                 PointMallOrderStatus::Shipped->value,
@@ -55,8 +57,22 @@ class PointMallOrderManagementController extends Controller
             return back()->withErrors(['status' => '취소/환불 완료된 주문은 상태를 변경할 수 없습니다.']);
         }
 
+        $toStatus = PointMallOrderStatus::from($validated['status']);
+
+        if ($order->status === PointMallOrderStatus::Pending && $toStatus !== PointMallOrderStatus::Paid) {
+            return back()->withErrors(['status' => '결제대기 주문은 결제완료 처리 후 배송 상태로 이동할 수 있습니다.']);
+        }
+
+        if ($toStatus === PointMallOrderStatus::Paid) {
+            $orders->markPaid($order);
+
+            return redirect()
+                ->route('admin.point-mall.orders.index')
+                ->with('success', '주문이 결제완료로 확정되었습니다.');
+        }
+
         $order->update([
-            'status' => PointMallOrderStatus::from($validated['status']),
+            'status' => $toStatus,
         ]);
 
         return redirect()
@@ -97,6 +113,13 @@ class PointMallOrderManagementController extends Controller
             'usedPoints' => $order->used_points,
             'deliveryFee' => $order->delivery_fee,
             'cashPaymentAmount' => $order->cash_payment_amount,
+            'paymentStatus' => $order->payment_status,
+            'paymentProvider' => $order->payment_provider,
+            'paymentOrderId' => $order->payment_order_id,
+            'paymentKey' => $order->payment_key,
+            'paymentMethod' => $order->payment_method,
+            'paymentRequestedAt' => $order->payment_requested_at?->format('Y-m-d H:i'),
+            'paymentApprovedAt' => $order->payment_approved_at?->format('Y-m-d H:i'),
             'recipientName' => $order->recipient_name,
             'recipientPhone' => $order->recipient_phone,
             'address' => trim($order->postal_code.' '.$order->address_line1.' '.($order->address_line2 ?? '')),
