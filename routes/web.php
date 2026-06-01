@@ -3,12 +3,14 @@
 use App\Http\Controllers\Admin\ContentManagementController;
 use App\Http\Controllers\Admin\ConsultationManagementController;
 use App\Http\Controllers\Admin\EventManagementController;
+use App\Http\Controllers\Admin\InquiryManagementController;
 use App\Http\Controllers\Admin\KnowledgeAnswerController;
 use App\Http\Controllers\Admin\PointMallOrderManagementController;
 use App\Http\Controllers\Admin\PointMallProductManagementController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\CustomerContentController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\KnowledgeQuestionController;
 use App\Http\Controllers\MemberPointController;
 use App\Http\Controllers\PointMallController;
@@ -113,6 +115,8 @@ Route::get('/customer', [CustomerContentController::class, 'index'])->name('cust
 Route::get('/customer/notices', [CustomerContentController::class, 'notices'])->name('customer.notices.index');
 Route::get('/customer/notices/{content}', [CustomerContentController::class, 'notice'])->name('customer.notices.show');
 Route::get('/customer/faq', [CustomerContentController::class, 'faq'])->name('customer.faq');
+Route::get('/customer/inquiries', [InquiryController::class, 'index'])->name('customer.inquiries.index');
+Route::post('/customer/inquiries', [InquiryController::class, 'store'])->name('customer.inquiries.store');
 Route::get('/customer/company', [CustomerContentController::class, 'company'])->name('customer.company');
 Route::get('/point-mall', [PointMallController::class, 'index'])->name('point-mall.index');
 Route::get('/point-mall/products/{slug}', [PointMallController::class, 'show'])->name('point-mall.products.show');
@@ -206,6 +210,22 @@ Route::middleware('auth')->group(function () {
         ->name('admin.knowledge.index');
     Route::post('/admin/knowledge/{question}/answer', [KnowledgeAnswerController::class, 'store'])
         ->name('admin.knowledge.answers.store');
+    Route::get('/admin/inquiries', [InquiryManagementController::class, 'index'])
+        ->name('admin.inquiries.index');
+    Route::patch('/admin/inquiries/{inquiry}', [InquiryManagementController::class, 'update'])
+        ->name('admin.inquiries.update');
+    Route::get('/admin/notices', [ContentManagementController::class, 'notices'])
+        ->name('admin.notices.index');
+    Route::post('/admin/notices', [ContentManagementController::class, 'storeNotice'])
+        ->name('admin.notices.store');
+    Route::patch('/admin/notices/{content}', [ContentManagementController::class, 'updateNotice'])
+        ->name('admin.notices.update');
+    Route::get('/admin/faqs', [ContentManagementController::class, 'faqs'])
+        ->name('admin.faqs.index');
+    Route::post('/admin/faqs', [ContentManagementController::class, 'storeFaq'])
+        ->name('admin.faqs.store');
+    Route::patch('/admin/faqs/{content}', [ContentManagementController::class, 'updateFaq'])
+        ->name('admin.faqs.update');
     Route::get('/admin/cms', [ContentManagementController::class, 'index'])
         ->name('admin.cms.index');
     Route::post('/admin/cms', [ContentManagementController::class, 'store'])

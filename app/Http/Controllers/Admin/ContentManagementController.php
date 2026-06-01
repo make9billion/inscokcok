@@ -16,17 +16,21 @@ class ContentManagementController extends Controller
     {
         $this->authorizeAdmin($request);
 
-        return Inertia::render('Admin/Cms/Index', [
-            'contents' => SiteContent::query()
-                ->orderBy('type')
-                ->orderBy('sort_order')
-                ->latest()
-                ->get()
-                ->map(fn (SiteContent $content) => $this->serializeContent($content)),
-            'typeOptions' => collect($this->typeLabels())
-                ->map(fn (string $label, string $value) => compact('value', 'label'))
-                ->values(),
-        ]);
+        return $this->renderIndex();
+    }
+
+    public function notices(Request $request): Response
+    {
+        $this->authorizeAdmin($request);
+
+        return $this->renderIndex('notice', '공지사항', '공지사항을 등록하고 게시 상태를 관리합니다.', 'admin.notices.store', 'admin.notices.update');
+    }
+
+    public function faqs(Request $request): Response
+    {
+        $this->authorizeAdmin($request);
+
+        return $this->renderIndex('faq', 'FAQ', '자주 묻는 질문과 답변을 관리합니다.', 'admin.faqs.store', 'admin.faqs.update');
     }
 
     public function store(Request $request): RedirectResponse
@@ -54,9 +58,86 @@ class ContentManagementController extends Controller
             ->with('success', '콘텐츠가 저장되었습니다.');
     }
 
-    private function validated(Request $request): array
+    public function storeNotice(Request $request): RedirectResponse
     {
-        return $request->validate([
+        return $this->storeFixedType($request, 'notice', 'admin.notices.index');
+    }
+
+    public function updateNotice(Request $request, SiteContent $content): RedirectResponse
+    {
+        return $this->updateFixedType($request, $content, 'notice', 'admin.notices.index');
+    }
+
+    public function storeFaq(Request $request): RedirectResponse
+    {
+        return $this->storeFixedType($request, 'faq', 'admin.faqs.index');
+    }
+
+    public function updateFaq(Request $request, SiteContent $content): RedirectResponse
+    {
+        return $this->updateFixedType($request, $content, 'faq', 'admin.faqs.index');
+    }
+
+    private function renderIndex(
+        ?string $fixedType = null,
+        string $pageTitle = 'CMS 관리',
+        string $pageDescription = '사이트 콘텐츠를 관리합니다.',
+        string $storeRouteName = 'admin.cms.store',
+        string $updateRouteName = 'admin.cms.update',
+    ): Response {
+        $query = SiteContent::query()
+            ->orderBy('type')
+            ->orderBy('sort_order')
+            ->latest();
+
+        if ($fixedType) {
+            $query->where('type', $fixedType);
+        }
+
+        return Inertia::render('Admin/Cms/Index', [
+            'contents' => $query
+                ->get()
+                ->map(fn (SiteContent $content) => $this->serializeContent($content)),
+            'typeOptions' => collect($this->typeLabels())
+                ->map(fn (string $label, string $value) => compact('value', 'label'))
+                ->values(),
+            'fixedType' => $fixedType,
+            'pageTitle' => $pageTitle,
+            'pageDescription' => $pageDescription,
+            'storeRouteName' => $storeRouteName,
+            'updateRouteName' => $updateRouteName,
+        ]);
+    }
+
+    private function storeFixedType(Request $request, string $type, string $routeName): RedirectResponse
+    {
+        $this->authorizeAdmin($request);
+
+        $validated = $this->validated($request, $type);
+
+        SiteContent::create($this->payload($validated));
+
+        return redirect()
+            ->route($routeName)
+            ->with('success', '콘텐츠가 추가되었습니다.');
+    }
+
+    private function updateFixedType(Request $request, SiteContent $content, string $type, string $routeName): RedirectResponse
+    {
+        $this->authorizeAdmin($request);
+        abort_unless($content->type === $type, 404);
+
+        $validated = $this->validated($request, $type);
+        $content->update($this->payload($validated));
+
+        return redirect()
+            ->route($routeName)
+            ->with('success', '콘텐츠가 저장되었습니다.');
+    }
+
+    private function validated(Request $request, ?string $fixedType = null): array
+    {
+        $validated = $request->validate([
             'type' => ['required', Rule::in(array_keys($this->typeLabels()))],
             'title' => ['required', 'string', 'max:160'],
             'body' => ['nullable', 'string', 'max:5000'],
@@ -64,6 +145,12 @@ class ContentManagementController extends Controller
             'sort_order' => ['required', 'integer', 'min:0', 'max:100000'],
             'is_published' => ['required', 'boolean'],
         ]);
+
+        if ($fixedType) {
+            $validated['type'] = $fixedType;
+        }
+
+        return $validated;
     }
 
     private function payload(array $validated): array

@@ -11,18 +11,19 @@ class AdminContentManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_member_cannot_access_cms_management(): void
+    public function test_member_cannot_access_split_content_management(): void
     {
         $member = User::factory()->create();
 
-        $this->actingAs($member)->get('/admin/cms')->assertForbidden();
+        $this->actingAs($member)->get('/admin/notices')->assertForbidden();
+        $this->actingAs($member)->get('/admin/faqs')->assertForbidden();
     }
 
-    public function test_admin_can_create_site_content(): void
+    public function test_admin_can_create_notice_from_split_notice_page(): void
     {
         $admin = User::factory()->admin()->create();
 
-        $response = $this->actingAs($admin)->post('/admin/cms', [
+        $response = $this->actingAs($admin)->post('/admin/notices', [
             'type' => 'notice',
             'title' => 'New notice',
             'body' => 'Notice body',
@@ -31,7 +32,7 @@ class AdminContentManagementTest extends TestCase
             'is_published' => true,
         ]);
 
-        $response->assertRedirect('/admin/cms');
+        $response->assertRedirect('/admin/notices');
         $this->assertDatabaseHas('site_contents', [
             'type' => 'notice',
             'title' => 'New notice',
@@ -41,48 +42,74 @@ class AdminContentManagementTest extends TestCase
         ]);
     }
 
-    public function test_admin_cms_exposes_extended_content_type_options(): void
+    public function test_admin_can_create_faq_from_split_faq_page(): void
     {
         $admin = User::factory()->admin()->create();
 
-        $this->actingAs($admin)->get('/admin/cms')->assertOk()->assertInertia(fn ($page) => $page
+        $response = $this->actingAs($admin)->post('/admin/faqs', [
+            'type' => 'faq',
+            'title' => 'Question',
+            'body' => 'Answer',
+            'link_url' => null,
+            'sort_order' => 3,
+            'is_published' => true,
+        ]);
+
+        $response->assertRedirect('/admin/faqs');
+        $this->assertDatabaseHas('site_contents', [
+            'type' => 'faq',
+            'title' => 'Question',
+            'body' => 'Answer',
+        ]);
+    }
+
+    public function test_admin_split_pages_expose_fixed_content_type(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)->get('/admin/notices')->assertOk()->assertInertia(fn ($page) => $page
             ->component('Admin/Cms/Index')
-            ->where('typeOptions.0.label', '공지사항')
-            ->where('typeOptions.1.label', 'FAQ')
-            ->where('typeOptions.2.label', '메인 배너')
-            ->where('typeOptions.3.value', 'company_intro')
-            ->where('typeOptions.3.label', '회사소개')
-            ->where('typeOptions.4.value', 'event_guide')
-            ->where('typeOptions.4.label', '이벤트 안내')
+            ->where('fixedType', 'notice')
+            ->where('pageTitle', '공지사항')
+            ->where('storeRouteName', 'admin.notices.store')
+            ->where('updateRouteName', 'admin.notices.update')
+        );
+
+        $this->actingAs($admin)->get('/admin/faqs')->assertOk()->assertInertia(fn ($page) => $page
+            ->component('Admin/Cms/Index')
+            ->where('fixedType', 'faq')
+            ->where('pageTitle', 'FAQ')
+            ->where('storeRouteName', 'admin.faqs.store')
+            ->where('updateRouteName', 'admin.faqs.update')
         );
     }
 
-    public function test_admin_can_update_site_content(): void
+    public function test_admin_can_update_notice_from_split_page(): void
     {
         $admin = User::factory()->admin()->create();
         $content = SiteContent::create([
-            'type' => 'faq',
-            'title' => 'Old question',
-            'body' => 'Old answer',
+            'type' => 'notice',
+            'title' => 'Old notice',
+            'body' => 'Old body',
             'sort_order' => 1,
             'is_published' => true,
             'published_at' => now(),
         ]);
 
-        $response = $this->actingAs($admin)->patch("/admin/cms/{$content->id}", [
-            'type' => 'faq',
-            'title' => 'Updated question',
-            'body' => 'Updated answer',
+        $response = $this->actingAs($admin)->patch("/admin/notices/{$content->id}", [
+            'type' => 'notice',
+            'title' => 'Updated notice',
+            'body' => 'Updated body',
             'link_url' => null,
             'sort_order' => 3,
             'is_published' => false,
         ]);
 
-        $response->assertRedirect('/admin/cms');
+        $response->assertRedirect('/admin/notices');
         $this->assertDatabaseHas('site_contents', [
             'id' => $content->id,
-            'title' => 'Updated question',
-            'body' => 'Updated answer',
+            'title' => 'Updated notice',
+            'body' => 'Updated body',
             'sort_order' => 3,
             'is_published' => false,
         ]);

@@ -5,14 +5,14 @@ import PublicLayout from '@/Layouts/PublicLayout';
 export default function Faq({ auth, faqs = [] }) {
     return (
         <PublicLayout auth={auth}>
-            <Head title="자주 묻는 질문" />
+            <Head title="FAQ" />
 
             <section className="border-b border-toss-grey200 bg-toss-grey50">
                 <div className="mx-auto max-w-5xl px-5 py-14 sm:px-6 lg:px-8">
                     <p className="text-sm font-semibold text-toss-blue">FAQ</p>
-                    <h1 className="mt-3 text-3xl font-bold text-toss-grey900">자주 묻는 질문</h1>
+                    <h1 className="mt-3 text-3xl font-bold text-toss-grey900">FAQ</h1>
                     <p className="mt-3 text-sm leading-6 text-toss-grey600">
-                        상담 신청, 포인트, 포인트몰 이용과 관련된 내용을 정리했습니다.
+                        상담 신청, 포인트, 포인트몰 이용과 관련된 자주 묻는 질문을 정리했습니다.
                     </p>
                 </div>
             </section>

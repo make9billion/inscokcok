@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { Bell, ChevronRight, HelpCircle, Phone } from 'lucide-react';
+import { Bell, ChevronRight, HelpCircle, MessageSquareText, Phone } from 'lucide-react';
 
 import PublicLayout from '@/Layouts/PublicLayout';
 
@@ -13,12 +13,12 @@ export default function CustomerIndex({ auth, notices = [], faqs = [] }) {
                     <p className="text-sm font-semibold text-toss-blue">Customer Center</p>
                     <h1 className="mt-3 text-3xl font-bold text-toss-grey900">고객센터</h1>
                     <p className="mt-3 max-w-2xl text-sm leading-6 text-toss-grey600">
-                        공지사항, 자주 묻는 질문, 상담 안내를 한 곳에서 확인하세요.
+                        공지사항, FAQ, 문의하기, 회사소개를 한곳에서 확인할 수 있습니다.
                     </p>
                 </div>
             </section>
 
-            <section className="mx-auto grid max-w-6xl gap-6 px-5 py-12 sm:px-6 lg:grid-cols-3 lg:px-8">
+            <section className="mx-auto grid max-w-6xl gap-6 px-5 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
                 <Link href="/customer/notices" className="rounded-lg border border-toss-grey200 bg-white p-6 transition hover:border-toss-grey500">
                     <Bell className="size-7 text-toss-grey800" strokeWidth={1.8} />
                     <h2 className="mt-5 text-lg font-bold text-toss-grey900">공지사항</h2>
@@ -26,8 +26,13 @@ export default function CustomerIndex({ auth, notices = [], faqs = [] }) {
                 </Link>
                 <Link href="/customer/faq" className="rounded-lg border border-toss-grey200 bg-white p-6 transition hover:border-toss-grey500">
                     <HelpCircle className="size-7 text-toss-grey800" strokeWidth={1.8} />
-                    <h2 className="mt-5 text-lg font-bold text-toss-grey900">자주 묻는 질문</h2>
-                    <p className="mt-2 text-sm leading-6 text-toss-grey600">상담 전 궁금한 내용을 빠르게 확인합니다.</p>
+                    <h2 className="mt-5 text-lg font-bold text-toss-grey900">FAQ</h2>
+                    <p className="mt-2 text-sm leading-6 text-toss-grey600">자주 묻는 질문을 빠르게 확인합니다.</p>
+                </Link>
+                <Link href="/customer/inquiries" className="rounded-lg border border-toss-grey200 bg-white p-6 transition hover:border-toss-grey500">
+                    <MessageSquareText className="size-7 text-toss-grey800" strokeWidth={1.8} />
+                    <h2 className="mt-5 text-lg font-bold text-toss-grey900">문의하기</h2>
+                    <p className="mt-2 text-sm leading-6 text-toss-grey600">이용, 이벤트, 사은품, 배송 문의를 남깁니다.</p>
                 </Link>
                 <Link href="/customer/company" className="rounded-lg border border-toss-grey200 bg-white p-6 transition hover:border-toss-grey500">
                     <Phone className="size-7 text-toss-grey800" strokeWidth={1.8} />
@@ -58,7 +63,7 @@ export default function CustomerIndex({ auth, notices = [], faqs = [] }) {
 
                 <div>
                     <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-bold text-toss-grey900">자주 묻는 질문</h2>
+                        <h2 className="text-xl font-bold text-toss-grey900">FAQ</h2>
                         <Link href="/customer/faq" className="inline-flex items-center gap-1 text-sm font-semibold text-toss-blue">
                             전체보기 <ChevronRight className="size-4" />
                         </Link>

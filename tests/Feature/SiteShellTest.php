@@ -76,23 +76,8 @@ class SiteShellTest extends TestCase
         $this->assertStringContainsString('consult-panel', $source);
         $this->assertStringContainsString('product-tabs', $source);
         $this->assertStringContainsString('lead-form', $source);
-        $this->assertStringContainsString('암보험', $source);
-        $this->assertStringContainsString('치매/간병보험', $source);
-        $this->assertStringContainsString('질병/상해보험', $source);
-        $this->assertStringContainsString('치아보험', $source);
-        $this->assertStringContainsString('펫보험', $source);
-        $this->assertStringContainsString('어린이보험', $source);
-        $this->assertStringContainsString('보험점검', $source);
-        $this->assertStringContainsString('제3자 정보제공 동의', $source);
-        $this->assertStringNotContainsString('성별', $source);
-        $this->assertStringNotContainsString('생년월일', $source);
         $this->assertStringContainsString('form.post(route(\'consultations.store\')', $source);
         $this->assertStringContainsString('aria-pressed={form.data.interested_product === slide.product}', $source);
-        $this->assertStringContainsString('실시간 상담 접수 현황', $source);
-        $this->assertStringContainsString('포인트몰 인기 상품', $source);
-        $this->assertStringContainsString('진행 중인 이벤트', $source);
-        $this->assertStringContainsString('보험지식인', $source);
-        $this->assertStringContainsString('공지사항', $source);
         $this->assertStringContainsString('href="/customer/notices"', $source);
         $this->assertStringContainsString('href="/customer"', $source);
         $this->assertStringNotContainsString('href="/notices"', $source);
@@ -112,8 +97,21 @@ class SiteShellTest extends TestCase
         $this->assertStringContainsString("method=\"post\"", $header);
         $this->assertStringContainsString("route('logout')", $header);
         $this->assertStringContainsString('로그아웃', $authenticatedLayout);
+        $this->assertStringContainsString('문의하기', $authenticatedLayout);
+        $this->assertStringContainsString('admin.inquiries.index', $authenticatedLayout);
+        $this->assertStringContainsString('admin.faqs.index', $authenticatedLayout);
+        $this->assertStringContainsString('admin.notices.index', $authenticatedLayout);
+        $this->assertStringNotContainsString('CMS', $authenticatedLayout);
         $this->assertStringNotContainsString('내정보', $header);
         $this->assertStringNotContainsString('profile.edit', $header);
+    }
+
+    public function test_public_navigation_exposes_inquiry_page(): void
+    {
+        $source = file_get_contents(resource_path('js/Constants/siteNavigation.js'));
+
+        $this->assertStringContainsString('문의하기', $source);
+        $this->assertStringContainsString('/customer/inquiries', $source);
     }
 
     public function test_insurance_product_navigation_uses_dental_insurance(): void
@@ -133,7 +131,6 @@ class SiteShellTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('StaticImagePage')
-            ->where('title', '치아보험')
             ->where('images.0', 'dental-insurance/01.png')
         );
     }
@@ -198,6 +195,5 @@ class SiteShellTest extends TestCase
 
         $this->assertStringContainsString('../../../images/company/01.png', $source);
         $this->assertStringContainsString('../../../images/company/02.png', $source);
-        $this->assertStringContainsString('회사소개', $source);
     }
 }

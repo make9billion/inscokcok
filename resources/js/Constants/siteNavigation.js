@@ -9,7 +9,8 @@ export const insuranceProductLinks = [
 
 export const customerCenterLinks = [
     { label: '공지사항', href: '/customer/notices' },
-    { label: '자주 묻는 질문', href: '/customer/faq' },
+    { label: 'FAQ', href: '/customer/faq' },
+    { label: '문의하기', href: '/customer/inquiries' },
     { label: '회사소개', href: '/customer/company' },
 ];
 

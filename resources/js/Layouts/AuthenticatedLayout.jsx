@@ -7,11 +7,13 @@ import { useState } from 'react';
 
 const adminLinks = [
     ['상담관리', 'admin.consultations.index'],
+    ['문의하기', 'admin.inquiries.index'],
+    ['FAQ', 'admin.faqs.index'],
+    ['공지사항', 'admin.notices.index'],
     ['이벤트관리', 'admin.events.index'],
     ['지식인관리', 'admin.knowledge.index'],
     ['주문관리', 'admin.point-mall.orders.index'],
     ['상품관리', 'admin.point-mall.products.index'],
-    ['CMS', 'admin.cms.index'],
 ];
 
 export default function AuthenticatedLayout({ header, children }) {
