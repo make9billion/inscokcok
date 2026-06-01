@@ -1,12 +1,13 @@
 <?php
 
-use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\Admin\ContentManagementController;
 use App\Http\Controllers\Admin\ConsultationManagementController;
 use App\Http\Controllers\Admin\EventManagementController;
 use App\Http\Controllers\Admin\KnowledgeAnswerController;
 use App\Http\Controllers\Admin\PointMallOrderManagementController;
 use App\Http\Controllers\Admin\PointMallProductManagementController;
+use App\Http\Controllers\ConsultationController;
+use App\Http\Controllers\CustomerContentController;
 use App\Http\Controllers\KnowledgeQuestionController;
 use App\Http\Controllers\MemberPointController;
 use App\Http\Controllers\PointMallController;
@@ -18,12 +19,12 @@ use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
 $staticImagePage = fn (string $title, string $folder, int $count, ?string $description = null): array => [
-        'title' => $title,
-        'description' => $description,
-        'images' => collect(range(1, $count))
-            ->map(fn (int $index) => sprintf('%s/%02d.png', $folder, $index))
-            ->all(),
-    ];
+    'title' => $title,
+    'description' => $description,
+    'images' => collect(range(1, $count))
+        ->map(fn (int $index) => sprintf('%s/%02d.png', $folder, $index))
+        ->all(),
+];
 
 Route::get('/', function () {
     $publishedContents = Schema::hasTable('site_contents')
@@ -76,7 +77,7 @@ Route::get('/insurance/dementia-care', fn () => Inertia::render('StaticImagePage
     '치매/간병보험',
     'care-insurance',
     5,
-    '긴 돌봄과 가족 부담을 대비하는 보장을 확인하세요.'
+    '긴 노후와 가족 부담을 대비하는 보장을 확인하세요.'
 )))->name('insurance.dementia-care');
 Route::get('/insurance/disease-accident', fn () => Inertia::render('StaticImagePage', $staticImagePage(
     '질병/상해보험',
@@ -106,6 +107,15 @@ Route::get('/insurance/child', fn () => Inertia::render('StaticImagePage', $stat
 Route::post('/consultations', [ConsultationController::class, 'store'])
     ->name('consultations.store');
 Route::get('/knowledge', [KnowledgeQuestionController::class, 'index'])->name('knowledge.index');
+Route::get('/events', fn () => Inertia::render('Customer/Company', [
+    'title' => '이벤트',
+    'description' => '진행 중인 이벤트와 포인트 혜택은 관리자 CMS 연동 후 이곳에 공개됩니다.',
+]))->name('events.index');
+Route::get('/customer', [CustomerContentController::class, 'index'])->name('customer.index');
+Route::get('/customer/notices', [CustomerContentController::class, 'notices'])->name('customer.notices.index');
+Route::get('/customer/notices/{content}', [CustomerContentController::class, 'notice'])->name('customer.notices.show');
+Route::get('/customer/faq', [CustomerContentController::class, 'faq'])->name('customer.faq');
+Route::get('/customer/company', [CustomerContentController::class, 'company'])->name('customer.company');
 Route::get('/point-mall', [PointMallController::class, 'index'])->name('point-mall.index');
 Route::get('/point-mall/products/{slug}', [PointMallController::class, 'show'])->name('point-mall.products.show');
 

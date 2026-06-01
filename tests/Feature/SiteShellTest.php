@@ -107,7 +107,7 @@ class SiteShellTest extends TestCase
         $this->assertStringNotContainsString('내정보', $navigation);
         $this->assertStringNotContainsString("href: '/mypage'", $navigation);
         $this->assertStringContainsString('마이페이지', $header);
-        $this->assertStringNotContainsString('대시보드', $header);
+        $this->assertStringNotContainsString('내정보', $header);
         $this->assertStringNotContainsString('profile.edit', $header);
     }
 
@@ -130,6 +130,56 @@ class SiteShellTest extends TestCase
             ->component('StaticImagePage')
             ->where('title', '치아보험')
             ->where('images.0', 'dental-insurance/01.png')
+        );
+    }
+
+    public function test_customer_center_pages_render_published_cms_contents(): void
+    {
+        $notice = SiteContent::create([
+            'type' => 'notice',
+            'title' => 'Published notice',
+            'body' => 'Notice body',
+            'sort_order' => 1,
+            'is_published' => true,
+            'published_at' => now(),
+        ]);
+        SiteContent::create([
+            'type' => 'faq',
+            'title' => 'Published FAQ',
+            'body' => 'FAQ body',
+            'sort_order' => 1,
+            'is_published' => true,
+            'published_at' => now(),
+        ]);
+        SiteContent::create([
+            'type' => 'notice',
+            'title' => 'Hidden notice',
+            'is_published' => false,
+        ]);
+
+        $this->get('/customer')->assertOk()->assertInertia(fn ($page) => $page
+            ->component('Customer/Index')
+            ->where('notices.0.title', 'Published notice')
+            ->where('faqs.0.title', 'Published FAQ')
+            ->missing('notices.1')
+        );
+
+        $this->get('/customer/notices')->assertOk()->assertInertia(fn ($page) => $page
+            ->component('Customer/Notices')
+            ->where('notices.0.title', 'Published notice')
+            ->missing('notices.1')
+        );
+
+        $this->get("/customer/notices/{$notice->id}")->assertOk()->assertInertia(fn ($page) => $page
+            ->component('Customer/NoticeShow')
+            ->where('notice.title', 'Published notice')
+            ->where('notice.body', 'Notice body')
+        );
+
+        $this->get('/customer/faq')->assertOk()->assertInertia(fn ($page) => $page
+            ->component('Customer/Faq')
+            ->where('faqs.0.title', 'Published FAQ')
+            ->where('faqs.0.body', 'FAQ body')
         );
     }
 }

@@ -19,7 +19,7 @@ const heroSlides = [
         product: '암보험',
         kicker: '암 보장 한 번에 확인',
         title: '암보험, 꼭 가입한 걸까요?',
-        description: '부족한 진단비와 중복 보장을 모아보고 내 상황에 맞는 암 보장을 확인하세요.',
+        description: '진단비와 치료비 보장을 현재 상황에 맞춰 점검해드립니다.',
         tags: ['암 진단비', '중복보장 체크', '보장분석'],
         tone: 'bg-[#edf7f7]',
         accent: 'text-[#6676b8]',
@@ -28,9 +28,9 @@ const heroSlides = [
     {
         label: '치매/간병보험',
         product: '치매/간병보험',
-        kicker: '긴 돌봄의 시간을 대비',
+        kicker: '긴 노후를 위한 준비',
         title: '치매/간병보험, 가족 부담까지 생각합니다.',
-        description: '간병비, 요양, 치매 관련 보장을 현재 가족 상황에 맞춰 현실적으로 정리합니다.',
+        description: '간병비, 요양, 치매 관련 보장을 가족 상황에 맞춰 정리합니다.',
         tags: ['간병비', '치매보장', '부모님 상담'],
         tone: 'bg-[#f0faf6]',
         accent: 'text-[#39806c]',
@@ -52,7 +52,7 @@ const heroSlides = [
         product: '치아보험',
         kicker: '치료비 부담을 가볍게',
         title: '치아보험, 필요한 치료 중심으로.',
-        description: '보존치료, 보철치료, 임플란트 보장을 연령과 치료 계획에 맞춰 확인합니다.',
+        description: '보존치료, 보철치료, 임플란트 보장을 나이와 치료 계획에 맞춰 확인합니다.',
         tags: ['보존치료', '보철치료', '임플란트'],
         tone: 'bg-[#fff8ec]',
         accent: 'text-[#c06d2b]',
@@ -74,8 +74,8 @@ const heroSlides = [
         product: '어린이보험',
         kicker: '성장 단계별 보장',
         title: '어린이보험, 필요한 때를 놓치지 않게.',
-        description: '태아부터 청소년기까지 치료비, 진단비, 생활 보장을 한눈에 비교합니다.',
-        tags: ['태아 상담', '성장기 보장', '부모 부담 절감'],
+        description: '영유아부터 청소년기까지 치료비, 진단비, 생활 보장을 비교합니다.',
+        tags: ['영유아 상담', '성장기 보장', '부모 부담 절감'],
         tone: 'bg-[#eef8ff]',
         accent: 'text-[#2f76a8]',
         badge: 'KIDS',
@@ -83,16 +83,16 @@ const heroSlides = [
 ];
 
 const rollingReceiptRows = [
-    { name: '김*현', product: '암보험', status: '상담사 배정 완료', time: '1분 전' },
+    { name: '김*아', product: '암보험', status: '상담사 배정 완료', time: '1분 전' },
     { name: '박*준', product: '질병/상해보험', status: '보장 분석 중', time: '4분 전' },
     { name: '이*지', product: '치매/간병보험', status: '전화 상담 예약', time: '8분 전' },
-    { name: '최*민', product: '펫보험', status: '접수 확인', time: '12분 전' },
+    { name: '최*미', product: '펫보험', status: '접수 확인', time: '12분 전' },
 ];
 
-const faqs = [
+const fallbackFaqs = [
     {
-        question: '보험진단은 어떤 내용을 확인하나요?',
-        answer: '가입 중인 보장의 중복, 부족한 진단비, 갱신 시점과 보험료 변화를 함께 살펴봅니다.',
+        question: '보험점검은 어떤 내용을 확인하나요?',
+        answer: '가입 중인 보장의 중복, 부족한 진단비, 갱신 시점과 보험료 변화를 함께 확인합니다.',
     },
     {
         question: '상담 신청 후 바로 연락이 오나요?',
@@ -111,8 +111,8 @@ const pointMallProducts = [
 ];
 
 const events = [
-    { title: '5월 보험진단 참여 이벤트', period: '2026.05.01 - 2026.05.31', reward: '최대 20,000P' },
-    { title: '펫보험 상담 후기 적립', period: '2026.05.10 - 2026.06.09', reward: '후기 작성 시 5,000P' },
+    { title: '보험점검 참여 이벤트', period: '2026.06.01 - 2026.06.30', reward: '최대 20,000P' },
+    { title: '펫보험 상담 후기 적립', period: '2026.06.01 - 2026.06.30', reward: '후기 작성 시 5,000P' },
 ];
 
 const qnaPreviews = [
@@ -123,7 +123,7 @@ const qnaPreviews = [
     },
     {
         category: '간병',
-        title: '부모님 간병보험은 몇 세까지 준비할 수 있나요?',
+        title: '부모님 간병보험은 몇 살까지 준비할 수 있나요?',
         answer: '상품별 가입 가능 나이와 고지 항목이 달라 사전 확인이 필요합니다.',
     },
     {
@@ -133,16 +133,16 @@ const qnaPreviews = [
     },
 ];
 
-const notices = [
-    { title: '개인정보 처리방침 개정 안내', date: '2026.05.28' },
-    { title: '상담 운영 시간 변경 안내', date: '2026.05.24' },
-    { title: '포인트몰 일부 상품 교환 지연 안내', date: '2026.05.20' },
+const fallbackNotices = [
+    { title: '개인정보 처리방침 개정 안내', date: '2026.06.01', href: '/customer/notices' },
+    { title: '상담 운영 시간 변경 안내', date: '2026.05.28', href: '/customer/notices' },
+    { title: '포인트몰 일부 상품 교환 지연 안내', date: '2026.05.20', href: '/customer/notices' },
 ];
 
 const formatPhone = (value) => {
-    const rest = value.replace(/\D/g, '').replace(/^010/, '').slice(0, 8);
-    const middle = rest.slice(0, 4);
-    const last = rest.slice(4, 8);
+    const digits = value.replace(/\D/g, '').replace(/^010/, '').slice(0, 8);
+    const middle = digits.slice(0, 4);
+    const last = digits.slice(4, 8);
 
     if (!middle) return '010-';
     if (!last) return `010-${middle}`;
@@ -203,21 +203,20 @@ export default function Welcome({ auth, cms = {} }) {
         ? cms.notices.map((notice) => ({
               title: notice.title,
               date: notice.publishedAt ?? '',
-              href: notice.linkUrl ?? '/customer/notices',
+              href: notice.linkUrl ?? `/customer/notices/${notice.id}`,
           }))
-        : notices.map((notice) => ({ ...notice, href: '/customer/notices' }));
+        : fallbackNotices;
     const cmsFaqs = cms.faqs?.length
         ? cms.faqs.map((faq) => ({
               question: faq.title,
               answer: faq.body ?? '',
           }))
-        : faqs;
+        : fallbackFaqs;
     const cmsMainBanner = cms.mainBanners?.[0] ?? null;
     const form = useForm({
         type: 'product',
         applicant_name: '',
         phone: '010-',
-        birth_date: '',
         interested_product: activeProduct.product,
         preferred_contact_time: '',
         privacy_agreement: false,
@@ -304,7 +303,7 @@ export default function Welcome({ auth, cms = {} }) {
                         </div>
                     </div>
 
-                    <div className="hero-dots absolute bottom-7 left-5 z-10 flex gap-2 sm:left-10 lg:left-[118px] lg:bottom-14">
+                    <div className="hero-dots absolute bottom-7 left-5 z-10 flex gap-2 sm:left-10 lg:bottom-14 lg:left-[118px]">
                         {heroSlides.map((slide, index) => (
                             <button
                                 key={slide.label}
@@ -447,7 +446,7 @@ export default function Welcome({ auth, cms = {} }) {
                         )}
                         <BannerStrip
                             icon={Sparkles}
-                            title="오늘의 맞춤 보험진단"
+                            title="오늘의 맞춤 보험점검"
                             description="가입 내역을 정리하고 부족한 보장만 빠르게 확인하세요."
                             href="/insurance-checkup"
                         />
@@ -489,6 +488,7 @@ export default function Welcome({ auth, cms = {} }) {
                         eyebrow="FAQ"
                         title="자주 묻는 질문"
                         description="상담 전에 가장 많이 확인하는 내용을 모았습니다."
+                        href="/customer/faq"
                     />
                     <div className="space-y-3">
                         {cmsFaqs.map((faq) => (
@@ -531,7 +531,7 @@ export default function Welcome({ auth, cms = {} }) {
                     <SectionHeader
                         eyebrow="Event"
                         title="진행 중인 이벤트"
-                        description="상담과 보험진단을 가볍게 시작할 수 있는 혜택입니다."
+                        description="상담과 보험점검을 가볍게 시작할 수 있는 혜택입니다."
                         href="/events"
                     />
                     <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -593,7 +593,7 @@ export default function Welcome({ auth, cms = {} }) {
                         <div className="mt-6 rounded-lg border border-toss-grey200 bg-toss-grey50 p-5">
                             <p className="text-sm font-semibold text-toss-grey900">고객센터</p>
                             <p className="mt-2 text-sm leading-6 text-toss-grey600">
-                                상담 접수와 포인트 이용 문의를 운영 시간 안에 순서대로 안내합니다.
+                                상담 접수, 포인트 이용, CMS 공지와 FAQ를 한 곳에서 확인할 수 있습니다.
                             </p>
                             <Link
                                 href="/customer"

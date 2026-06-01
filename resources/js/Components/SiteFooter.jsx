@@ -34,9 +34,9 @@ export default function SiteFooter() {
             <div className="mx-auto max-w-7xl px-5 py-10 sm:px-6 lg:px-8">
                 <div className="grid gap-8 lg:grid-cols-[1.4fr_repeat(3,1fr)]">
                     <div>
-                        <div className="text-lg font-bold text-toss-grey900">보흠CC</div>
+                        <div className="text-lg font-bold text-toss-grey900">보험CC</div>
                         <p className="mt-3 max-w-sm text-sm leading-6 text-toss-grey600">
-                            보험 상담과 점검을 차분하게 연결하는 독립 보험 플랫폼입니다.
+                            보험 상담, 보장 점검, 포인트몰을 한 곳에서 이용할 수 있는 보험 플랫폼입니다.
                             필요한 정보만 명확하게 안내합니다.
                         </p>
                         <dl className="mt-5 space-y-1 text-xs leading-5 text-toss-grey500">
@@ -52,7 +52,7 @@ export default function SiteFooter() {
                 </div>
 
                 <div className="mt-8 border-t border-toss-grey200 pt-5 text-xs text-toss-grey500">
-                    © 2026 보흠CC. 보험계약 체결 전 상품설명서와 약관을 확인하시기 바랍니다.
+                    © 2026 보험CC. 보험계약 체결 전 상품설명서와 약관을 확인하시기 바랍니다.
                 </div>
             </div>
         </footer>
