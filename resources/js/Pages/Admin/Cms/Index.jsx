@@ -79,7 +79,9 @@ export default function Index({ contents, typeOptions }) {
                 <div className="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
                     <section className="rounded-lg bg-white p-5 shadow-sm ring-1 ring-gray-200">
                         <h1 className="text-xl font-bold text-gray-900">콘텐츠 추가</h1>
-                        <p className="mt-1 text-sm text-gray-500">공지사항, FAQ, 메인 배너 문구를 관리할 수 있는 CMS 기본 구조입니다.</p>
+                        <p className="mt-1 text-sm text-gray-500">
+                            공지사항, FAQ, 메인 배너, 회사소개, 이벤트 안내 문구를 관리합니다.
+                        </p>
                         {flash?.success && (
                             <div className="mt-4 rounded-lg bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700">{flash.success}</div>
                         )}
@@ -100,6 +102,9 @@ export default function Index({ contents, typeOptions }) {
                                         <span className="rounded bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-600">
                                             {content.isPublished ? '게시중' : '숨김'}
                                         </span>
+                                        {content.publishedAt && (
+                                            <span className="text-xs text-gray-400">{content.publishedAt}</span>
+                                        )}
                                     </div>
                                     <ContentForm content={content} typeOptions={typeOptions} />
                                 </div>

@@ -95,6 +95,8 @@ class ContentManagementController extends Controller
             'notice' => '공지사항',
             'faq' => 'FAQ',
             'main_banner' => '메인 배너',
+            'company_intro' => '회사소개',
+            'event_guide' => '이벤트 안내',
         ];
     }
 

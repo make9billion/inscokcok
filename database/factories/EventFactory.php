@@ -14,7 +14,7 @@ class EventFactory extends Factory
         return [
             'slug' => fake()->unique()->slug(2),
             'name' => fake()->words(2, true),
-            'trigger_type' => fake()->unique()->lexify('event.????'),
+            'trigger_type' => fake()->unique()->bothify('event.####'),
             'point_amount' => 1000,
             'is_active' => true,
         ];

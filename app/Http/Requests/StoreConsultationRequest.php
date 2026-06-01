@@ -41,7 +41,7 @@ class StoreConsultationRequest extends FormRequest
             'preferred_contact_time' => '희망 연락 시간',
             'memo' => '상담 메모',
             'privacy_agreement' => '개인정보 수집 및 이용 동의',
-            'third_party_agreement' => '제3자 제공 동의',
+            'third_party_agreement' => '제3자 정보제공 동의',
         ];
     }
 }

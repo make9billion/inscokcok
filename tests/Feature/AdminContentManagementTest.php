@@ -41,6 +41,22 @@ class AdminContentManagementTest extends TestCase
         ]);
     }
 
+    public function test_admin_cms_exposes_extended_content_type_options(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)->get('/admin/cms')->assertOk()->assertInertia(fn ($page) => $page
+            ->component('Admin/Cms/Index')
+            ->where('typeOptions.0.label', '공지사항')
+            ->where('typeOptions.1.label', 'FAQ')
+            ->where('typeOptions.2.label', '메인 배너')
+            ->where('typeOptions.3.value', 'company_intro')
+            ->where('typeOptions.3.label', '회사소개')
+            ->where('typeOptions.4.value', 'event_guide')
+            ->where('typeOptions.4.label', '이벤트 안내')
+        );
+    }
+
     public function test_admin_can_update_site_content(): void
     {
         $admin = User::factory()->admin()->create();

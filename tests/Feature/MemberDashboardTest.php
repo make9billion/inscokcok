@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\ConsultationStatus;
 use App\Enums\PointLedgerType;
 use App\Models\Consultation;
 use App\Models\KnowledgeQuestion;
@@ -19,9 +20,17 @@ class MemberDashboardTest extends TestCase
     {
         $user = User::factory()->create();
 
-        Consultation::factory()->for($user)->create();
-        KnowledgeQuestion::factory()->for($user)->create();
-        PointMallOrder::factory()->for($user)->create(['total_points' => 3000]);
+        Consultation::factory()->for($user)->create([
+            'interested_product' => '암보험',
+            'status' => ConsultationStatus::Received,
+        ]);
+        KnowledgeQuestion::factory()->for($user)->create([
+            'title' => '보험료 질문',
+        ]);
+        PointMallOrder::factory()->for($user)->create([
+            'order_number' => 'PM-TEST-001',
+            'total_points' => 3000,
+        ]);
         PointLedgerEntry::factory()->for($user)->create([
             'type' => PointLedgerType::Earned,
             'points' => 1000,
@@ -37,6 +46,9 @@ class MemberDashboardTest extends TestCase
             ->where('summary.consultationCount', 1)
             ->where('summary.questionCount', 1)
             ->where('summary.orderCount', 1)
+            ->where('recentConsultations.0.interestedProduct', '암보험')
+            ->where('recentOrders.0.orderNumber', 'PM-TEST-001')
+            ->where('recentQuestions.0.title', '보험료 질문')
         );
     }
 }

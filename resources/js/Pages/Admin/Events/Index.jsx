@@ -82,7 +82,7 @@ export default function Index({ events }) {
                         <div className="border-b border-gray-100 px-5 py-4">
                             <h1 className="text-lg font-bold text-gray-900">포인트 이벤트 설정</h1>
                             <p className="mt-1 text-sm text-gray-500">
-                                회원가입, 상담완료 등 자동 적립 이벤트의 포인트와 활성 여부를 관리합니다.
+                                회원가입, 상담완료 등 자동 적립 이벤트의 포인트와 활성 상태를 관리합니다.
                             </p>
                         </div>
 

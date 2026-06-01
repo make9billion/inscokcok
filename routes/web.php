@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\PointMallOrderManagementController;
 use App\Http\Controllers\Admin\PointMallProductManagementController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\CustomerContentController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\KnowledgeQuestionController;
 use App\Http\Controllers\MemberPointController;
 use App\Http\Controllers\PointMallController;
@@ -107,10 +108,7 @@ Route::get('/insurance/child', fn () => Inertia::render('StaticImagePage', $stat
 Route::post('/consultations', [ConsultationController::class, 'store'])
     ->name('consultations.store');
 Route::get('/knowledge', [KnowledgeQuestionController::class, 'index'])->name('knowledge.index');
-Route::get('/events', fn () => Inertia::render('Customer/Company', [
-    'title' => '이벤트',
-    'description' => '진행 중인 이벤트와 포인트 혜택은 관리자 CMS 연동 후 이곳에 공개됩니다.',
-]))->name('events.index');
+Route::get('/events', [EventController::class, 'index'])->name('events.index');
 Route::get('/customer', [CustomerContentController::class, 'index'])->name('customer.index');
 Route::get('/customer/notices', [CustomerContentController::class, 'notices'])->name('customer.notices.index');
 Route::get('/customer/notices/{content}', [CustomerContentController::class, 'notice'])->name('customer.notices.show');
@@ -138,6 +136,39 @@ Route::get('/dashboard', function () {
                 'points' => $entry->points,
                 'memo' => $entry->memo,
                 'createdAt' => $entry->created_at?->format('Y-m-d'),
+            ]),
+        'recentConsultations' => $user->consultations()
+            ->latest()
+            ->take(5)
+            ->get(['id', 'status', 'interested_product', 'preferred_contact_time', 'created_at'])
+            ->map(fn ($consultation) => [
+                'id' => $consultation->id,
+                'status' => $consultation->status->value,
+                'interestedProduct' => $consultation->interested_product,
+                'preferredContactTime' => $consultation->preferred_contact_time,
+                'createdAt' => $consultation->created_at?->format('Y-m-d'),
+            ]),
+        'recentOrders' => $user->pointMallOrders()
+            ->latest()
+            ->take(5)
+            ->get(['id', 'status', 'order_number', 'total_points', 'cash_payment_amount', 'ordered_at', 'created_at'])
+            ->map(fn ($order) => [
+                'id' => $order->id,
+                'status' => $order->status->value,
+                'orderNumber' => $order->order_number,
+                'totalPoints' => $order->total_points,
+                'cashPaymentAmount' => $order->cash_payment_amount,
+                'orderedAt' => ($order->ordered_at ?? $order->created_at)?->format('Y-m-d'),
+            ]),
+        'recentQuestions' => $user->knowledgeQuestions()
+            ->latest()
+            ->take(5)
+            ->get(['id', 'status', 'title', 'created_at'])
+            ->map(fn ($question) => [
+                'id' => $question->id,
+                'status' => $question->status->value,
+                'title' => $question->title,
+                'createdAt' => $question->created_at?->format('Y-m-d'),
             ]),
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
