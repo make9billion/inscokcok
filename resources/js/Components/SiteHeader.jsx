@@ -53,6 +53,18 @@ function AuthLinks({ auth, mobile = false }) {
                 <Link href={route('dashboard')} className={baseClass}>
                     마이페이지
                 </Link>
+                <Link
+                    href={route('logout')}
+                    method="post"
+                    as="button"
+                    className={
+                        mobile
+                            ? `${baseClass} w-full text-left`
+                            : 'rounded px-3 py-2 text-sm font-semibold text-toss-grey500 transition hover:text-toss-grey900 focus:outline-none focus-visible:ring-2 focus-visible:ring-toss-blue'
+                    }
+                >
+                    로그아웃
+                </Link>
             </div>
         );
     }

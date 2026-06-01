@@ -99,14 +99,19 @@ class SiteShellTest extends TestCase
         $this->assertStringNotContainsString('href="/customer-center"', $source);
     }
 
-    public function test_site_navigation_excludes_my_info_top_level_link(): void
+    public function test_site_navigation_excludes_my_info_and_exposes_logout(): void
     {
         $navigation = file_get_contents(resource_path('js/Constants/siteNavigation.js'));
         $header = file_get_contents(resource_path('js/Components/SiteHeader.jsx'));
+        $authenticatedLayout = file_get_contents(resource_path('js/Layouts/AuthenticatedLayout.jsx'));
 
         $this->assertStringNotContainsString('내정보', $navigation);
         $this->assertStringNotContainsString("href: '/mypage'", $navigation);
         $this->assertStringContainsString('마이페이지', $header);
+        $this->assertStringContainsString('로그아웃', $header);
+        $this->assertStringContainsString("method=\"post\"", $header);
+        $this->assertStringContainsString("route('logout')", $header);
+        $this->assertStringContainsString('로그아웃', $authenticatedLayout);
         $this->assertStringNotContainsString('내정보', $header);
         $this->assertStringNotContainsString('profile.edit', $header);
     }
