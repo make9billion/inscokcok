@@ -20,7 +20,7 @@ class ConsultationCompletionPointGrantTest extends TestCase
         $admin = User::factory()->admin()->create();
         $member = User::factory()->create();
         $consultation = Consultation::factory()->for($member)->create([
-            'status' => ConsultationStatus::InProgress,
+            'status' => ConsultationStatus::Assigned,
         ]);
         Event::factory()->create([
             'slug' => 'consultation_completed_bonus',
@@ -58,7 +58,7 @@ class ConsultationCompletionPointGrantTest extends TestCase
         $admin = User::factory()->admin()->create();
         $consultation = Consultation::factory()->create([
             'user_id' => null,
-            'status' => ConsultationStatus::InProgress,
+            'status' => ConsultationStatus::Assigned,
         ]);
         Event::factory()->create([
             'slug' => 'consultation_completed_bonus',

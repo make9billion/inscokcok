@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Services\PointLedgerService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -19,7 +20,7 @@ class ConsultationManagementController extends Controller
 {
     public function index(Request $request): Response
     {
-        $this->authorizeAdmin($request);
+        $this->authorizeConsultationAccess($request);
 
         $validated = $request->validate([
             'status' => ['nullable', new Enum(ConsultationStatus::class)],
@@ -28,9 +29,12 @@ class ConsultationManagementController extends Controller
 
         $status = $validated['status'] ?? null;
         $search = trim((string) ($validated['search'] ?? ''));
+        $user = $request->user();
 
         return Inertia::render('Admin/Consultations/Index', [
             'consultations' => Consultation::query()
+                ->with('assignedPlanner')
+                ->when($user?->isPlanner(), fn ($query) => $query->where('assigned_planner_id', $user->id))
                 ->when($status, fn ($query) => $query->where('status', $status))
                 ->when($search !== '', fn ($query) => $query->where(function ($query) use ($search) {
                     $query
@@ -46,33 +50,22 @@ class ConsultationManagementController extends Controller
                 'status' => $status,
                 'search' => $search,
             ],
-            'statusOptions' => collect(ConsultationStatus::cases())->map(fn (ConsultationStatus $status) => [
-                'value' => $status->value,
-                'label' => $this->statusLabel($status),
-            ]),
+            'statusOptions' => $this->statusOptions(),
         ]);
     }
 
     public function show(Request $request, Consultation $consultation): Response
     {
-        $this->authorizeAdmin($request);
+        $this->authorizeConsultationAccess($request);
+        $this->authorizePlannerAssignment($request, $consultation);
 
         return Inertia::render('Admin/Consultations/Show', [
             'consultation' => $this->serializeConsultation(
                 $consultation->load(['assignedPlanner', 'statusLogs.actor'])
             ),
-            'planners' => User::query()
-                ->where('role', UserRole::Planner)
-                ->orderBy('name')
-                ->get(['id', 'name'])
-                ->map(fn (User $planner) => [
-                    'id' => $planner->id,
-                    'name' => $planner->name,
-                ]),
-            'statusOptions' => collect(ConsultationStatus::cases())->map(fn (ConsultationStatus $status) => [
-                'value' => $status->value,
-                'label' => $this->statusLabel($status),
-            ]),
+            'planners' => $this->plannerOptions($request),
+            'statusOptions' => $this->statusOptions($request),
+            'canChangePlanner' => $request->user()?->isAdmin() ?? false,
         ]);
     }
 
@@ -81,22 +74,29 @@ class ConsultationManagementController extends Controller
         Consultation $consultation,
         PointLedgerService $pointLedger
     ): RedirectResponse {
-        $this->authorizeAdmin($request);
+        $this->authorizeConsultationAccess($request);
+        $this->authorizePlannerAssignment($request, $consultation);
 
+        $allowedStatuses = $this->allowedStatusValues($request);
         $validated = $request->validate([
-            'status' => ['required', new Enum(ConsultationStatus::class)],
+            'status' => ['required', Rule::in($allowedStatuses)],
             'assigned_planner_id' => ['nullable', 'exists:users,id'],
             'memo' => ['nullable', 'string', 'max:1000'],
         ]);
 
         $fromStatus = $consultation->status;
         $toStatus = ConsultationStatus::from($validated['status']);
+        $assignedPlannerId = $request->user()?->isPlanner()
+            ? $request->user()->id
+            : ($validated['assigned_planner_id'] ?? null);
 
         $consultation->update([
             'status' => $toStatus,
-            'assigned_planner_id' => $validated['assigned_planner_id'] ?? null,
+            'assigned_planner_id' => $assignedPlannerId,
             'completed_at' => $toStatus === ConsultationStatus::Completed ? now() : $consultation->completed_at,
-            'cancelled_at' => $toStatus === ConsultationStatus::Cancelled ? now() : $consultation->cancelled_at,
+            'cancelled_at' => in_array($toStatus, [ConsultationStatus::Cancelled, ConsultationStatus::ConsultationCancelled], true)
+                ? now()
+                : $consultation->cancelled_at,
         ]);
 
         ConsultationStatusLog::create([
@@ -116,9 +116,67 @@ class ConsultationManagementController extends Controller
             ->with('success', '상담 상태가 변경되었습니다.');
     }
 
-    private function authorizeAdmin(Request $request): void
+    private function authorizeConsultationAccess(Request $request): void
     {
-        abort_unless($request->user()?->canAccessAdmin(), 403);
+        abort_unless($request->user()?->isAdmin() || $request->user()?->isPlanner(), 403);
+    }
+
+    private function authorizePlannerAssignment(Request $request, Consultation $consultation): void
+    {
+        if ($request->user()?->isPlanner()) {
+            abort_unless($consultation->assigned_planner_id === $request->user()->id, 403);
+        }
+    }
+
+    private function plannerOptions(Request $request): array
+    {
+        if ($request->user()?->isPlanner()) {
+            return [[
+                'id' => $request->user()->id,
+                'name' => $request->user()->name,
+            ]];
+        }
+
+        return User::query()
+            ->where('role', UserRole::Planner)
+            ->orderBy('name')
+            ->get(['id', 'name'])
+            ->map(fn (User $planner) => [
+                'id' => $planner->id,
+                'name' => $planner->name,
+            ])
+            ->all();
+    }
+
+    private function allowedStatusValues(Request $request): array
+    {
+        if ($request->user()?->isPlanner()) {
+            return [
+                ConsultationStatus::Assigned->value,
+                ConsultationStatus::Completed->value,
+                ConsultationStatus::ConsultationCancelled->value,
+            ];
+        }
+
+        return collect(ConsultationStatus::cases())->map->value->all();
+    }
+
+    private function statusOptions(?Request $request = null): array
+    {
+        $statuses = ConsultationStatus::cases();
+
+        if ($request?->user()?->isPlanner()) {
+            $statuses = [
+                ConsultationStatus::Assigned,
+                ConsultationStatus::Completed,
+                ConsultationStatus::ConsultationCancelled,
+            ];
+        }
+
+        return collect($statuses)->map(fn (ConsultationStatus $status) => [
+            'value' => $status->value,
+            'label' => $this->statusLabel($status),
+        ])->all();
     }
 
     private function serializeConsultation(Consultation $consultation): array
@@ -154,10 +212,12 @@ class ConsultationManagementController extends Controller
     {
         return match ($status) {
             ConsultationStatus::Received => '접수',
-            ConsultationStatus::Assigned => '배정',
-            ConsultationStatus::InProgress => '진행 중',
-            ConsultationStatus::Completed => '완료',
+            ConsultationStatus::NoAnswer => '부재',
+            ConsultationStatus::Recall => '재통화',
             ConsultationStatus::Cancelled => '취소',
+            ConsultationStatus::Assigned => '설계사배정',
+            ConsultationStatus::Completed => '상담완료',
+            ConsultationStatus::ConsultationCancelled => '상담취소',
         };
     }
 }

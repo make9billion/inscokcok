@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAccountManagementController;
 use App\Http\Controllers\Admin\ContentManagementController;
 use App\Http\Controllers\Admin\ConsultationManagementController;
 use App\Http\Controllers\Admin\EventManagementController;
@@ -219,6 +220,12 @@ Route::middleware('auth')->group(function () {
         ->name('admin.members.index');
     Route::post('/admin/members/{member}/points', [MemberManagementController::class, 'adjustPoints'])
         ->name('admin.members.points.adjust');
+    Route::get('/admin/accounts', [AdminAccountManagementController::class, 'index'])
+        ->name('admin.accounts.index');
+    Route::post('/admin/accounts', [AdminAccountManagementController::class, 'store'])
+        ->name('admin.accounts.store');
+    Route::patch('/admin/accounts/{account}', [AdminAccountManagementController::class, 'update'])
+        ->name('admin.accounts.update');
     Route::get('/admin/notices', [ContentManagementController::class, 'notices'])
         ->name('admin.notices.index');
     Route::post('/admin/notices', [ContentManagementController::class, 'storeNotice'])

@@ -10,7 +10,7 @@ function DetailRow({ label, value }) {
     );
 }
 
-export default function Show({ consultation, planners, statusOptions }) {
+export default function Show({ consultation, planners, statusOptions, canChangePlanner = false }) {
     const { flash } = usePage().props;
     const form = useForm({
         status: consultation.status,
@@ -27,17 +27,12 @@ export default function Show({ consultation, planners, statusOptions }) {
     };
 
     return (
-        <AuthenticatedLayout
-            header={<h2 className="text-xl font-semibold leading-tight text-gray-800">상담 상세</h2>}
-        >
+        <AuthenticatedLayout header={<h2 className="text-xl font-semibold leading-tight text-gray-800">상담 상세</h2>}>
             <Head title="상담 상세" />
 
             <div className="py-8">
                 <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-                    <Link
-                        href={route('admin.consultations.index')}
-                        className="text-sm font-semibold text-gray-600 hover:text-gray-900"
-                    >
+                    <Link href={route('admin.consultations.index')} className="text-sm font-semibold text-gray-600 hover:text-gray-900">
                         상담 목록으로
                     </Link>
 
@@ -52,9 +47,7 @@ export default function Show({ consultation, planners, statusOptions }) {
                             <div className="flex items-start justify-between gap-4">
                                 <div>
                                     <p className="text-sm font-semibold text-toss-blue">{consultation.statusLabel}</p>
-                                    <h1 className="mt-1 text-2xl font-bold text-gray-900">
-                                        {consultation.applicantName}
-                                    </h1>
+                                    <h1 className="mt-1 text-2xl font-bold text-gray-900">{consultation.applicantName}</h1>
                                 </div>
                                 <span className="rounded-lg bg-gray-100 px-3 py-1 text-sm font-semibold text-gray-700">
                                     {consultation.type === 'checkup' ? '보험점검' : '상품상담'}
@@ -64,17 +57,13 @@ export default function Show({ consultation, planners, statusOptions }) {
                             <dl className="mt-6 grid gap-5 sm:grid-cols-2">
                                 <DetailRow label="연락처" value={consultation.phone} />
                                 <DetailRow label="생년월일" value={consultation.birthDate} />
-                                <DetailRow label="관심 상품" value={consultation.interestedProduct} />
+                                <DetailRow label="관심상품" value={consultation.interestedProduct} />
                                 <DetailRow
                                     label="현재 월 보험료"
-                                    value={
-                                        consultation.currentMonthlyPremium
-                                            ? `${Number(consultation.currentMonthlyPremium).toLocaleString()}원`
-                                            : null
-                                    }
+                                    value={consultation.currentMonthlyPremium ? `${Number(consultation.currentMonthlyPremium).toLocaleString()}원` : null}
                                 />
                                 <DetailRow label="희망 연락 시간" value={consultation.preferredContactTime} />
-                                <DetailRow label="담당 플래너" value={consultation.assignedPlannerName} />
+                                <DetailRow label="담당 설계사" value={consultation.assignedPlannerName} />
                             </dl>
 
                             <div className="mt-6 rounded-lg bg-gray-50 p-4">
@@ -96,25 +85,22 @@ export default function Show({ consultation, planners, statusOptions }) {
                                     className="mt-2 w-full rounded-lg border-gray-300 text-sm focus:border-toss-blue focus:ring-toss-blue"
                                 >
                                     {statusOptions.map((status) => (
-                                        <option key={status.value} value={status.value}>
-                                            {status.label}
-                                        </option>
+                                        <option key={status.value} value={status.value}>{status.label}</option>
                                     ))}
                                 </select>
                             </label>
 
                             <label className="mt-4 block">
-                                <span className="text-sm font-semibold text-gray-700">담당 플래너</span>
+                                <span className="text-sm font-semibold text-gray-700">담당 설계사</span>
                                 <select
                                     value={form.data.assigned_planner_id}
                                     onChange={(event) => form.setData('assigned_planner_id', event.target.value)}
-                                    className="mt-2 w-full rounded-lg border-gray-300 text-sm focus:border-toss-blue focus:ring-toss-blue"
+                                    disabled={!canChangePlanner}
+                                    className="mt-2 w-full rounded-lg border-gray-300 text-sm focus:border-toss-blue focus:ring-toss-blue disabled:bg-gray-100"
                                 >
                                     <option value="">미배정</option>
                                     {planners.map((planner) => (
-                                        <option key={planner.id} value={planner.id}>
-                                            {planner.name}
-                                        </option>
+                                        <option key={planner.id} value={planner.id}>{planner.name}</option>
                                     ))}
                                 </select>
                             </label>
@@ -129,11 +115,7 @@ export default function Show({ consultation, planners, statusOptions }) {
                                 />
                             </label>
 
-                            <button
-                                type="submit"
-                                disabled={form.processing}
-                                className="mt-5 w-full rounded-lg bg-toss-blue px-4 py-3 text-sm font-semibold text-white transition hover:bg-toss-blueHover disabled:opacity-60"
-                            >
+                            <button type="submit" disabled={form.processing} className="mt-5 w-full rounded-lg bg-toss-blue px-4 py-3 text-sm font-semibold text-white transition hover:bg-toss-blueHover disabled:opacity-60">
                                 {form.processing ? '저장 중' : '상태 저장'}
                             </button>
                         </form>
@@ -149,7 +131,7 @@ export default function Show({ consultation, planners, statusOptions }) {
                                         <span className="text-gray-500">{log.createdAt}</span>
                                     </div>
                                     <p className="mt-1 text-gray-600">{log.memo || '메모 없음'}</p>
-                                    <p className="mt-1 text-xs text-gray-500">처리자: {log.actorName || '-'}</p>
+                                    <p className="mt-1 text-xs text-gray-500">처리자 {log.actorName || '-'}</p>
                                 </div>
                             ))}
                         </div>

@@ -6,20 +6,26 @@ import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 const adminLinks = [
-    ['상담관리', 'admin.consultations.index'],
-    ['회원관리', 'admin.members.index'],
-    ['문의하기', 'admin.inquiries.index'],
-    ['FAQ', 'admin.faqs.index'],
-    ['공지사항', 'admin.notices.index'],
-    ['이벤트관리', 'admin.events.index'],
-    ['지식인관리', 'admin.knowledge.index'],
-    ['주문관리', 'admin.point-mall.orders.index'],
-    ['상품관리', 'admin.point-mall.products.index'],
+    ['상담관리', 'admin.consultations.index', ['admin', 'planner']],
+    ['관리자관리', 'admin.accounts.index', ['admin']],
+    ['회원관리', 'admin.members.index', ['admin']],
+    ['문의하기', 'admin.inquiries.index', ['admin']],
+    ['FAQ', 'admin.faqs.index', ['admin']],
+    ['공지사항', 'admin.notices.index', ['admin']],
+    ['이벤트관리', 'admin.events.index', ['admin']],
+    ['지식인관리', 'admin.knowledge.index', ['admin', 'consultation_manager']],
+    ['주문관리', 'admin.point-mall.orders.index', ['admin']],
+    ['상품관리', 'admin.point-mall.products.index', ['admin']],
 ];
+
+function allowedLinks(user) {
+    return adminLinks.filter(([, , roles]) => roles.includes(user?.role));
+}
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const visibleAdminLinks = allowedLinks(user);
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -37,12 +43,11 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <NavLink href={route('dashboard')} active={route().current('dashboard')}>
                                     마이페이지
                                 </NavLink>
-                                {user?.canAccessAdmin &&
-                                    adminLinks.map(([label, routeName]) => (
-                                        <NavLink key={routeName} href={route(routeName)} active={route().current(routeName)}>
-                                            {label}
-                                        </NavLink>
-                                    ))}
+                                {visibleAdminLinks.map(([label, routeName]) => (
+                                    <NavLink key={routeName} href={route(routeName)} active={route().current(routeName)}>
+                                        {label}
+                                    </NavLink>
+                                ))}
                             </div>
                         </div>
 
@@ -79,20 +84,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                 className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
                             >
                                 <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path
-                                        className={!showingNavigationDropdown ? 'inline-flex' : 'hidden'}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={showingNavigationDropdown ? 'inline-flex' : 'hidden'}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
+                                    <path className={!showingNavigationDropdown ? 'inline-flex' : 'hidden'} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                                    <path className={showingNavigationDropdown ? 'inline-flex' : 'hidden'} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
                         </div>
@@ -104,12 +97,11 @@ export default function AuthenticatedLayout({ header, children }) {
                         <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
                             마이페이지
                         </ResponsiveNavLink>
-                        {user?.canAccessAdmin &&
-                            adminLinks.map(([label, routeName]) => (
-                                <ResponsiveNavLink key={routeName} href={route(routeName)} active={route().current(routeName)}>
-                                    {label}
-                                </ResponsiveNavLink>
-                            ))}
+                        {visibleAdminLinks.map(([label, routeName]) => (
+                            <ResponsiveNavLink key={routeName} href={route(routeName)} active={route().current(routeName)}>
+                                {label}
+                            </ResponsiveNavLink>
+                        ))}
                     </div>
 
                     <div className="border-t border-gray-200 pb-1 pt-4">

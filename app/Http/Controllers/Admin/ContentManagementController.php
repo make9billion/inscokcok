@@ -189,6 +189,6 @@ class ContentManagementController extends Controller
 
     private function authorizeAdmin(Request $request): void
     {
-        abort_unless($request->user()?->canAccessAdmin(), 403);
+        abort_unless($request->user()?->isAdmin(), 403);
     }
 }
