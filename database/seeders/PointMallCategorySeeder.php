@@ -29,7 +29,7 @@ class PointMallCategorySeeder extends Seeder
                 'updated_at' => $now,
             ],
             [
-                'name' => '휴대폰 주변기기',
+                'name' => '모바일 주변기기',
                 'slug' => 'mobile-accessories',
                 'sort_order' => 30,
                 'is_active' => true,
@@ -37,7 +37,7 @@ class PointMallCategorySeeder extends Seeder
                 'updated_at' => $now,
             ],
             [
-                'name' => '잡화',
+                'name' => '생활용품',
                 'slug' => 'goods',
                 'sort_order' => 40,
                 'is_active' => true,

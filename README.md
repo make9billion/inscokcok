@@ -7,7 +7,7 @@ Full-custom Korean insurance agency platform with a customer site, admin CMS, co
 - Point mall is self-built.
 - Admin CMS does not include insurance product management.
 - Insurance product, service guide, insurance checkup, and company intro pages are image-backed project-file content.
-- Main page references `배너+폼_예시` for the banner and form direction.
+- Main page references the uploaded banner and form example for the banner/form direction.
 - `DESIGN.MD` is the visual design source of truth.
 - Event point amounts are editable from admin event management.
 
@@ -28,9 +28,17 @@ npm install
 copy .env.example .env
 php artisan key:generate
 php artisan migrate
+php artisan db:seed
 npm.cmd run build
 php artisan test
 ```
+
+Default local seeded accounts:
+
+- Admin: `make9billion@gmail.com` / `password`
+- Member: `test@example.com` / `password`
+
+For deployment or shared environments, override the admin seed with `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `ADMIN_NAME` in `.env` before running `php artisan db:seed`.
 
 If PowerShell cannot find `php` or `composer`, open Laravel Herd once and confirm the Herd user bin path is available:
 
@@ -82,4 +90,3 @@ Implementation should follow:
 - Breeze auth/profile baseline is installed.
 - Windows verifier passes.
 - Playwright is not configured yet and is skipped by the verifier.
-
