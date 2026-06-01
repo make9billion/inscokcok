@@ -182,4 +182,17 @@ class SiteShellTest extends TestCase
             ->where('faqs.0.body', 'FAQ body')
         );
     }
+
+    public function test_company_page_renders_uploaded_company_images(): void
+    {
+        $this->get('/customer/company')->assertOk()->assertInertia(fn ($page) => $page
+            ->component('Customer/Company')
+        );
+
+        $source = file_get_contents(resource_path('js/Pages/Customer/Company.jsx'));
+
+        $this->assertStringContainsString('../../../images/company/01.png', $source);
+        $this->assertStringContainsString('../../../images/company/02.png', $source);
+        $this->assertStringContainsString('회사소개', $source);
+    }
 }
