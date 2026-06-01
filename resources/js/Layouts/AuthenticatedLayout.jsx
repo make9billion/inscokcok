@@ -26,6 +26,7 @@ export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
     const visibleAdminLinks = allowedLinks(user);
+    const dashboardLabel = user?.canAccessAdmin ? '대시보드' : '마이페이지';
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -41,7 +42,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                             <div className="hidden space-x-6 sm:-my-px sm:ms-8 sm:flex">
                                 <NavLink href={route('dashboard')} active={route().current('dashboard')}>
-                                    마이페이지
+                                    {dashboardLabel}
                                 </NavLink>
                                 {visibleAdminLinks.map(([label, routeName]) => (
                                     <NavLink key={routeName} href={route(routeName)} active={route().current(routeName)}>
@@ -95,7 +96,7 @@ export default function AuthenticatedLayout({ header, children }) {
                 <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
                     <div className="space-y-1 pb-3 pt-2">
                         <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
-                            마이페이지
+                            {dashboardLabel}
                         </ResponsiveNavLink>
                         {visibleAdminLinks.map(([label, routeName]) => (
                             <ResponsiveNavLink key={routeName} href={route(routeName)} active={route().current(routeName)}>

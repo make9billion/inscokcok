@@ -110,6 +110,21 @@ class AdminAccountManagementTest extends TestCase
         );
     }
 
+    public function test_consultation_status_options_keep_cancelled_after_recall(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)->get('/admin/consultations')->assertOk()->assertInertia(fn ($page) => $page
+            ->where('statusOptions.0.value', ConsultationStatus::Received->value)
+            ->where('statusOptions.1.value', ConsultationStatus::NoAnswer->value)
+            ->where('statusOptions.2.value', ConsultationStatus::Recall->value)
+            ->where('statusOptions.3.value', ConsultationStatus::Cancelled->value)
+            ->where('statusOptions.4.value', ConsultationStatus::Assigned->value)
+            ->where('statusOptions.5.value', ConsultationStatus::Completed->value)
+            ->where('statusOptions.6.value', ConsultationStatus::ConsultationCancelled->value)
+        );
+    }
+
     public function test_planner_cannot_access_unassigned_consultation_or_other_admin_pages(): void
     {
         $planner = User::factory()->planner()->create();
