@@ -7,6 +7,7 @@ import { useState } from 'react';
 
 const adminLinks = [
     ['상담관리', 'admin.consultations.index'],
+    ['회원관리', 'admin.members.index'],
     ['문의하기', 'admin.inquiries.index'],
     ['FAQ', 'admin.faqs.index'],
     ['공지사항', 'admin.notices.index'],

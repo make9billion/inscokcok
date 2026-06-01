@@ -97,6 +97,8 @@ class SiteShellTest extends TestCase
         $this->assertStringContainsString("method=\"post\"", $header);
         $this->assertStringContainsString("route('logout')", $header);
         $this->assertStringContainsString('로그아웃', $authenticatedLayout);
+        $this->assertStringContainsString('회원관리', $authenticatedLayout);
+        $this->assertStringContainsString('admin.members.index', $authenticatedLayout);
         $this->assertStringContainsString('문의하기', $authenticatedLayout);
         $this->assertStringContainsString('admin.inquiries.index', $authenticatedLayout);
         $this->assertStringContainsString('admin.faqs.index', $authenticatedLayout);

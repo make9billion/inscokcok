@@ -122,6 +122,20 @@ class PointLedgerService
         ]);
     }
 
+    public function adjustManually(User $user, User $actor, int $points, string $memo): PointLedgerEntry
+    {
+        $currentBalance = (int) $user->pointLedgerEntries()->sum('points');
+
+        return PointLedgerEntry::create([
+            'user_id' => $user->id,
+            'created_by_id' => $actor->id,
+            'type' => PointLedgerType::Adjusted,
+            'points' => $points,
+            'balance_after' => $currentBalance + $points,
+            'memo' => $memo,
+        ]);
+    }
+
     private function activeEvent(string $slug, string $triggerType): ?Event
     {
         return Event::query()

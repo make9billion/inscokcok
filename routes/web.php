@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ConsultationManagementController;
 use App\Http\Controllers\Admin\EventManagementController;
 use App\Http\Controllers\Admin\InquiryManagementController;
 use App\Http\Controllers\Admin\KnowledgeAnswerController;
+use App\Http\Controllers\Admin\MemberManagementController;
 use App\Http\Controllers\Admin\PointMallOrderManagementController;
 use App\Http\Controllers\Admin\PointMallProductManagementController;
 use App\Http\Controllers\ConsultationController;
@@ -214,6 +215,10 @@ Route::middleware('auth')->group(function () {
         ->name('admin.inquiries.index');
     Route::patch('/admin/inquiries/{inquiry}', [InquiryManagementController::class, 'update'])
         ->name('admin.inquiries.update');
+    Route::get('/admin/members', [MemberManagementController::class, 'index'])
+        ->name('admin.members.index');
+    Route::post('/admin/members/{member}/points', [MemberManagementController::class, 'adjustPoints'])
+        ->name('admin.members.points.adjust');
     Route::get('/admin/notices', [ContentManagementController::class, 'notices'])
         ->name('admin.notices.index');
     Route::post('/admin/notices', [ContentManagementController::class, 'storeNotice'])
