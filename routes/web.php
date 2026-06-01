@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\PointMallOrderManagementController;
 use App\Http\Controllers\Admin\PointMallProductManagementController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\CustomerContentController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\KnowledgeQuestionController;
@@ -123,61 +124,7 @@ Route::get('/customer/company', [CustomerContentController::class, 'company'])->
 Route::get('/point-mall', [PointMallController::class, 'index'])->name('point-mall.index');
 Route::get('/point-mall/products/{slug}', [PointMallController::class, 'show'])->name('point-mall.products.show');
 
-Route::get('/dashboard', function () {
-    $user = request()->user();
-
-    return Inertia::render('Dashboard', [
-        'summary' => [
-            'pointBalance' => (int) $user->pointLedgerEntries()->sum('points'),
-            'consultationCount' => $user->consultations()->count(),
-            'questionCount' => $user->knowledgeQuestions()->count(),
-            'orderCount' => $user->pointMallOrders()->count(),
-        ],
-        'recentPointEntries' => $user->pointLedgerEntries()
-            ->latest()
-            ->take(5)
-            ->get(['type', 'points', 'memo', 'created_at'])
-            ->map(fn ($entry) => [
-                'type' => $entry->type->value,
-                'points' => $entry->points,
-                'memo' => $entry->memo,
-                'createdAt' => $entry->created_at?->format('Y-m-d'),
-            ]),
-        'recentConsultations' => $user->consultations()
-            ->latest()
-            ->take(5)
-            ->get(['id', 'status', 'interested_product', 'preferred_contact_time', 'created_at'])
-            ->map(fn ($consultation) => [
-                'id' => $consultation->id,
-                'status' => $consultation->status->value,
-                'interestedProduct' => $consultation->interested_product,
-                'preferredContactTime' => $consultation->preferred_contact_time,
-                'createdAt' => $consultation->created_at?->format('Y-m-d'),
-            ]),
-        'recentOrders' => $user->pointMallOrders()
-            ->latest()
-            ->take(5)
-            ->get(['id', 'status', 'order_number', 'total_points', 'cash_payment_amount', 'ordered_at', 'created_at'])
-            ->map(fn ($order) => [
-                'id' => $order->id,
-                'status' => $order->status->value,
-                'orderNumber' => $order->order_number,
-                'totalPoints' => $order->total_points,
-                'cashPaymentAmount' => $order->cash_payment_amount,
-                'orderedAt' => ($order->ordered_at ?? $order->created_at)?->format('Y-m-d'),
-            ]),
-        'recentQuestions' => $user->knowledgeQuestions()
-            ->latest()
-            ->take(5)
-            ->get(['id', 'status', 'title', 'created_at'])
-            ->map(fn ($question) => [
-                'id' => $question->id,
-                'status' => $question->status->value,
-                'title' => $question->title,
-                'createdAt' => $question->created_at?->format('Y-m-d'),
-            ]),
-    ]);
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
