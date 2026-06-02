@@ -115,6 +115,19 @@ class SiteShellTest extends TestCase
         $this->assertStringNotContainsString('profile.edit', $header);
     }
 
+    public function test_footer_contains_company_information_and_grayscale_logo(): void
+    {
+        $footer = file_get_contents(resource_path('js/Components/SiteFooter.jsx'));
+
+        $this->assertStringContainsString("import logoUrl from '../../images/logo/logo.png'", $footer);
+        $this->assertStringContainsString('grayscale', $footer);
+        $this->assertStringContainsString('주식회사 만형', $footer);
+        $this->assertStringContainsString('인천광역시 미추홀구 주안로 115 전시문화빌딩 601호', $footer);
+        $this->assertStringContainsString('경기도 수원시 팔달구 인계로94번길 32 정진빌딩 302호', $footer);
+        $this->assertStringContainsString('553-88-01928', $footer);
+        $this->assertStringContainsString('강준보', $footer);
+    }
+
     public function test_public_navigation_exposes_inquiry_page(): void
     {
         $source = file_get_contents(resource_path('js/Constants/siteNavigation.js'));
