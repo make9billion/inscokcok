@@ -126,6 +126,13 @@ class SiteShellTest extends TestCase
         $this->assertStringContainsString('경기도 수원시 팔달구 인계로94번길 32 정진빌딩 302호', $footer);
         $this->assertStringContainsString('553-88-01928', $footer);
         $this->assertStringContainsString('강준보', $footer);
+        $this->assertStringContainsString('개인정보처리방침', $footer);
+        $this->assertStringContainsString('/privacy-policy', $footer);
+        $this->assertStringContainsString('제휴문의', $footer);
+        $this->assertStringContainsString('/partnership', $footer);
+        $this->assertStringNotContainsString('FooterGroup title="서비스"', $footer);
+        $this->assertStringNotContainsString('FooterGroup title="보험상품"', $footer);
+        $this->assertStringNotContainsString('FooterGroup title="고객센터"', $footer);
     }
 
     public function test_public_navigation_exposes_inquiry_page(): void
