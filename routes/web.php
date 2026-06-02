@@ -147,6 +147,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/admin/consultations', [ConsultationManagementController::class, 'index'])
         ->name('admin.consultations.index');
+    Route::get('/admin/consultations/export', [ConsultationManagementController::class, 'export'])
+        ->name('admin.consultations.export');
+    Route::patch('/admin/consultations/bulk', [ConsultationManagementController::class, 'bulkUpdate'])
+        ->name('admin.consultations.bulk');
     Route::get('/admin/consultations/{consultation}', [ConsultationManagementController::class, 'show'])
         ->name('admin.consultations.show');
     Route::patch('/admin/consultations/{consultation}', [ConsultationManagementController::class, 'update'])

@@ -16,6 +16,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 use Inertia\Inertia;
 use Inertia\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ConsultationManagementController extends Controller
 {
@@ -26,32 +27,67 @@ class ConsultationManagementController extends Controller
         $validated = $request->validate([
             'status' => ['nullable', new Enum(ConsultationStatus::class)],
             'search' => ['nullable', 'string', 'max:100'],
+            'assigned_planner_id' => ['nullable', 'string', 'max:20'],
+            'product' => ['nullable', 'string', 'max:100'],
+            'date_from' => ['nullable', 'date'],
+            'date_to' => ['nullable', 'date'],
         ]);
 
-        $status = $validated['status'] ?? null;
-        $search = trim((string) ($validated['search'] ?? ''));
         $user = $request->user();
+        $filters = $this->normalizedFilters($validated);
 
         return Inertia::render('Admin/Consultations/Index', [
-            'consultations' => Consultation::query()
-                ->with('assignedPlanner')
-                ->when($user?->isPlanner(), fn ($query) => $query->where('assigned_planner_id', $user->id))
-                ->when($status, fn ($query) => $query->where('status', $status))
-                ->when($search !== '', fn ($query) => $query->where(function ($query) use ($search) {
-                    $query
-                        ->where('applicant_name', 'like', "%{$search}%")
-                        ->orWhere('phone', 'like', "%{$search}%")
-                        ->orWhere('interested_product', 'like', "%{$search}%");
-                }))
+            'consultations' => $this->filteredConsultationQuery($request, $filters)
                 ->latest()
                 ->take(50)
                 ->get()
                 ->map(fn (Consultation $consultation) => $this->serializeConsultation($consultation)),
-            'filters' => [
-                'status' => $status,
-                'search' => $search,
-            ],
-            'statusOptions' => $this->statusOptions(),
+            'filters' => $filters,
+            'planners' => $this->plannerOptions($request),
+            'productOptions' => $this->productOptions($request),
+            'statusOptions' => $this->statusOptions($request),
+        ]);
+    }
+
+    public function export(Request $request): StreamedResponse
+    {
+        $this->authorizeConsultationAccess($request);
+
+        $validated = $request->validate([
+            'status' => ['nullable', new Enum(ConsultationStatus::class)],
+            'search' => ['nullable', 'string', 'max:100'],
+            'assigned_planner_id' => ['nullable', 'string', 'max:20'],
+            'product' => ['nullable', 'string', 'max:100'],
+            'date_from' => ['nullable', 'date'],
+            'date_to' => ['nullable', 'date'],
+        ]);
+        $filters = $this->normalizedFilters($validated);
+
+        return response()->stream(function () use ($request, $filters) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+            fputcsv($handle, ['접수일', '이름', '연락처', '상품', '상태', '담당자', '메모']);
+
+            $this->filteredConsultationQuery($request, $filters)
+                ->oldest()
+                ->chunk(200, function ($consultations) use ($handle) {
+                    foreach ($consultations as $consultation) {
+                        fputcsv($handle, [
+                            $consultation->created_at?->format('Y-m-d H:i'),
+                            $consultation->applicant_name,
+                            $consultation->phone,
+                            $consultation->interested_product,
+                            $this->statusLabel($consultation->status),
+                            $consultation->assignedPlanner?->name,
+                            $consultation->memo,
+                        ]);
+                    }
+                });
+
+            fclose($handle);
+        }, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename=consultations.csv',
         ]);
     }
 
@@ -133,6 +169,76 @@ class ConsultationManagementController extends Controller
             ->with('success', '상담 상태가 변경되었습니다.');
     }
 
+    public function bulkUpdate(
+        Request $request,
+        PointLedgerService $pointLedger,
+        AdminAuditLogger $audit
+    ): RedirectResponse {
+        $this->authorizeConsultationAccess($request);
+
+        $allowedStatuses = $this->allowedStatusValues($request);
+        $validated = $request->validate([
+            'consultation_ids' => ['required', 'array', 'min:1', 'max:100'],
+            'consultation_ids.*' => ['integer', 'exists:consultations,id'],
+            'status' => ['required', Rule::in($allowedStatuses)],
+            'assigned_planner_id' => ['nullable', 'exists:users,id'],
+            'memo' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $consultations = Consultation::query()
+            ->whereIn('id', $validated['consultation_ids'])
+            ->get();
+
+        if ($request->user()?->isPlanner()) {
+            abort_unless($consultations->every(fn (Consultation $consultation) => $consultation->assigned_planner_id === $request->user()->id), 403);
+        }
+
+        $toStatus = ConsultationStatus::from($validated['status']);
+        $assignedPlannerId = $request->user()?->isPlanner()
+            ? $request->user()->id
+            : ($validated['assigned_planner_id'] ?? null);
+
+        foreach ($consultations as $consultation) {
+            $fromStatus = $consultation->status;
+            $before = [
+                'status' => $consultation->status->value,
+                'assigned_planner_id' => $consultation->assigned_planner_id,
+            ];
+
+            $consultation->update([
+                'status' => $toStatus,
+                'assigned_planner_id' => $assignedPlannerId,
+                'completed_at' => $toStatus === ConsultationStatus::Completed ? now() : $consultation->completed_at,
+                'cancelled_at' => in_array($toStatus, [ConsultationStatus::Cancelled, ConsultationStatus::ConsultationCancelled], true)
+                    ? now()
+                    : $consultation->cancelled_at,
+            ]);
+
+            ConsultationStatusLog::create([
+                'consultation_id' => $consultation->id,
+                'actor_id' => $request->user()?->id,
+                'from_status' => $fromStatus,
+                'to_status' => $toStatus,
+                'memo' => $validated['memo'] ?? null,
+            ]);
+
+            if ($toStatus === ConsultationStatus::Completed) {
+                $pointLedger->grantConsultationCompletedBonus($consultation->refresh());
+            }
+
+            $consultation->refresh();
+            $audit->record($request, 'consultation.bulk_updated', $consultation, $before, [
+                'status' => $consultation->status->value,
+                'assigned_planner_id' => $consultation->assigned_planner_id,
+                'memo' => $validated['memo'] ?? null,
+            ]);
+        }
+
+        return redirect()
+            ->route('admin.consultations.index')
+            ->with('success', '선택한 상담이 일괄 변경되었습니다.');
+    }
+
     private function authorizeConsultationAccess(Request $request): void
     {
         abort_unless($request->user()?->isAdmin() || $request->user()?->isPlanner(), 403);
@@ -163,6 +269,58 @@ class ConsultationManagementController extends Controller
                 'name' => $planner->name,
             ])
             ->all();
+    }
+
+    private function productOptions(Request $request): array
+    {
+        return Consultation::query()
+            ->when($request->user()?->isPlanner(), fn ($query) => $query->where('assigned_planner_id', $request->user()->id))
+            ->whereNotNull('interested_product')
+            ->distinct()
+            ->orderBy('interested_product')
+            ->pluck('interested_product')
+            ->values()
+            ->all();
+    }
+
+    private function normalizedFilters(array $validated): array
+    {
+        return [
+            'status' => $validated['status'] ?? null,
+            'search' => trim((string) ($validated['search'] ?? '')),
+            'assigned_planner_id' => $validated['assigned_planner_id'] ?? '',
+            'product' => trim((string) ($validated['product'] ?? '')),
+            'date_from' => $validated['date_from'] ?? '',
+            'date_to' => $validated['date_to'] ?? '',
+        ];
+    }
+
+    private function filteredConsultationQuery(Request $request, array $filters)
+    {
+        $search = $filters['search'];
+
+        return Consultation::query()
+            ->with('assignedPlanner')
+            ->when($request->user()?->isPlanner(), fn ($query) => $query->where('assigned_planner_id', $request->user()->id))
+            ->when(! $request->user()?->isPlanner() && $filters['assigned_planner_id'] !== '', function ($query) use ($filters) {
+                if ($filters['assigned_planner_id'] === 'unassigned') {
+                    $query->whereNull('assigned_planner_id');
+
+                    return;
+                }
+
+                $query->where('assigned_planner_id', (int) $filters['assigned_planner_id']);
+            })
+            ->when($filters['status'], fn ($query) => $query->where('status', $filters['status']))
+            ->when($filters['product'] !== '', fn ($query) => $query->where('interested_product', $filters['product']))
+            ->when($filters['date_from'] !== '', fn ($query) => $query->whereDate('created_at', '>=', $filters['date_from']))
+            ->when($filters['date_to'] !== '', fn ($query) => $query->whereDate('created_at', '<=', $filters['date_to']))
+            ->when($search !== '', fn ($query) => $query->where(function ($query) use ($search) {
+                $query
+                    ->where('applicant_name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('interested_product', 'like', "%{$search}%");
+            }));
     }
 
     private function allowedStatusValues(Request $request): array
