@@ -48,7 +48,7 @@ class DashboardController extends Controller
             'assignedConsultations' => (clone $consultationQuery)->whereNotNull('assigned_planner_id')->count(),
             'completedConsultations' => (clone $consultationQuery)->where('status', ConsultationStatus::Completed)->count(),
             'pendingInquiries' => $user->isAdmin() ? Inquiry::query()->whereIn('status', ['received', 'reviewing'])->count() : 0,
-            'openQuestions' => ($user->isAdmin() || $user->isConsultationManager())
+            'openQuestions' => ($user->isAdmin() || $user->isPlanner())
                 ? KnowledgeQuestion::query()->where('status', KnowledgeQuestionStatus::Open)->count()
                 : 0,
             'pendingOrders' => $user->isAdmin() ? PointMallOrder::query()->where('status', PointMallOrderStatus::Pending)->count() : 0,
@@ -114,7 +114,7 @@ class DashboardController extends Controller
                         ])
                         ->values()
                     : [],
-                'questions' => ($user->isAdmin() || $user->isConsultationManager())
+                'questions' => ($user->isAdmin() || $user->isPlanner())
                     ? KnowledgeQuestion::query()
                         ->with('user')
                         ->where('status', KnowledgeQuestionStatus::Open)

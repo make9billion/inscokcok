@@ -45,37 +45,25 @@ class AdminDashboardTest extends TestCase
         );
     }
 
-    public function test_planner_dashboard_only_counts_assigned_consultations(): void
+    public function test_planner_dashboard_counts_assigned_consultations_and_open_questions(): void
     {
         $planner = User::factory()->planner()->create();
         $assigned = Consultation::factory()->create([
             'assigned_planner_id' => $planner->id,
             'status' => ConsultationStatus::Assigned,
         ]);
+        KnowledgeQuestion::factory()->create(['status' => KnowledgeQuestionStatus::Open, 'title' => '답변 필요']);
         Consultation::factory()->create(['status' => ConsultationStatus::Received]);
 
         $this->actingAs($planner)->get('/dashboard')->assertOk()->assertInertia(fn ($page) => $page
             ->component('Admin/Dashboard')
             ->where('role', 'planner')
             ->where('summary.openConsultations', 1)
+            ->where('summary.openQuestions', 1)
             ->where('workQueues.consultations.0.id', $assigned->id)
             ->missing('workQueues.consultations.1')
-            ->where('summary.pendingInquiries', 0)
-        );
-    }
-
-    public function test_consultation_manager_dashboard_focuses_on_knowledge_questions(): void
-    {
-        $manager = User::factory()->consultationManager()->create();
-        KnowledgeQuestion::factory()->create(['status' => KnowledgeQuestionStatus::Open, 'title' => '답변 필요']);
-        Consultation::factory()->create(['status' => ConsultationStatus::Received]);
-
-        $this->actingAs($manager)->get('/dashboard')->assertOk()->assertInertia(fn ($page) => $page
-            ->component('Admin/Dashboard')
-            ->where('role', 'consultation_manager')
-            ->where('summary.openQuestions', 1)
-            ->where('summary.openConsultations', 1)
             ->where('workQueues.questions.0.title', '답변 필요')
+            ->where('summary.pendingInquiries', 0)
         );
     }
 

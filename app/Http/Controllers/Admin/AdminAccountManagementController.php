@@ -21,7 +21,7 @@ class AdminAccountManagementController extends Controller
 
         return Inertia::render('Admin/Accounts/Index', [
             'accounts' => User::query()
-                ->whereIn('role', [UserRole::Admin, UserRole::Planner, UserRole::ConsultationManager])
+                ->whereIn('role', [UserRole::Admin, UserRole::Planner])
                 ->orderBy('role')
                 ->orderBy('name')
                 ->get()
@@ -69,7 +69,7 @@ class AdminAccountManagementController extends Controller
     public function update(Request $request, User $account, AdminAuditLogger $audit): RedirectResponse
     {
         $this->authorizeFullAdmin($request);
-        abort_unless(in_array($account->role, [UserRole::Admin, UserRole::Planner, UserRole::ConsultationManager], true), 404);
+        abort_unless(in_array($account->role, [UserRole::Admin, UserRole::Planner], true), 404);
 
         $validated = $request->validate([
             'role' => ['required', Rule::in($this->managedRoleValues())],
@@ -129,7 +129,6 @@ class AdminAccountManagementController extends Controller
         return [
             UserRole::Admin->value,
             UserRole::Planner->value,
-            UserRole::ConsultationManager->value,
         ];
     }
 
@@ -138,7 +137,6 @@ class AdminAccountManagementController extends Controller
         return match ($role) {
             UserRole::Admin => '전체권한',
             UserRole::Planner => '설계사권한',
-            UserRole::ConsultationManager => '상담사권한',
             UserRole::Member => '회원',
         };
     }

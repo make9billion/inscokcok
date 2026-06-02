@@ -17,10 +17,8 @@ class AdminAccountManagementTest extends TestCase
     public function test_only_full_admin_can_access_admin_account_management(): void
     {
         $planner = User::factory()->planner()->create();
-        $manager = User::factory()->consultationManager()->create();
 
         $this->actingAs($planner)->get('/admin/accounts')->assertForbidden();
-        $this->actingAs($manager)->get('/admin/accounts')->assertForbidden();
     }
 
     public function test_admin_can_create_admin_account_with_username(): void
@@ -65,17 +63,17 @@ class AdminAccountManagementTest extends TestCase
         ]);
 
         $response = $this->actingAs($admin)->patch("/admin/accounts/{$account->id}", [
-            'role' => UserRole::ConsultationManager->value,
+            'role' => UserRole::Admin->value,
             'phone' => '010-3333-4444',
-            'organization' => '상담팀',
+            'organization' => '운영팀',
         ]);
 
         $response->assertRedirect('/admin/accounts');
         $this->assertDatabaseHas('users', [
             'id' => $account->id,
-            'role' => UserRole::ConsultationManager->value,
+            'role' => UserRole::Admin->value,
             'phone' => '010-3333-4444',
-            'organization' => '상담팀',
+            'organization' => '운영팀',
         ]);
 
         $audit = AdminAuditLog::query()->where('action', 'admin_account.updated')->firstOrFail();
@@ -84,8 +82,21 @@ class AdminAccountManagementTest extends TestCase
         $this->assertSame(User::class, $audit->subject_type);
         $this->assertSame($account->id, $audit->subject_id);
         $this->assertSame(UserRole::Planner->value, $audit->before['role']);
-        $this->assertSame(UserRole::ConsultationManager->value, $audit->after['role']);
+        $this->assertSame(UserRole::Admin->value, $audit->after['role']);
         $this->assertSame('010-3333-4444', $audit->after['phone']);
+    }
+
+    public function test_admin_account_role_options_only_include_admin_and_planner(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)->get('/admin/accounts')->assertOk()->assertInertia(fn ($page) => $page
+            ->where('roleOptions.0.value', UserRole::Admin->value)
+            ->where('roleOptions.0.label', '전체권한')
+            ->where('roleOptions.1.value', UserRole::Planner->value)
+            ->where('roleOptions.1.label', '설계사권한')
+            ->missing('roleOptions.2')
+        );
     }
 
     public function test_admin_account_can_login_with_username(): void
@@ -150,16 +161,7 @@ class AdminAccountManagementTest extends TestCase
         $consultation = Consultation::factory()->create();
 
         $this->actingAs($planner)->get("/admin/consultations/{$consultation->id}")->assertForbidden();
-        $this->actingAs($planner)->get('/admin/knowledge')->assertForbidden();
+        $this->actingAs($planner)->get('/admin/knowledge')->assertOk();
         $this->actingAs($planner)->get('/admin/members')->assertForbidden();
-    }
-
-    public function test_consultation_manager_only_accesses_knowledge_admin(): void
-    {
-        $manager = User::factory()->consultationManager()->create();
-
-        $this->actingAs($manager)->get('/admin/knowledge')->assertOk();
-        $this->actingAs($manager)->get('/admin/consultations')->assertForbidden();
-        $this->actingAs($manager)->get('/admin/members')->assertForbidden();
     }
 }

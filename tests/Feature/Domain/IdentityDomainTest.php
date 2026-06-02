@@ -18,7 +18,6 @@ class IdentityDomainTest extends TestCase
         $this->assertSame(UserRole::Member, $user->role);
         $this->assertTrue($user->isMember());
         $this->assertFalse($user->isPlanner());
-        $this->assertFalse($user->isConsultationManager());
         $this->assertFalse($user->isAdmin());
     }
 
@@ -26,16 +25,11 @@ class IdentityDomainTest extends TestCase
     {
         $member = User::factory()->create();
         $planner = User::factory()->planner()->create();
-        $consultationManager = User::factory()->consultationManager()->create();
         $admin = User::factory()->admin()->create();
 
         $this->assertTrue($planner->isPlanner());
         $this->assertTrue($planner->canAccessAdmin());
         $this->assertFalse($planner->isMember());
-
-        $this->assertTrue($consultationManager->isConsultationManager());
-        $this->assertTrue($consultationManager->canAccessAdmin());
-        $this->assertFalse($consultationManager->isMember());
 
         $this->assertTrue($admin->isAdmin());
         $this->assertTrue($admin->canAccessAdmin());

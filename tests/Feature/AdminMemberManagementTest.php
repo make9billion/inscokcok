@@ -61,10 +61,10 @@ class AdminMemberManagementTest extends TestCase
 
     public function test_only_admin_can_manually_adjust_member_points(): void
     {
-        $manager = User::factory()->consultationManager()->create();
+        $planner = User::factory()->planner()->create();
         $member = User::factory()->create();
 
-        $this->actingAs($manager)->post("/admin/members/{$member->id}/points", [
+        $this->actingAs($planner)->post("/admin/members/{$member->id}/points", [
             'points' => 1000,
             'memo' => '테스트 지급',
         ])->assertForbidden();

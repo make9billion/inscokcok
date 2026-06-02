@@ -15,7 +15,7 @@ class KnowledgeAnswerFactory extends Factory
     {
         return [
             'knowledge_question_id' => KnowledgeQuestion::factory(),
-            'manager_id' => User::factory()->consultationManager(),
+            'manager_id' => User::factory()->planner(),
             'body' => fake()->paragraph(),
         ];
     }

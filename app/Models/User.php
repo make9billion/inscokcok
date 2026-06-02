@@ -72,11 +72,6 @@ class User extends Authenticatable
         return $this->role === UserRole::Planner;
     }
 
-    public function isConsultationManager(): bool
-    {
-        return $this->role === UserRole::ConsultationManager;
-    }
-
     public function isAdmin(): bool
     {
         return $this->role === UserRole::Admin;
@@ -85,7 +80,6 @@ class User extends Authenticatable
     public function canAccessAdmin(): bool
     {
         return $this->isPlanner()
-            || $this->isConsultationManager()
             || $this->isAdmin();
     }
 

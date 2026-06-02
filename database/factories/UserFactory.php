@@ -51,13 +51,6 @@ class UserFactory extends Factory
         ]);
     }
 
-    public function consultationManager(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'role' => UserRole::ConsultationManager,
-        ]);
-    }
-
     public function admin(): static
     {
         return $this->state(fn (array $attributes) => [

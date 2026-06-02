@@ -17,7 +17,6 @@ const cardMeta = [
 const roleTitle = {
     admin: '전체 운영 대시보드',
     planner: '설계사 대시보드',
-    consultation_manager: '상담사 대시보드',
 };
 
 function SummaryCard({ label, value, href }) {

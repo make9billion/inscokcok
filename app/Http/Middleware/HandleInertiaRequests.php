@@ -38,7 +38,6 @@ class HandleInertiaRequests extends Middleware
                         'role' => $request->user()->role->value,
                         'isAdmin' => $request->user()->isAdmin(),
                         'isPlanner' => $request->user()->isPlanner(),
-                        'isConsultationManager' => $request->user()->isConsultationManager(),
                         'canAccessAdmin' => $request->user()->canAccessAdmin(),
                     ]
                     : null,

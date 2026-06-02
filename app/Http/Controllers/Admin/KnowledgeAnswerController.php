@@ -75,7 +75,7 @@ class KnowledgeAnswerController extends Controller
     {
         $user = $request->user();
 
-        abort_unless($user?->isConsultationManager() || $user?->isAdmin(), 403);
+        abort_unless($user?->isPlanner() || $user?->isAdmin(), 403);
     }
 
     private function statusLabel(KnowledgeQuestionStatus $status): string
