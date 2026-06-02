@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\ConsultationStatus;
 use App\Enums\UserRole;
+use App\Models\AdminAuditLog;
 use App\Models\Consultation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -44,6 +45,15 @@ class AdminAccountManagementTest extends TestCase
             'organization' => '서울지점',
             'role' => UserRole::Planner->value,
         ]);
+
+        $createdAccount = User::query()->where('username', 'planner01')->firstOrFail();
+        $audit = AdminAuditLog::query()->where('action', 'admin_account.created')->firstOrFail();
+
+        $this->assertSame($admin->id, $audit->actor_id);
+        $this->assertSame(User::class, $audit->subject_type);
+        $this->assertSame($createdAccount->id, $audit->subject_id);
+        $this->assertSame('planner01', $audit->after['username']);
+        $this->assertSame(UserRole::Planner->value, $audit->after['role']);
     }
 
     public function test_admin_can_update_admin_account_role(): void
@@ -67,6 +77,15 @@ class AdminAccountManagementTest extends TestCase
             'phone' => '010-3333-4444',
             'organization' => '상담팀',
         ]);
+
+        $audit = AdminAuditLog::query()->where('action', 'admin_account.updated')->firstOrFail();
+
+        $this->assertSame($admin->id, $audit->actor_id);
+        $this->assertSame(User::class, $audit->subject_type);
+        $this->assertSame($account->id, $audit->subject_id);
+        $this->assertSame(UserRole::Planner->value, $audit->before['role']);
+        $this->assertSame(UserRole::ConsultationManager->value, $audit->after['role']);
+        $this->assertSame('010-3333-4444', $audit->after['phone']);
     }
 
     public function test_admin_account_can_login_with_username(): void

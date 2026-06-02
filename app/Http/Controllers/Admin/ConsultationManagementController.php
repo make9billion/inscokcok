@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Consultation;
 use App\Models\ConsultationStatusLog;
 use App\Models\User;
+use App\Services\AdminAuditLogger;
 use App\Services\PointLedgerService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -72,7 +73,8 @@ class ConsultationManagementController extends Controller
     public function update(
         Request $request,
         Consultation $consultation,
-        PointLedgerService $pointLedger
+        PointLedgerService $pointLedger,
+        AdminAuditLogger $audit
     ): RedirectResponse {
         $this->authorizeConsultationAccess($request);
         $this->authorizePlannerAssignment($request, $consultation);
@@ -85,6 +87,12 @@ class ConsultationManagementController extends Controller
         ]);
 
         $fromStatus = $consultation->status;
+        $before = [
+            'status' => $consultation->status->value,
+            'assigned_planner_id' => $consultation->assigned_planner_id,
+            'completed_at' => $consultation->completed_at?->toISOString(),
+            'cancelled_at' => $consultation->cancelled_at?->toISOString(),
+        ];
         $toStatus = ConsultationStatus::from($validated['status']);
         $assignedPlannerId = $request->user()?->isPlanner()
             ? $request->user()->id
@@ -110,6 +118,15 @@ class ConsultationManagementController extends Controller
         if ($toStatus === ConsultationStatus::Completed) {
             $pointLedger->grantConsultationCompletedBonus($consultation->refresh());
         }
+
+        $consultation->refresh();
+        $audit->record($request, 'consultation.updated', $consultation, $before, [
+            'status' => $consultation->status->value,
+            'assigned_planner_id' => $consultation->assigned_planner_id,
+            'completed_at' => $consultation->completed_at?->toISOString(),
+            'cancelled_at' => $consultation->cancelled_at?->toISOString(),
+            'memo' => $validated['memo'] ?? null,
+        ]);
 
         return redirect()
             ->route('admin.consultations.show', $consultation)

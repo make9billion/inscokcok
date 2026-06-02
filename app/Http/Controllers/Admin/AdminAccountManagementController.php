@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\AdminAuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -29,7 +30,7 @@ class AdminAccountManagementController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, AdminAuditLogger $audit): RedirectResponse
     {
         $this->authorizeFullAdmin($request);
 
@@ -42,7 +43,7 @@ class AdminAccountManagementController extends Controller
             'role' => ['required', Rule::in($this->managedRoleValues())],
         ]);
 
-        User::create([
+        $account = User::create([
             'username' => $validated['username'],
             'email' => $validated['username'].'@admin.local',
             'password' => Hash::make($validated['password']),
@@ -52,12 +53,20 @@ class AdminAccountManagementController extends Controller
             'role' => UserRole::from($validated['role']),
         ]);
 
+        $audit->record($request, 'admin_account.created', $account, null, [
+            'username' => $account->username,
+            'name' => $account->name,
+            'phone' => $account->phone,
+            'organization' => $account->organization,
+            'role' => $account->role->value,
+        ]);
+
         return redirect()
             ->route('admin.accounts.index')
             ->with('success', '관리자 계정이 생성되었습니다.');
     }
 
-    public function update(Request $request, User $account): RedirectResponse
+    public function update(Request $request, User $account, AdminAuditLogger $audit): RedirectResponse
     {
         $this->authorizeFullAdmin($request);
         abort_unless(in_array($account->role, [UserRole::Admin, UserRole::Planner, UserRole::ConsultationManager], true), 404);
@@ -68,10 +77,22 @@ class AdminAccountManagementController extends Controller
             'phone' => ['required', 'string', 'max:30'],
         ]);
 
+        $before = [
+            'role' => $account->role->value,
+            'organization' => $account->organization,
+            'phone' => $account->phone,
+        ];
+
         $account->update([
             'role' => UserRole::from($validated['role']),
             'organization' => $validated['organization'],
             'phone' => $validated['phone'],
+        ]);
+
+        $audit->record($request, 'admin_account.updated', $account, $before, [
+            'role' => $account->role->value,
+            'organization' => $account->organization,
+            'phone' => $account->phone,
         ]);
 
         return redirect()

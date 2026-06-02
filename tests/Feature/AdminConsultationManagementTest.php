@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\ConsultationStatus;
+use App\Models\AdminAuditLog;
 use App\Models\Consultation;
 use App\Models\ConsultationStatusLog;
 use App\Models\User;
@@ -102,5 +103,15 @@ class AdminConsultationManagementTest extends TestCase
         $this->assertSame(ConsultationStatus::Received, $log->from_status);
         $this->assertSame(ConsultationStatus::Assigned, $log->to_status);
         $this->assertSame('플래너 배정 완료', $log->memo);
+
+        $audit = AdminAuditLog::query()->where('action', 'consultation.updated')->firstOrFail();
+
+        $this->assertSame($admin->id, $audit->actor_id);
+        $this->assertSame(Consultation::class, $audit->subject_type);
+        $this->assertSame($consultation->id, $audit->subject_id);
+        $this->assertSame(ConsultationStatus::Received->value, $audit->before['status']);
+        $this->assertNull($audit->before['assigned_planner_id']);
+        $this->assertSame(ConsultationStatus::Assigned->value, $audit->after['status']);
+        $this->assertSame($planner->id, $audit->after['assigned_planner_id']);
     }
 }

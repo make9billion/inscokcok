@@ -5,27 +5,68 @@ import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
-const adminLinks = [
-    ['상담관리', 'admin.consultations.index', ['admin', 'planner']],
-    ['관리자관리', 'admin.accounts.index', ['admin']],
-    ['회원관리', 'admin.members.index', ['admin']],
-    ['문의하기', 'admin.inquiries.index', ['admin']],
-    ['FAQ', 'admin.faqs.index', ['admin']],
-    ['공지사항', 'admin.notices.index', ['admin']],
-    ['이벤트관리', 'admin.events.index', ['admin']],
-    ['지식인관리', 'admin.knowledge.index', ['admin', 'consultation_manager']],
-    ['주문관리', 'admin.point-mall.orders.index', ['admin']],
-    ['상품관리', 'admin.point-mall.products.index', ['admin']],
+const adminGroups = [
+    {
+        label: '운영',
+        links: [
+            ['상담관리', 'admin.consultations.index', ['admin', 'planner']],
+            ['문의하기', 'admin.inquiries.index', ['admin']],
+            ['지식인관리', 'admin.knowledge.index', ['admin', 'consultation_manager']],
+        ],
+    },
+    {
+        label: '콘텐츠',
+        links: [
+            ['FAQ', 'admin.faqs.index', ['admin']],
+            ['공지사항', 'admin.notices.index', ['admin']],
+            ['이벤트관리', 'admin.events.index', ['admin']],
+        ],
+    },
+    {
+        label: '포인트몰',
+        links: [
+            ['주문관리', 'admin.point-mall.orders.index', ['admin']],
+            ['상품관리', 'admin.point-mall.products.index', ['admin']],
+        ],
+    },
+    {
+        label: '권한',
+        links: [
+            ['관리자관리', 'admin.accounts.index', ['admin']],
+            ['회원관리', 'admin.members.index', ['admin']],
+        ],
+    },
 ];
 
-function allowedLinks(user) {
-    return adminLinks.filter(([, , roles]) => roles.includes(user?.role));
+function allowedGroups(user) {
+    return adminGroups
+        .map((group) => ({
+            ...group,
+            links: group.links.filter(([, , roles]) => roles.includes(user?.role)),
+        }))
+        .filter((group) => group.links.length > 0);
+}
+
+function roleLabel(user) {
+    if (user?.role === 'admin') {
+        return '전체권한';
+    }
+
+    if (user?.role === 'planner') {
+        return '설계사권한';
+    }
+
+    if (user?.role === 'consultation_manager') {
+        return '상담사권한';
+    }
+
+    return '회원';
 }
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
-    const visibleAdminLinks = allowedLinks(user);
+    const visibleAdminGroups = allowedGroups(user);
     const dashboardLabel = user?.canAccessAdmin ? '대시보드' : '마이페이지';
 
     return (
@@ -44,15 +85,45 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <NavLink href={route('dashboard')} active={route().current('dashboard')}>
                                     {dashboardLabel}
                                 </NavLink>
-                                {visibleAdminLinks.map(([label, routeName]) => (
-                                    <NavLink key={routeName} href={route(routeName)} active={route().current(routeName)}>
-                                        {label}
-                                    </NavLink>
-                                ))}
+
+                                {visibleAdminGroups.length > 0 && (
+                                    <div className="flex items-center">
+                                        <Dropdown>
+                                            <Dropdown.Trigger>
+                                                <button
+                                                    type="button"
+                                                    className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium leading-5 text-gray-500 transition hover:border-gray-300 hover:text-gray-700 focus:border-gray-300 focus:text-gray-700 focus:outline-none"
+                                                >
+                                                    어드민
+                                                    <svg className="ms-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                    </svg>
+                                                </button>
+                                            </Dropdown.Trigger>
+
+                                            <Dropdown.Content align="left" contentClasses="bg-white py-2">
+                                                {visibleAdminGroups.map((group) => (
+                                                    <div key={group.label} className="py-1">
+                                                        <div className="px-4 pb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">{group.label}</div>
+                                                        {group.links.map(([label, routeName]) => (
+                                                            <Dropdown.Link key={routeName} href={route(routeName)}>
+                                                                {label}
+                                                            </Dropdown.Link>
+                                                        ))}
+                                                    </div>
+                                                ))}
+                                            </Dropdown.Content>
+                                        </Dropdown>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">
+                            <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
+                                {roleLabel(user)}
+                            </span>
+
                             <div className="relative ms-3">
                                 <Dropdown>
                                     <Dropdown.Trigger>
@@ -98,10 +169,16 @@ export default function AuthenticatedLayout({ header, children }) {
                         <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
                             {dashboardLabel}
                         </ResponsiveNavLink>
-                        {visibleAdminLinks.map(([label, routeName]) => (
-                            <ResponsiveNavLink key={routeName} href={route(routeName)} active={route().current(routeName)}>
-                                {label}
-                            </ResponsiveNavLink>
+
+                        {visibleAdminGroups.map((group) => (
+                            <div key={group.label} className="pt-2">
+                                <div className="px-4 pb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">{group.label}</div>
+                                {group.links.map(([label, routeName]) => (
+                                    <ResponsiveNavLink key={routeName} href={route(routeName)} active={route().current(routeName)}>
+                                        {label}
+                                    </ResponsiveNavLink>
+                                ))}
+                            </div>
                         ))}
                     </div>
 
@@ -109,6 +186,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         <div className="px-4">
                             <div className="text-base font-medium text-gray-800">{user.name}</div>
                             <div className="text-sm font-medium text-gray-500">{user.email}</div>
+                            <div className="mt-1 text-xs font-semibold text-gray-500">{roleLabel(user)}</div>
                         </div>
 
                         <div className="mt-3 space-y-1">

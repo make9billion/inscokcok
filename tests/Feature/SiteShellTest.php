@@ -105,6 +105,11 @@ class SiteShellTest extends TestCase
         $this->assertStringContainsString('admin.inquiries.index', $authenticatedLayout);
         $this->assertStringContainsString('admin.faqs.index', $authenticatedLayout);
         $this->assertStringContainsString('admin.notices.index', $authenticatedLayout);
+        $this->assertStringContainsString('adminGroups', $authenticatedLayout);
+        $this->assertStringContainsString('운영', $authenticatedLayout);
+        $this->assertStringContainsString('콘텐츠', $authenticatedLayout);
+        $this->assertStringContainsString('포인트몰', $authenticatedLayout);
+        $this->assertStringContainsString('권한', $authenticatedLayout);
         $this->assertStringNotContainsString('CMS', $authenticatedLayout);
         $this->assertStringNotContainsString('내정보', $header);
         $this->assertStringNotContainsString('profile.edit', $header);

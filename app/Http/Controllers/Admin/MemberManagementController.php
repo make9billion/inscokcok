@@ -6,6 +6,7 @@ use App\Enums\PointLedgerType;
 use App\Http\Controllers\Controller;
 use App\Models\PointLedgerEntry;
 use App\Models\User;
+use App\Services\AdminAuditLogger;
 use App\Services\PointLedgerService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -72,7 +73,12 @@ class MemberManagementController extends Controller
         ]);
     }
 
-    public function adjustPoints(Request $request, User $member, PointLedgerService $pointLedger): RedirectResponse
+    public function adjustPoints(
+        Request $request,
+        User $member,
+        PointLedgerService $pointLedger,
+        AdminAuditLogger $audit
+    ): RedirectResponse
     {
         $this->authorizeAdmin($request);
         abort_unless($request->user()?->isAdmin(), 403);
@@ -83,7 +89,17 @@ class MemberManagementController extends Controller
             'memo' => ['required', 'string', 'max:160'],
         ]);
 
-        $pointLedger->adjustManually($member, $request->user(), $validated['points'], $validated['memo']);
+        $beforeBalance = (int) $member->pointLedgerEntries()->sum('points');
+        $entry = $pointLedger->adjustManually($member, $request->user(), $validated['points'], $validated['memo']);
+
+        $audit->record($request, 'member.points_adjusted', $member, [
+            'point_balance' => $beforeBalance,
+        ], [
+            'point_balance' => $entry->balance_after,
+            'points' => $entry->points,
+            'memo' => $entry->memo,
+            'ledger_entry_id' => $entry->id,
+        ]);
 
         return redirect()
             ->route('admin.members.index', $request->only('search'))

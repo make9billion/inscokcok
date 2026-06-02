@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AdminAuditLog;
 use App\Models\Inquiry;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -82,5 +83,15 @@ class InquiryBoardTest extends TestCase
             'admin_reply' => '확인 후 안내드렸습니다.',
         ]);
         $this->assertNotNull($inquiry->fresh()->replied_at);
+
+        $audit = AdminAuditLog::query()->where('action', 'inquiry.updated')->firstOrFail();
+
+        $this->assertSame($admin->id, $audit->actor_id);
+        $this->assertSame(Inquiry::class, $audit->subject_type);
+        $this->assertSame($inquiry->id, $audit->subject_id);
+        $this->assertSame('received', $audit->before['status']);
+        $this->assertNull($audit->before['admin_reply']);
+        $this->assertSame('answered', $audit->after['status']);
+        $this->assertSame('확인 후 안내드렸습니다.', $audit->after['admin_reply']);
     }
 }

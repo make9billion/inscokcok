@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Inquiry;
+use App\Services\AdminAuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -41,7 +42,7 @@ class InquiryManagementController extends Controller
         ]);
     }
 
-    public function update(Request $request, Inquiry $inquiry): RedirectResponse
+    public function update(Request $request, Inquiry $inquiry, AdminAuditLogger $audit): RedirectResponse
     {
         $this->authorizeAdmin($request);
 
@@ -50,9 +51,22 @@ class InquiryManagementController extends Controller
             'admin_reply' => ['nullable', 'string', 'max:5000'],
         ]);
 
+        $before = [
+            'status' => $inquiry->status,
+            'admin_reply' => $inquiry->admin_reply,
+            'replied_at' => $inquiry->replied_at?->toISOString(),
+        ];
+
         $inquiry->update([
             ...$validated,
             'replied_at' => filled($validated['admin_reply'] ?? null) ? now() : null,
+        ]);
+
+        $inquiry->refresh();
+        $audit->record($request, 'inquiry.updated', $inquiry, $before, [
+            'status' => $inquiry->status,
+            'admin_reply' => $inquiry->admin_reply,
+            'replied_at' => $inquiry->replied_at?->toISOString(),
         ]);
 
         return redirect()

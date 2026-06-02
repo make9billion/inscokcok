@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\PointLedgerType;
+use App\Models\AdminAuditLog;
 use App\Models\PointLedgerEntry;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -92,5 +93,15 @@ class AdminMemberManagementTest extends TestCase
             'balance_after' => 1500,
             'memo' => '관리자 수동 차감',
         ]);
+
+        $audit = AdminAuditLog::query()->where('action', 'member.points_adjusted')->firstOrFail();
+
+        $this->assertSame($admin->id, $audit->actor_id);
+        $this->assertSame(User::class, $audit->subject_type);
+        $this->assertSame($member->id, $audit->subject_id);
+        $this->assertSame(2000, $audit->before['point_balance']);
+        $this->assertSame(1500, $audit->after['point_balance']);
+        $this->assertSame(-500, $audit->after['points']);
+        $this->assertSame('관리자 수동 차감', $audit->after['memo']);
     }
 }
