@@ -187,4 +187,55 @@ class AdminAccountManagementTest extends TestCase
         $this->actingAs($planner)->get('/admin/knowledge')->assertOk();
         $this->actingAs($planner)->get('/admin/members')->assertForbidden();
     }
+
+    public function test_planner_is_blocked_from_admin_only_management_routes(): void
+    {
+        $planner = User::factory()->planner()->create();
+        $adminAccount = User::factory()->admin()->create();
+
+        $adminOnlyGetRoutes = [
+            '/admin/accounts',
+            "/admin/accounts/{$adminAccount->id}",
+            '/admin/members',
+            '/admin/members/export',
+            '/admin/inquiries',
+            '/admin/partnership-inquiries',
+            '/admin/faqs',
+            '/admin/notices',
+            '/admin/events',
+            '/admin/point-mall/orders',
+            '/admin/point-mall/products',
+            '/admin/point-mall/products/create',
+        ];
+
+        foreach ($adminOnlyGetRoutes as $uri) {
+            $this->actingAs($planner)->get($uri)->assertForbidden();
+        }
+    }
+
+    public function test_planner_cannot_use_disallowed_consultation_statuses_or_reassign_consultation(): void
+    {
+        $planner = User::factory()->planner()->create();
+        $otherPlanner = User::factory()->planner()->create();
+        $consultation = Consultation::factory()->create([
+            'assigned_planner_id' => $planner->id,
+            'status' => ConsultationStatus::Assigned,
+        ]);
+
+        $this->actingAs($planner)->patch("/admin/consultations/{$consultation->id}", [
+            'status' => ConsultationStatus::Received->value,
+            'assigned_planner_id' => $otherPlanner->id,
+        ])->assertSessionHasErrors('status');
+
+        $this->actingAs($planner)->patch("/admin/consultations/{$consultation->id}", [
+            'status' => ConsultationStatus::Completed->value,
+            'assigned_planner_id' => $otherPlanner->id,
+        ])->assertRedirect("/admin/consultations/{$consultation->id}");
+
+        $this->assertDatabaseHas('consultations', [
+            'id' => $consultation->id,
+            'status' => ConsultationStatus::Completed->value,
+            'assigned_planner_id' => $planner->id,
+        ]);
+    }
 }
