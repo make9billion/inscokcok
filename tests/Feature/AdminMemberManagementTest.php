@@ -59,6 +59,29 @@ class AdminMemberManagementTest extends TestCase
         );
     }
 
+    public function test_admin_can_export_filtered_members_csv(): void
+    {
+        $admin = User::factory()->admin()->create();
+        User::factory()->create([
+            'name' => 'Target Member',
+            'email' => 'target@example.com',
+            'phone' => '010-1111-2222',
+        ]);
+        User::factory()->create([
+            'name' => 'Other Member',
+            'email' => 'other@example.com',
+        ]);
+
+        $response = $this->actingAs($admin)->get('/admin/members/export?search=target');
+
+        $response->assertOk();
+        $response->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
+        $content = $response->streamedContent();
+        $this->assertStringContainsString('name,email,phone', $content);
+        $this->assertStringContainsString('"Target Member",target@example.com,010-1111-2222', $content);
+        $this->assertStringNotContainsString('Other Member', $content);
+    }
+
     public function test_only_admin_can_manually_adjust_member_points(): void
     {
         $planner = User::factory()->planner()->create();

@@ -19,6 +19,14 @@ class SiteShellTest extends TestCase
         $response->assertSee('data-page', false);
     }
 
+    public function test_inertia_shell_exposes_csrf_token_for_direct_upload_requests(): void
+    {
+        $response = $this->get('/');
+
+        $response->assertOk();
+        $response->assertSee('name="csrf-token"', false);
+    }
+
     public function test_homepage_receives_published_cms_contents(): void
     {
         SiteContent::create([
@@ -89,6 +97,7 @@ class SiteShellTest extends TestCase
         $navigation = file_get_contents(resource_path('js/Constants/siteNavigation.js'));
         $header = file_get_contents(resource_path('js/Components/SiteHeader.jsx'));
         $authenticatedLayout = file_get_contents(resource_path('js/Layouts/AuthenticatedLayout.jsx'));
+        $applicationLogo = file_get_contents(resource_path('js/Components/ApplicationLogo.jsx'));
 
         $this->assertStringNotContainsString('내정보', $navigation);
         $this->assertStringNotContainsString("href: '/mypage'", $navigation);
@@ -103,9 +112,14 @@ class SiteShellTest extends TestCase
         $this->assertStringContainsString('admin.members.index', $authenticatedLayout);
         $this->assertStringContainsString('문의하기', $authenticatedLayout);
         $this->assertStringContainsString('admin.inquiries.index', $authenticatedLayout);
+        $this->assertStringContainsString('제휴문의', $authenticatedLayout);
+        $this->assertStringContainsString('admin.partnership-inquiries.index', $authenticatedLayout);
         $this->assertStringContainsString('admin.faqs.index', $authenticatedLayout);
         $this->assertStringContainsString('admin.notices.index', $authenticatedLayout);
         $this->assertStringContainsString('adminLinks', $authenticatedLayout);
+        $this->assertStringContainsString('AdminSidebar', $authenticatedLayout);
+        $this->assertStringContainsString("import logoUrl from '../../images/logo/logo.png'", $applicationLogo);
+        $this->assertStringContainsString("alt = '보험콕콕'", $applicationLogo);
         $this->assertStringContainsString('설계사권한', $authenticatedLayout);
         $this->assertStringNotContainsString('상담사권한', $authenticatedLayout);
         $this->assertStringNotContainsString('adminGroups', $authenticatedLayout);
@@ -133,6 +147,17 @@ class SiteShellTest extends TestCase
         $this->assertStringNotContainsString('FooterGroup title="서비스"', $footer);
         $this->assertStringNotContainsString('FooterGroup title="보험상품"', $footer);
         $this->assertStringNotContainsString('FooterGroup title="고객센터"', $footer);
+    }
+
+    public function test_footer_static_pages_render(): void
+    {
+        $this->get('/privacy-policy')->assertOk()->assertInertia(fn ($page) => $page
+            ->component('PrivacyPolicy')
+        );
+
+        $this->get('/partnership')->assertOk()->assertInertia(fn ($page) => $page
+            ->component('Partnership')
+        );
     }
 
     public function test_public_navigation_exposes_inquiry_page(): void

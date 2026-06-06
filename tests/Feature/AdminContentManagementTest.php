@@ -114,4 +114,46 @@ class AdminContentManagementTest extends TestCase
             'is_published' => false,
         ]);
     }
+
+    public function test_admin_can_delete_notice_and_faq_from_split_pages(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $notice = SiteContent::create([
+            'type' => 'notice',
+            'title' => 'Delete notice',
+            'body' => 'Body',
+            'sort_order' => 1,
+            'is_published' => true,
+            'published_at' => now(),
+        ]);
+        $faq = SiteContent::create([
+            'type' => 'faq',
+            'title' => 'Delete faq',
+            'body' => 'Answer',
+            'sort_order' => 1,
+            'is_published' => true,
+            'published_at' => now(),
+        ]);
+
+        $this->actingAs($admin)->delete("/admin/notices/{$notice->id}")->assertRedirect('/admin/notices');
+        $this->actingAs($admin)->delete("/admin/faqs/{$faq->id}")->assertRedirect('/admin/faqs');
+
+        $this->assertDatabaseMissing('site_contents', ['id' => $notice->id]);
+        $this->assertDatabaseMissing('site_contents', ['id' => $faq->id]);
+    }
+
+    public function test_notice_delete_rejects_wrong_content_type(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $faq = SiteContent::create([
+            'type' => 'faq',
+            'title' => 'FAQ',
+            'body' => 'Answer',
+            'sort_order' => 1,
+            'is_published' => true,
+        ]);
+
+        $this->actingAs($admin)->delete("/admin/notices/{$faq->id}")->assertNotFound();
+        $this->assertDatabaseHas('site_contents', ['id' => $faq->id]);
+    }
 }

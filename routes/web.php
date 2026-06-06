@@ -121,6 +121,9 @@ Route::get('/customer/faq', [CustomerContentController::class, 'faq'])->name('cu
 Route::get('/customer/inquiries', [InquiryController::class, 'index'])->name('customer.inquiries.index');
 Route::post('/customer/inquiries', [InquiryController::class, 'store'])->name('customer.inquiries.store');
 Route::get('/customer/company', [CustomerContentController::class, 'company'])->name('customer.company');
+Route::get('/privacy-policy', fn () => Inertia::render('PrivacyPolicy'))->name('privacy-policy');
+Route::get('/partnership', [InquiryController::class, 'partnership'])->name('partnership');
+Route::post('/partnership', [InquiryController::class, 'storePartnership'])->name('partnership.store');
 Route::get('/point-mall', [PointMallController::class, 'index'])->name('point-mall.index');
 Route::get('/point-mall/products/{slug}', [PointMallController::class, 'show'])->name('point-mall.products.show');
 
@@ -161,34 +164,58 @@ Route::middleware('auth')->group(function () {
         ->name('admin.events.update');
     Route::get('/admin/knowledge', [KnowledgeAnswerController::class, 'index'])
         ->name('admin.knowledge.index');
+    Route::get('/admin/knowledge/{question}', [KnowledgeAnswerController::class, 'show'])
+        ->name('admin.knowledge.show');
     Route::post('/admin/knowledge/{question}/answer', [KnowledgeAnswerController::class, 'store'])
         ->name('admin.knowledge.answers.store');
     Route::get('/admin/inquiries', [InquiryManagementController::class, 'index'])
         ->name('admin.inquiries.index');
+    Route::get('/admin/inquiries/{inquiry}', [InquiryManagementController::class, 'show'])
+        ->name('admin.inquiries.show');
     Route::patch('/admin/inquiries/{inquiry}', [InquiryManagementController::class, 'update'])
         ->name('admin.inquiries.update');
+    Route::get('/admin/partnership-inquiries', [InquiryManagementController::class, 'partnershipIndex'])
+        ->name('admin.partnership-inquiries.index');
+    Route::get('/admin/partnership-inquiries/{inquiry}', [InquiryManagementController::class, 'partnershipShow'])
+        ->name('admin.partnership-inquiries.show');
     Route::get('/admin/members', [MemberManagementController::class, 'index'])
         ->name('admin.members.index');
+    Route::get('/admin/members/export', [MemberManagementController::class, 'export'])
+        ->name('admin.members.export');
+    Route::get('/admin/members/{member}', [MemberManagementController::class, 'show'])
+        ->name('admin.members.show');
     Route::post('/admin/members/{member}/points', [MemberManagementController::class, 'adjustPoints'])
         ->name('admin.members.points.adjust');
     Route::get('/admin/accounts', [AdminAccountManagementController::class, 'index'])
         ->name('admin.accounts.index');
+    Route::get('/admin/accounts/{account}', [AdminAccountManagementController::class, 'show'])
+        ->name('admin.accounts.show');
     Route::post('/admin/accounts', [AdminAccountManagementController::class, 'store'])
         ->name('admin.accounts.store');
     Route::patch('/admin/accounts/{account}', [AdminAccountManagementController::class, 'update'])
         ->name('admin.accounts.update');
+    Route::delete('/admin/accounts/{account}', [AdminAccountManagementController::class, 'destroy'])
+        ->name('admin.accounts.destroy');
     Route::get('/admin/notices', [ContentManagementController::class, 'notices'])
         ->name('admin.notices.index');
+    Route::get('/admin/notices/{content}', [ContentManagementController::class, 'noticeShow'])
+        ->name('admin.notices.show');
     Route::post('/admin/notices', [ContentManagementController::class, 'storeNotice'])
         ->name('admin.notices.store');
     Route::patch('/admin/notices/{content}', [ContentManagementController::class, 'updateNotice'])
         ->name('admin.notices.update');
+    Route::delete('/admin/notices/{content}', [ContentManagementController::class, 'destroyNotice'])
+        ->name('admin.notices.destroy');
     Route::get('/admin/faqs', [ContentManagementController::class, 'faqs'])
         ->name('admin.faqs.index');
+    Route::get('/admin/faqs/{content}', [ContentManagementController::class, 'faqShow'])
+        ->name('admin.faqs.show');
     Route::post('/admin/faqs', [ContentManagementController::class, 'storeFaq'])
         ->name('admin.faqs.store');
     Route::patch('/admin/faqs/{content}', [ContentManagementController::class, 'updateFaq'])
         ->name('admin.faqs.update');
+    Route::delete('/admin/faqs/{content}', [ContentManagementController::class, 'destroyFaq'])
+        ->name('admin.faqs.destroy');
     Route::get('/admin/cms', [ContentManagementController::class, 'index'])
         ->name('admin.cms.index');
     Route::post('/admin/cms', [ContentManagementController::class, 'store'])
@@ -197,10 +224,24 @@ Route::middleware('auth')->group(function () {
         ->name('admin.cms.update');
     Route::get('/admin/point-mall/products', [PointMallProductManagementController::class, 'index'])
         ->name('admin.point-mall.products.index');
+    Route::get('/admin/point-mall/products/create', [PointMallProductManagementController::class, 'create'])
+        ->name('admin.point-mall.products.create');
+    Route::post('/admin/point-mall/products', [PointMallProductManagementController::class, 'store'])
+        ->name('admin.point-mall.products.store');
+    Route::post('/admin/point-mall/products/description-images', [PointMallProductManagementController::class, 'uploadDescriptionImage'])
+        ->name('admin.point-mall.products.description-images.store');
+    Route::get('/admin/point-mall/products/{product}', [PointMallProductManagementController::class, 'show'])
+        ->name('admin.point-mall.products.show');
     Route::patch('/admin/point-mall/products/{product}', [PointMallProductManagementController::class, 'update'])
         ->name('admin.point-mall.products.update');
+    Route::delete('/admin/point-mall/products/{product}', [PointMallProductManagementController::class, 'destroy'])
+        ->name('admin.point-mall.products.destroy');
     Route::patch('/admin/point-mall/products/{product}/delivery', [PointMallProductManagementController::class, 'updateDelivery'])
         ->name('admin.point-mall.products.delivery.update');
+    Route::post('/admin/point-mall/categories', [PointMallProductManagementController::class, 'storeCategory'])
+        ->name('admin.point-mall.categories.store');
+    Route::patch('/admin/point-mall/categories/{category}', [PointMallProductManagementController::class, 'updateCategory'])
+        ->name('admin.point-mall.categories.update');
     Route::get('/admin/point-mall/orders', [PointMallOrderManagementController::class, 'index'])
         ->name('admin.point-mall.orders.index');
     Route::patch('/admin/point-mall/orders/{order}/status', [PointMallOrderManagementController::class, 'updateStatus'])

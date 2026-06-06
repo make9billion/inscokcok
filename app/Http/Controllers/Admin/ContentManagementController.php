@@ -33,6 +33,22 @@ class ContentManagementController extends Controller
         return $this->renderIndex('faq', 'FAQ', '자주 묻는 질문과 답변을 관리합니다.', 'admin.faqs.store', 'admin.faqs.update');
     }
 
+    public function noticeShow(Request $request, SiteContent $content): Response
+    {
+        $this->authorizeAdmin($request);
+        abort_unless($content->type === 'notice', 404);
+
+        return $this->renderShow($content, '공지사항 상세', 'notice', 'admin.notices.index', 'admin.notices.update');
+    }
+
+    public function faqShow(Request $request, SiteContent $content): Response
+    {
+        $this->authorizeAdmin($request);
+        abort_unless($content->type === 'faq', 404);
+
+        return $this->renderShow($content, 'FAQ 상세', 'faq', 'admin.faqs.index', 'admin.faqs.update');
+    }
+
     public function store(Request $request): RedirectResponse
     {
         $this->authorizeAdmin($request);
@@ -78,6 +94,16 @@ class ContentManagementController extends Controller
         return $this->updateFixedType($request, $content, 'faq', 'admin.faqs.index');
     }
 
+    public function destroyNotice(Request $request, SiteContent $content): RedirectResponse
+    {
+        return $this->destroyFixedType($request, $content, 'notice', 'admin.notices.index');
+    }
+
+    public function destroyFaq(Request $request, SiteContent $content): RedirectResponse
+    {
+        return $this->destroyFixedType($request, $content, 'faq', 'admin.faqs.index');
+    }
+
     private function renderIndex(
         ?string $fixedType = null,
         string $pageTitle = 'CMS 관리',
@@ -109,6 +135,25 @@ class ContentManagementController extends Controller
         ]);
     }
 
+    private function renderShow(
+        SiteContent $content,
+        string $pageTitle,
+        string $fixedType,
+        string $backRouteName,
+        string $updateRouteName,
+    ): Response {
+        return Inertia::render('Admin/Cms/Show', [
+            'content' => $this->serializeContent($content),
+            'typeOptions' => collect($this->typeLabels())
+                ->map(fn (string $label, string $value) => compact('value', 'label'))
+                ->values(),
+            'fixedType' => $fixedType,
+            'pageTitle' => $pageTitle,
+            'backRouteName' => $backRouteName,
+            'updateRouteName' => $updateRouteName,
+        ]);
+    }
+
     private function storeFixedType(Request $request, string $type, string $routeName): RedirectResponse
     {
         $this->authorizeAdmin($request);
@@ -133,6 +178,18 @@ class ContentManagementController extends Controller
         return redirect()
             ->route($routeName)
             ->with('success', '콘텐츠가 저장되었습니다.');
+    }
+
+    private function destroyFixedType(Request $request, SiteContent $content, string $type, string $routeName): RedirectResponse
+    {
+        $this->authorizeAdmin($request);
+        abort_unless($content->type === $type, 404);
+
+        $content->delete();
+
+        return redirect()
+            ->route($routeName)
+            ->with('success', '콘텐츠를 삭제했습니다.');
     }
 
     private function validated(Request $request, ?string $fixedType = null): array

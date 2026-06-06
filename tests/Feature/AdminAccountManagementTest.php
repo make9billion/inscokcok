@@ -86,6 +86,29 @@ class AdminAccountManagementTest extends TestCase
         $this->assertSame('010-3333-4444', $audit->after['phone']);
     }
 
+    public function test_admin_can_delete_managed_admin_account(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $account = User::factory()->planner()->create(['username' => 'delete-me']);
+
+        $response = $this->actingAs($admin)->delete("/admin/accounts/{$account->id}");
+
+        $response->assertRedirect('/admin/accounts');
+        $this->assertDatabaseMissing('users', ['id' => $account->id]);
+
+        $audit = AdminAuditLog::query()->where('action', 'admin_account.deleted')->firstOrFail();
+        $this->assertSame($admin->id, $audit->actor_id);
+        $this->assertSame('delete-me', $audit->before['username']);
+    }
+
+    public function test_admin_cannot_delete_self_account(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)->delete("/admin/accounts/{$admin->id}")->assertForbidden();
+        $this->assertDatabaseHas('users', ['id' => $admin->id]);
+    }
+
     public function test_admin_account_role_options_only_include_admin_and_planner(): void
     {
         $admin = User::factory()->admin()->create();

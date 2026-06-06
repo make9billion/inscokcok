@@ -38,6 +38,16 @@ class KnowledgeAnswerController extends Controller
         ]);
     }
 
+    public function show(Request $request, KnowledgeQuestion $question): Response
+    {
+        $this->authorizeManager($request);
+        $question->load(['user', 'answer.manager']);
+
+        return Inertia::render('Admin/Knowledge/Show', [
+            'question' => $this->serializeQuestion($question),
+        ]);
+    }
+
     public function store(Request $request, KnowledgeQuestion $question): RedirectResponse
     {
         $this->authorizeManager($request);
@@ -85,5 +95,20 @@ class KnowledgeAnswerController extends Controller
             KnowledgeQuestionStatus::Answered => '답변 완료',
             KnowledgeQuestionStatus::Closed => '종료',
         };
+    }
+
+    private function serializeQuestion(KnowledgeQuestion $question): array
+    {
+        return [
+            'id' => $question->id,
+            'title' => $question->title,
+            'body' => $question->body,
+            'status' => $question->status->value,
+            'statusLabel' => $this->statusLabel($question->status),
+            'authorName' => $question->user?->name,
+            'answerBody' => $question->answer?->body,
+            'answeredBy' => $question->answer?->manager?->name,
+            'createdAt' => $question->created_at?->format('Y-m-d H:i'),
+        ];
     }
 }

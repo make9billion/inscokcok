@@ -21,9 +21,12 @@ class PointMallProductFactory extends Factory
             'image_path' => null,
             'point_price' => fake()->numberBetween(1000, 50000),
             'stock_quantity' => fake()->numberBetween(0, 100),
+            'low_stock_threshold' => 0,
             'delivery_type' => 'free',
             'delivery_fee' => 0,
+            'sort_order' => 0,
             'is_featured' => false,
+            'is_main_visible' => false,
             'is_active' => true,
         ];
     }

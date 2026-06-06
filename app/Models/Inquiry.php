@@ -11,6 +11,7 @@ class Inquiry extends Model
         'event' => '이벤트 문의',
         'gift' => '사은품 문의',
         'delivery' => '배송 문의',
+        'partnership' => '제휴 문의',
         'etc' => '기타 문의',
     ];
 

@@ -30,6 +30,17 @@ class AdminAccountManagementController extends Controller
         ]);
     }
 
+    public function show(Request $request, User $account): Response
+    {
+        $this->authorizeFullAdmin($request);
+        abort_unless(in_array($account->role, [UserRole::Admin, UserRole::Planner], true), 404);
+
+        return Inertia::render('Admin/Accounts/Show', [
+            'account' => $this->serializeAccount($account),
+            'roleOptions' => $this->roleOptions(),
+        ]);
+    }
+
     public function store(Request $request, AdminAuditLogger $audit): RedirectResponse
     {
         $this->authorizeFullAdmin($request);
@@ -98,6 +109,28 @@ class AdminAccountManagementController extends Controller
         return redirect()
             ->route('admin.accounts.index')
             ->with('success', '관리자 권한이 저장되었습니다.');
+    }
+
+    public function destroy(Request $request, User $account, AdminAuditLogger $audit): RedirectResponse
+    {
+        $this->authorizeFullAdmin($request);
+        abort_unless(in_array($account->role, [UserRole::Admin, UserRole::Planner], true), 404);
+        abort_if($request->user()->id === $account->id, 403);
+
+        $before = [
+            'username' => $account->username,
+            'name' => $account->name,
+            'phone' => $account->phone,
+            'organization' => $account->organization,
+            'role' => $account->role->value,
+        ];
+
+        $audit->record($request, 'admin_account.deleted', $account, $before, null);
+        $account->delete();
+
+        return redirect()
+            ->route('admin.accounts.index')
+            ->with('success', '관리자 계정을 삭제했습니다.');
     }
 
     private function serializeAccount(User $user): array

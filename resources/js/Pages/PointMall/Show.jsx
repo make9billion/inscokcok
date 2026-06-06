@@ -24,8 +24,12 @@ export default function Show({ auth, product }) {
                     </Link>
 
                     <div className="mt-8 grid gap-8 lg:grid-cols-[0.85fr_1fr]">
-                        <div className="flex aspect-square items-center justify-center rounded-lg bg-toss-grey50 text-toss-grey500">
-                            <ShoppingBag className="size-16" strokeWidth={1.5} />
+                        <div className="flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-toss-grey50 text-toss-grey500">
+                            {product.imagePath ? (
+                                <img src={`/storage/${product.imagePath}`} alt="" className="h-full w-full object-cover" />
+                            ) : (
+                                <ShoppingBag className="size-16" strokeWidth={1.5} />
+                            )}
                         </div>
 
                         <div>
@@ -75,7 +79,7 @@ export default function Show({ auth, product }) {
                                     </button>
                                 ) : (
                                     <Link href={route('login')} className="w-full rounded-lg bg-toss-grey900 px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-toss-grey700">
-                                        로그인 후 담기
+                                        로그인하고 담기
                                     </Link>
                                 )}
                             </form>
@@ -84,9 +88,11 @@ export default function Show({ auth, product }) {
 
                     <div className="mt-8 rounded-lg border border-toss-grey200 bg-toss-grey50 p-5">
                         <h2 className="text-base font-bold text-toss-grey900">상품 설명</h2>
-                        <p className="mt-3 whitespace-pre-line text-sm leading-7 text-toss-grey600">
-                            {product.description ?? '등록된 상품 설명이 없습니다.'}
-                        </p>
+                        {product.description ? (
+                            <div className="prose mt-3 max-w-none text-sm leading-7 text-toss-grey600" dangerouslySetInnerHTML={{ __html: product.description }} />
+                        ) : (
+                            <p className="mt-3 text-sm leading-7 text-toss-grey600">등록된 상품 설명이 없습니다.</p>
+                        )}
                     </div>
                 </div>
             </section>

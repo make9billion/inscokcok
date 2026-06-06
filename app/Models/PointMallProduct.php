@@ -22,18 +22,26 @@ class PointMallProduct extends Model
         'image_path',
         'point_price',
         'stock_quantity',
+        'low_stock_threshold',
         'delivery_type',
         'delivery_fee',
+        'sort_order',
         'is_featured',
+        'is_main_visible',
         'is_active',
     ];
 
     protected function casts(): array
     {
         return [
-            'is_featured' => 'boolean',
-            'is_active' => 'boolean',
+            'point_price' => 'integer',
+            'stock_quantity' => 'integer',
+            'low_stock_threshold' => 'integer',
             'delivery_fee' => 'integer',
+            'sort_order' => 'integer',
+            'is_featured' => 'boolean',
+            'is_main_visible' => 'boolean',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -50,5 +58,10 @@ class PointMallProduct extends Model
     public function orderItems(): HasMany
     {
         return $this->hasMany(PointMallOrderItem::class);
+    }
+
+    public function logs(): HasMany
+    {
+        return $this->hasMany(PointMallProductLog::class);
     }
 }
