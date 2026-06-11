@@ -11,10 +11,10 @@ class EventSeeder extends Seeder
     {
         $now = now();
 
-        Event::upsert([
+        collect([
             [
                 'slug' => 'signup_bonus',
-                'name' => '회원가입 적립',
+                'name' => '회원가입 포인트 적립',
                 'trigger_type' => 'member.registered',
                 'point_amount' => 1000,
                 'banner_image_path' => 'event-banners/event-banner-1.jpg',
@@ -26,7 +26,7 @@ class EventSeeder extends Seeder
             ],
             [
                 'slug' => 'consultation_completed_bonus',
-                'name' => '보험점검 완료 적립',
+                'name' => '보험점검 완료시 포인트 적립',
                 'trigger_type' => 'consultation.completed',
                 'point_amount' => 1000,
                 'banner_image_path' => 'event-banners/event-banner-2.jpg',
@@ -36,15 +36,11 @@ class EventSeeder extends Seeder
                 'created_at' => $now,
                 'updated_at' => $now,
             ],
-        ], ['slug'], [
-            'name',
-            'trigger_type',
-            'point_amount',
-            'banner_image_path',
-            'detail_content',
-            'is_active',
-            'show_on_home',
-            'updated_at',
-        ]);
+        ])->each(function (array $event): void {
+            Event::query()->firstOrCreate(
+                ['slug' => $event['slug']],
+                $event,
+            );
+        });
     }
 }
