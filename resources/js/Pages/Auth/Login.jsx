@@ -31,6 +31,15 @@ export default function Login({ status, canResetPassword }) {
                 </div>
             )}
 
+            <InputError message={errors.social} className="mb-4" />
+
+            <Link
+                href={route('social.kakao.redirect')}
+                className="mb-5 flex h-12 w-full items-center justify-center rounded-xl bg-[#fee500] text-sm font-bold text-[#191600] transition hover:-translate-y-0.5"
+            >
+                카카오로 로그인
+            </Link>
+
             <form onSubmit={submit}>
                 <div>
                     <InputLabel htmlFor="email" value="아이디 또는 이메일" />

@@ -52,7 +52,19 @@ function Field({ label, error, children }) {
     );
 }
 
-function SocialButton({ provider, label, className }) {
+function SocialButton({ provider, label, className, href = null }) {
+    if (href) {
+        return (
+            <Link
+                href={href}
+                className={`mx-auto flex min-h-16 w-full items-center justify-between rounded-2xl px-5 text-base font-black transition hover:-translate-y-0.5 ${className}`}
+            >
+                <span>{label}</span>
+                <ChevronRight className="size-5" strokeWidth={2.4} />
+            </Link>
+        );
+    }
+
     return (
         <button
             type="button"
@@ -197,7 +209,7 @@ export default function Register() {
                     {mode === 'select' ? (
                         <div className="flex flex-1 flex-col justify-center">
                             <div className="mx-auto grid w-full max-w-[548px] gap-3">
-                                <SocialButton provider="카카오" label="카카오로 시작하기" className="bg-[#fee500] text-[#191600]" />
+                                <SocialButton provider="카카오" label="카카오로 시작하기" href={route('social.kakao.redirect')} className="bg-[#fee500] text-[#191600]" />
                                 <SocialButton provider="네이버" label="네이버로 시작하기" className="bg-[#03c75a] text-white" />
                                 <SocialButton provider="구글" label="구글로 시작하기" className="border border-gray-200 bg-white text-gray-900" />
                                 <button

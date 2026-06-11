@@ -128,6 +128,11 @@ class User extends Authenticatable
         return $this->hasMany(PointMallOrder::class);
     }
 
+    public function socialAccounts(): HasMany
+    {
+        return $this->hasMany(SocialAccount::class);
+    }
+
     public function adminAuditLogs(): HasMany
     {
         return $this->hasMany(AdminAuditLog::class, 'actor_id');

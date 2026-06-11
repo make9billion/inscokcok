@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\AdminRegisteredUserController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
+use App\Http\Controllers\Auth\KakaoAuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -35,6 +36,12 @@ Route::middleware('guest')->group(function () {
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
+
+    Route::get('auth/kakao/redirect', [KakaoAuthenticatedSessionController::class, 'redirect'])
+        ->name('social.kakao.redirect');
+
+    Route::get('auth/kakao/callback', [KakaoAuthenticatedSessionController::class, 'callback'])
+        ->name('social.kakao.callback');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
