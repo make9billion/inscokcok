@@ -17,9 +17,7 @@ const FontSize = Mark.create({
                 default: null,
                 parseHTML: (element) => element.style.fontSize || null,
                 renderHTML: (attributes) => {
-                    if (!attributes.size) {
-                        return {};
-                    }
+                    if (!attributes.size) return {};
 
                     return {
                         style: `font-size: ${attributes.size}`,
@@ -30,11 +28,7 @@ const FontSize = Mark.create({
     },
 
     parseHTML() {
-        return [
-            {
-                tag: 'span[style*="font-size"]',
-            },
-        ];
+        return [{ tag: 'span[style*="font-size"]' }];
     },
 
     renderHTML({ HTMLAttributes }) {
@@ -63,9 +57,7 @@ const TextAlign = Extension.create({
                         default: null,
                         parseHTML: (element) => element.style.textAlign || null,
                         renderHTML: (attributes) => {
-                            if (!attributes.textAlign) {
-                                return {};
-                            }
+                            if (!attributes.textAlign) return {};
 
                             return {
                                 style: `text-align: ${attributes.textAlign}`,
@@ -104,11 +96,11 @@ function ToolbarButton({ active = false, disabled = false, icon: Icon, label, on
     );
 }
 
-async function uploadEditorImage(file) {
+async function uploadEditorImage(file, uploadRouteName) {
     const formData = new FormData();
     formData.append('image', file);
 
-    const response = await fetch(route('admin.point-mall.products.description-images.store'), {
+    const response = await fetch(route(uploadRouteName), {
         method: 'POST',
         credentials: 'same-origin',
         headers: {
@@ -129,7 +121,11 @@ async function uploadEditorImage(file) {
     return response.json();
 }
 
-export default function ProductDescriptionEditor({ value, onChange }) {
+export default function ProductDescriptionEditor({
+    value,
+    onChange,
+    uploadRouteName = 'admin.point-mall.products.description-images.store',
+}) {
     const fileInputRef = useRef(null);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState('');
@@ -167,17 +163,13 @@ export default function ProductDescriptionEditor({ value, onChange }) {
     });
 
     useEffect(() => {
-        if (!editor || editor.getHTML() === (value || '')) {
-            return;
-        }
+        if (!editor || editor.getHTML() === (value || '')) return;
 
         editor.commands.setContent(value || '', false);
     }, [editor, value]);
 
     const uploadImage = async (file) => {
-        if (!file || !editor) {
-            return;
-        }
+        if (!file || !editor) return;
 
         if (!file.type.startsWith('image/')) {
             setError('이미지 파일만 업로드할 수 있습니다.');
@@ -193,7 +185,7 @@ export default function ProductDescriptionEditor({ value, onChange }) {
         setError('');
 
         try {
-            const data = await uploadEditorImage(file);
+            const data = await uploadEditorImage(file, uploadRouteName);
             editor.chain().focus().setImage({ src: data.url }).run();
         } catch (uploadError) {
             setError(uploadError.message);

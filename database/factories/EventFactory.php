@@ -17,6 +17,7 @@ class EventFactory extends Factory
             'trigger_type' => fake()->unique()->bothify('event.####'),
             'point_amount' => 1000,
             'is_active' => true,
+            'show_on_home' => false,
         ];
     }
 }

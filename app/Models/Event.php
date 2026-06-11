@@ -16,7 +16,10 @@ class Event extends Model
         'name',
         'trigger_type',
         'point_amount',
+        'banner_image_path',
+        'detail_content',
         'is_active',
+        'show_on_home',
         'starts_at',
         'ends_at',
     ];
@@ -25,6 +28,7 @@ class Event extends Model
     {
         return [
             'is_active' => 'boolean',
+            'show_on_home' => 'boolean',
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
         ];
@@ -33,5 +37,14 @@ class Event extends Model
     public function pointLedgerEntries(): HasMany
     {
         return $this->hasMany(PointLedgerEntry::class);
+    }
+
+    public function getBannerImageUrlAttribute(): ?string
+    {
+        if (! $this->banner_image_path) {
+            return null;
+        }
+
+        return '/storage/'.$this->banner_image_path;
     }
 }

@@ -24,11 +24,13 @@ class SignupPointGrantTest extends TestCase
         ]);
 
         $this->post('/register', [
-            'name' => '김민준',
+            'name' => '김민지',
             'email' => 'member@example.com',
             'phone' => '010-1234-5678',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'terms_agreement' => '1',
+            'privacy_agreement' => '1',
         ])->assertRedirect(route('dashboard', absolute: false));
 
         $user = User::where('email', 'member@example.com')->firstOrFail();
@@ -51,11 +53,13 @@ class SignupPointGrantTest extends TestCase
         ]);
 
         $this->post('/register', [
-            'name' => '박서연',
+            'name' => '박서준',
             'email' => 'member@example.com',
             'phone' => '010-2222-3333',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'terms_agreement' => '1',
+            'privacy_agreement' => '1',
         ])->assertRedirect(route('dashboard', absolute: false));
 
         $this->assertDatabaseCount('point_ledger_entries', 0);

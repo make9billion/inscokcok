@@ -13,6 +13,8 @@ import { useEffect, useState } from 'react';
 
 import ConsultationConsentPanel, { ConsultationConsentPolicyView } from '@/Components/ConsultationConsentPanel';
 import PublicLayout from '@/Layouts/PublicLayout';
+import eventBannerOne from '../../images/events/event-banner-1.jpg';
+import eventBannerTwo from '../../images/events/event-banner-2.jpg';
 import cancerHeroImage from '../../images/hero/bohum-cancer.png';
 import cancerCardImage from '../../images/hero/backup-banner-card-20260607/bohum-cancer.png';
 import careHeroImage from '../../images/hero/bohum-care.png';
@@ -281,7 +283,7 @@ function BannerStrip({ icon: Icon, title, description, href }) {
     );
 }
 
-export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMallProducts = [] }) {
+export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMallProducts = [], events: activeEvents = [] }) {
     const { flash } = usePage().props;
     const [activeSlide, setActiveSlide] = useState(0);
     const [isAutoPaused, setIsAutoPaused] = useState(false);
@@ -378,7 +380,7 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
 
     return (
         <PublicLayout auth={auth}>
-            <Head title="보험CC" />
+            <Head title="보험콕콕" />
 
             <section
                 className={`hero-stage relative overflow-hidden transition-colors duration-700 ease-out ${activeProduct.tone}`}
@@ -577,7 +579,38 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
                 </div>
             </section>
 
-            <section className="bg-[#f7f8fb] py-20">
+            <section className="bg-gradient-to-br from-[#fff3e7] via-[#fff8f0] to-[#eaf6ff]">
+                <div className="mx-auto max-w-7xl px-5 py-24 sm:px-6 lg:px-8">
+                    <h2 className="text-center text-4xl font-black tracking-normal text-[#12284a] sm:text-5xl">EVENT</h2>
+                    <div className="mt-10 grid justify-center gap-6 md:grid-cols-2">
+                        {(activeEvents.length
+                            ? activeEvents.map((event) => ({
+                                  src: event.bannerImageUrl || (event.slug === 'signup_bonus' ? eventBannerOne : eventBannerTwo),
+                                  alt: event.name,
+                                  href: route('events.show', event.slug),
+                              }))
+                            : [
+                                  { src: eventBannerOne, alt: '회원가입 포인트 적립 이벤트', href: '/events' },
+                                  { src: eventBannerTwo, alt: '보험점검 완료 포인트 적립 이벤트', href: '/events' },
+                              ]
+                        ).map((banner) => (
+                            <Link
+                                key={banner.alt}
+                                href={banner.href}
+                                className="group mx-auto h-[200px] w-full max-w-[500px] overflow-hidden rounded-[24px] bg-white ring-1 ring-white/70 transition hover:-translate-y-1 hover:ring-[#f47b20]/40"
+                            >
+                                <img
+                                    src={banner.src}
+                                    alt={banner.alt}
+                                    className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                                />
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            <section className="bg-white py-28">
                 <div className="mx-auto max-w-6xl px-5 sm:px-6">
                 <div className="scroll-reveal mb-9 max-w-3xl">
                     <p className="text-lg font-black text-[#f47b20]">보험상품 바로가기</p>
@@ -627,6 +660,7 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
                 </div>
             </section>
 
+            {false && (
             <section className="border-y border-toss-grey200 bg-toss-grey50">
                 <div className="mx-auto max-w-7xl px-5 py-6 sm:px-6 lg:px-8">
                     <div className="grid gap-4 md:grid-cols-2">
@@ -653,9 +687,10 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
                     </div>
                 </div>
             </section>
+            )}
 
             <section className="overflow-hidden bg-[#fff8f0]">
-                <div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 sm:px-6 lg:grid-cols-[25fr_75fr] lg:items-center lg:px-8">
+                <div className="mx-auto grid max-w-7xl gap-8 px-5 py-24 sm:px-6 lg:grid-cols-[25fr_75fr] lg:items-center lg:px-8">
                     <div className="scroll-reveal reveal-from-left flex items-end justify-center lg:justify-start">
                         <img src={liveConsultingImage} alt="" className="h-80 w-auto object-contain sm:h-96 lg:h-[430px]" />
                     </div>
@@ -695,7 +730,7 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
                 </div>
             </section>
             <section className="bg-toss-grey50">
-                <div className="mx-auto max-w-4xl px-5 py-16 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-4xl px-5 py-24 sm:px-6 lg:px-8">
                     <div className="text-center">
                         <p className="text-sm font-semibold text-toss-blue">FAQ</p>
                         <h2 className="mt-2 text-2xl font-bold leading-8 text-toss-grey900">자주 묻는 질문</h2>
@@ -751,7 +786,7 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
             </section>
             {visiblePointMallProducts.length > 0 && (
                 <section className="bg-white">
-                    <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
+                    <div className="mx-auto max-w-7xl px-5 py-24 sm:px-6 lg:px-8">
                         <SectionHeader
                             eyebrow="Point Mall"
                             title="포인트몰 추천 상품"
@@ -794,6 +829,7 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
                 </section>
             )}
 
+            {false && (
             <section className="bg-toss-grey50">
                 <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
                     <SectionHeader
@@ -816,7 +852,9 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
                     </div>
                 </div>
             </section>
+            )}
 
+            {false && (
             <section className="bg-white">
                 <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:px-8">
                     <div>
@@ -874,6 +912,7 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
                     </div>
                 </div>
             </section>
+            )}
         </PublicLayout>
     );
 }

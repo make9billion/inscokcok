@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\ConsultationStatus;
+use App\Enums\ConsultationType;
 use App\Enums\PointLedgerType;
 use App\Models\Consultation;
 use App\Models\Event;
@@ -15,16 +16,17 @@ class ConsultationCompletionPointGrantTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_completing_member_consultation_grants_event_points_once(): void
+    public function test_completing_member_checkup_consultation_grants_event_points_once(): void
     {
         $admin = User::factory()->admin()->create();
         $member = User::factory()->create();
         $consultation = Consultation::factory()->for($member)->create([
+            'type' => ConsultationType::Checkup,
             'status' => ConsultationStatus::Assigned,
         ]);
         Event::factory()->create([
             'slug' => 'consultation_completed_bonus',
-            'name' => '상담완료 적립',
+            'name' => '보험점검 완료 적립',
             'trigger_type' => 'consultation.completed',
             'point_amount' => 3000,
             'is_active' => true,
@@ -51,6 +53,29 @@ class ConsultationCompletionPointGrantTest extends TestCase
         ])->assertRedirect("/admin/consultations/{$consultation->id}");
 
         $this->assertDatabaseCount('point_ledger_entries', 1);
+    }
+
+    public function test_completing_member_product_consultation_does_not_grant_points(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $member = User::factory()->create();
+        $consultation = Consultation::factory()->for($member)->create([
+            'type' => ConsultationType::Product,
+            'status' => ConsultationStatus::Assigned,
+        ]);
+        Event::factory()->create([
+            'slug' => 'consultation_completed_bonus',
+            'trigger_type' => 'consultation.completed',
+            'point_amount' => 3000,
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($admin)->patch("/admin/consultations/{$consultation->id}", [
+            'status' => 'completed',
+            'assigned_planner_id' => null,
+        ])->assertRedirect("/admin/consultations/{$consultation->id}");
+
+        $this->assertDatabaseCount('point_ledger_entries', 0);
     }
 
     public function test_completing_guest_consultation_does_not_grant_points(): void

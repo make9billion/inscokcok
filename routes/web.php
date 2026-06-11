@@ -20,6 +20,7 @@ use App\Http\Controllers\PointMallController;
 use App\Http\Controllers\ProfileController;
 use App\Models\SiteContent;
 use App\Models\PointMallProduct;
+use App\Models\Event;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
@@ -80,6 +81,25 @@ Route::get('/', function () {
                 ])
                 ->values()
             : [],
+        'events' => Schema::hasTable('events')
+            ? Event::query()
+                ->where('is_active', true)
+                ->where('show_on_home', true)
+                ->where(fn ($query) => $query->whereNull('starts_at')->orWhere('starts_at', '<=', now()))
+                ->where(fn ($query) => $query->whereNull('ends_at')->orWhere('ends_at', '>=', now()))
+                ->orderByDesc('updated_at')
+                ->orderBy('id')
+                ->take(2)
+                ->get()
+                ->map(fn (Event $event) => [
+                    'id' => $event->id,
+                    'slug' => $event->slug,
+                    'name' => $event->name,
+                    'pointAmount' => $event->point_amount,
+                    'bannerImageUrl' => $event->banner_image_url,
+                ])
+                ->values()
+            : [],
     ]);
 });
 
@@ -135,6 +155,7 @@ Route::post('/consultations', [ConsultationController::class, 'store'])
     ->name('consultations.store');
 Route::get('/knowledge', [KnowledgeQuestionController::class, 'index'])->name('knowledge.index');
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
+Route::get('/events/{event:slug}', [EventController::class, 'show'])->name('events.show');
 Route::redirect('/customer', '/customer/notices')->name('customer.index');
 Route::get('/customer/notices', [CustomerContentController::class, 'notices'])->name('customer.notices.index');
 Route::get('/customer/notices/{content}', [CustomerContentController::class, 'notice'])->name('customer.notices.show');
@@ -195,8 +216,12 @@ Route::middleware('auth')->group(function () {
         ->name('admin.consultations.update');
     Route::get('/admin/events', [EventManagementController::class, 'index'])
         ->name('admin.events.index');
+    Route::post('/admin/events', [EventManagementController::class, 'store'])
+        ->name('admin.events.store');
     Route::patch('/admin/events/{event}', [EventManagementController::class, 'update'])
         ->name('admin.events.update');
+    Route::post('/admin/events/detail-images', [EventManagementController::class, 'uploadDetailImage'])
+        ->name('admin.events.detail-images.store');
     Route::get('/admin/knowledge', [KnowledgeAnswerController::class, 'index'])
         ->name('admin.knowledge.index');
     Route::get('/admin/knowledge/{question}', [KnowledgeAnswerController::class, 'show'])

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\PointLedgerType;
+use App\Enums\ConsultationType;
 use App\Models\Consultation;
 use App\Models\Event;
 use App\Models\PointLedgerEntry;
@@ -41,6 +42,10 @@ class PointLedgerService
     public function grantConsultationCompletedBonus(Consultation $consultation): ?PointLedgerEntry
     {
         if (! $consultation->user_id) {
+            return null;
+        }
+
+        if ($consultation->type !== ConsultationType::Checkup) {
             return null;
         }
 

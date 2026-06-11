@@ -1,7 +1,14 @@
 import { Head, Link } from '@inertiajs/react';
-import { ArrowRight, CalendarDays, Gift } from 'lucide-react';
+import { CalendarDays } from 'lucide-react';
 
 import PublicLayout from '@/Layouts/PublicLayout';
+import eventBannerOne from '../../../images/events/event-banner-1.jpg';
+import eventBannerTwo from '../../../images/events/event-banner-2.jpg';
+
+const fallbackBanners = {
+    signup_bonus: eventBannerOne,
+    consultation_completed_bonus: eventBannerTwo,
+};
 
 const formatNumber = (value) => new Intl.NumberFormat('ko-KR').format(value ?? 0);
 
@@ -22,32 +29,47 @@ export default function EventIndex({ auth, events = [] }) {
                     <p className="text-sm font-semibold text-toss-blue">Event</p>
                     <h1 className="mt-3 text-3xl font-bold text-toss-grey900">진행 중인 이벤트</h1>
                     <p className="mt-3 max-w-2xl text-sm leading-6 text-toss-grey600">
-                        상담, 회원가입, 보험점검 참여로 받을 수 있는 포인트 혜택을 확인하세요.
+                        회원가입, 보험점검 참여 등 받을 수 있는 포인트 혜택을 확인하세요.
                     </p>
                 </div>
             </section>
 
             <section className="mx-auto max-w-6xl px-5 py-12 sm:px-6 lg:px-8">
                 {events.length > 0 ? (
-                    <div className="grid gap-4 md:grid-cols-2">
-                        {events.map((event) => (
-                            <article key={event.id} className="rounded-lg border border-toss-grey200 bg-white p-6">
-                                <div className="flex items-start justify-between gap-4">
-                                    <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-toss-blueLight text-toss-blue">
-                                        <Gift className="size-5" strokeWidth={1.8} />
-                                    </span>
-                                    <span className="rounded-lg bg-toss-grey100 px-3 py-1 text-sm font-bold tabular-nums text-toss-grey800">
-                                        {formatNumber(event.pointAmount)}P
-                                    </span>
-                                </div>
-                                <h2 className="mt-5 text-lg font-bold text-toss-grey900">{event.name}</h2>
-                                <div className="mt-3 flex items-center gap-2 text-sm text-toss-grey600">
-                                    <CalendarDays className="size-4" strokeWidth={1.8} />
-                                    {eventPeriod(event)}
-                                </div>
-                                <p className="mt-2 text-xs text-toss-grey500">{event.triggerType}</p>
-                            </article>
-                        ))}
+                    <div className="grid gap-6 md:grid-cols-2">
+                        {events.map((event) => {
+                            const banner = event.bannerImageUrl || fallbackBanners[event.slug];
+
+                            return (
+                                <Link
+                                    key={event.id}
+                                    href={route('events.show', event.slug)}
+                                    className="group overflow-hidden rounded-[24px] border border-toss-grey200 bg-white transition hover:-translate-y-1 hover:border-toss-blue/30"
+                                >
+                                    <div className="aspect-[5/2] bg-toss-grey100">
+                                        {banner && (
+                                            <img
+                                                src={banner}
+                                                alt={event.name}
+                                                className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                                            />
+                                        )}
+                                    </div>
+                                    <div className="flex items-center justify-between gap-4 p-5">
+                                        <div>
+                                            <h2 className="text-lg font-bold text-toss-grey900">{event.name}</h2>
+                                            <div className="mt-2 flex items-center gap-2 text-sm text-toss-grey600">
+                                                <CalendarDays className="size-4" strokeWidth={1.8} />
+                                                {eventPeriod(event)}
+                                            </div>
+                                        </div>
+                                        <span className="rounded-full bg-toss-blueLight px-4 py-2 text-sm font-black text-toss-blue">
+                                            {formatNumber(event.pointAmount)}P
+                                        </span>
+                                    </div>
+                                </Link>
+                            );
+                        })}
                     </div>
                 ) : (
                     <div className="rounded-lg border border-toss-grey200 bg-white px-5 py-12 text-center">
@@ -55,11 +77,6 @@ export default function EventIndex({ auth, events = [] }) {
                         <p className="mt-2 text-sm text-toss-grey600">새 이벤트가 시작되면 이 페이지에서 안내해드릴게요.</p>
                     </div>
                 )}
-
-                <Link href="/insurance-checkup" className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-toss-blue">
-                    보험점검 신청하기
-                    <ArrowRight className="size-4" strokeWidth={1.8} />
-                </Link>
             </section>
         </PublicLayout>
     );
