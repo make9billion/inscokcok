@@ -32,6 +32,9 @@ NODE_ENV="$NODE_ENV" npm run build
 log "DB 마이그레이션"
 "$PHP_BIN" artisan migrate --force
 
+log "기본 이벤트 데이터 동기화"
+"$PHP_BIN" artisan db:seed --class=EventSeeder --force
+
 log "스토리지 링크 확인"
 "$PHP_BIN" artisan storage:link || true
 
