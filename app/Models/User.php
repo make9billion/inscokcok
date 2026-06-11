@@ -25,6 +25,10 @@ class User extends Authenticatable
         'name',
         'email',
         'role',
+        'admin_approval_status',
+        'admin_requested_role',
+        'admin_approved_at',
+        'admin_approved_by',
         'phone',
         'organization',
         'birth_date',
@@ -56,6 +60,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'role' => UserRole::class,
+            'admin_approved_at' => 'datetime',
             'birth_date' => 'date',
             'withdrawn_at' => 'datetime',
             'password' => 'hashed',
@@ -79,8 +84,8 @@ class User extends Authenticatable
 
     public function canAccessAdmin(): bool
     {
-        return $this->isPlanner()
-            || $this->isAdmin();
+        return $this->admin_approval_status === 'approved'
+            && ($this->isPlanner() || $this->isAdmin());
     }
 
     public function consultations(): HasMany

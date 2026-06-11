@@ -19,6 +19,7 @@ use App\Http\Controllers\MemberPointController;
 use App\Http\Controllers\PointMallController;
 use App\Http\Controllers\ProfileController;
 use App\Models\SiteContent;
+use App\Models\PointMallProduct;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
@@ -59,6 +60,26 @@ Route::get('/', function () {
             'faqs' => ($publishedContents->get('faq') ?? collect())->take(5)->map($serializeContent)->values(),
             'mainBanners' => ($publishedContents->get('main_banner') ?? collect())->take(2)->map($serializeContent)->values(),
         ],
+        'pointMallProducts' => Schema::hasTable('point_mall_products')
+            ? PointMallProduct::query()
+                ->with('category')
+                ->where('is_active', true)
+                ->orderByDesc('is_main_visible')
+                ->orderByDesc('is_featured')
+                ->latest()
+                ->take(4)
+                ->get()
+                ->map(fn (PointMallProduct $product) => [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'slug' => $product->slug,
+                    'summary' => $product->summary,
+                    'imagePath' => $product->image_path,
+                    'pointPrice' => $product->point_price,
+                    'categoryName' => $product->category?->name,
+                ])
+                ->values()
+            : [],
     ]);
 });
 
@@ -82,7 +103,7 @@ Route::get('/insurance/cancer', fn () => Inertia::render('StaticImagePage', $sta
 Route::get('/insurance/dementia-care', fn () => Inertia::render('StaticImagePage', $staticImagePage(
     '치매/간병보험',
     'care-insurance',
-    5,
+    1,
     '긴 노후와 가족 부담을 대비하는 보장을 확인하세요.'
 )))->name('insurance.dementia-care');
 Route::get('/insurance/disease-accident', fn () => Inertia::render('StaticImagePage', $staticImagePage(
@@ -114,7 +135,7 @@ Route::post('/consultations', [ConsultationController::class, 'store'])
     ->name('consultations.store');
 Route::get('/knowledge', [KnowledgeQuestionController::class, 'index'])->name('knowledge.index');
 Route::get('/events', [EventController::class, 'index'])->name('events.index');
-Route::get('/customer', [CustomerContentController::class, 'index'])->name('customer.index');
+Route::redirect('/customer', '/customer/notices')->name('customer.index');
 Route::get('/customer/notices', [CustomerContentController::class, 'notices'])->name('customer.notices.index');
 Route::get('/customer/notices/{content}', [CustomerContentController::class, 'notice'])->name('customer.notices.show');
 Route::get('/customer/faq', [CustomerContentController::class, 'faq'])->name('customer.faq');
@@ -122,6 +143,8 @@ Route::get('/customer/inquiries', [InquiryController::class, 'index'])->name('cu
 Route::post('/customer/inquiries', [InquiryController::class, 'store'])->name('customer.inquiries.store');
 Route::get('/customer/company', [CustomerContentController::class, 'company'])->name('customer.company');
 Route::get('/privacy-policy', fn () => Inertia::render('PrivacyPolicy'))->name('privacy-policy');
+Route::get('/terms', fn () => Inertia::render('Terms'))->name('terms');
+Route::get('/point-mall-guide', fn () => Inertia::render('PointMallGuide'))->name('point-mall-guide');
 Route::get('/partnership', [InquiryController::class, 'partnership'])->name('partnership');
 Route::post('/partnership', [InquiryController::class, 'storePartnership'])->name('partnership.store');
 Route::get('/point-mall', [PointMallController::class, 'index'])->name('point-mall.index');
@@ -130,6 +153,8 @@ Route::get('/point-mall/products/{slug}', [PointMallController::class, 'show'])-
 Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::redirect('/admin', '/dashboard')->name('admin.index');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -139,8 +164,18 @@ Route::middleware('auth')->group(function () {
     Route::post('/mypage/point-mall/orders/{order}/cancel', [PointMallController::class, 'cancelOrder'])
         ->name('mypage.point-mall.orders.cancel');
     Route::get('/point-mall/cart', [PointMallController::class, 'cart'])->name('point-mall.cart.show');
+    Route::patch('/point-mall/cart/items/{item}', [PointMallController::class, 'updateCartItem'])
+        ->name('point-mall.cart.items.update');
+    Route::delete('/point-mall/cart/items/{item}', [PointMallController::class, 'destroyCartItem'])
+        ->name('point-mall.cart.items.destroy');
     Route::post('/point-mall/cart/checkout', [PointMallController::class, 'checkout'])
         ->name('point-mall.cart.checkout');
+    Route::get('/point-mall/orders/{order}/payment', [PointMallController::class, 'payment'])
+        ->name('point-mall.orders.payment');
+    Route::get('/point-mall/payment/success', [PointMallController::class, 'paymentSuccess'])
+        ->name('point-mall.payment.success');
+    Route::get('/point-mall/payment/fail', [PointMallController::class, 'paymentFail'])
+        ->name('point-mall.payment.fail');
     Route::post('/point-mall/products/{slug}/cart', [PointMallController::class, 'addToCart'])
         ->name('point-mall.products.cart.store');
     Route::post('/knowledge/questions', [KnowledgeQuestionController::class, 'store'])
@@ -244,8 +279,12 @@ Route::middleware('auth')->group(function () {
         ->name('admin.point-mall.categories.update');
     Route::get('/admin/point-mall/orders', [PointMallOrderManagementController::class, 'index'])
         ->name('admin.point-mall.orders.index');
+    Route::get('/admin/point-mall/orders/export', [PointMallOrderManagementController::class, 'export'])
+        ->name('admin.point-mall.orders.export');
     Route::patch('/admin/point-mall/orders/{order}/status', [PointMallOrderManagementController::class, 'updateStatus'])
         ->name('admin.point-mall.orders.status.update');
+    Route::patch('/admin/point-mall/orders/{order}/tracking', [PointMallOrderManagementController::class, 'updateTracking'])
+        ->name('admin.point-mall.orders.tracking.update');
     Route::post('/admin/point-mall/orders/{order}/cancel', [PointMallOrderManagementController::class, 'cancel'])
         ->name('admin.point-mall.orders.cancel');
 });

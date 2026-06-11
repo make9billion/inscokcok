@@ -23,9 +23,11 @@ class InquiryController extends Controller
                     'id' => $inquiry->id,
                     'category' => Inquiry::CATEGORIES[$inquiry->category] ?? $inquiry->category,
                     'title' => $inquiry->title,
+                    'body' => $inquiry->body,
                     'status' => Inquiry::STATUSES[$inquiry->status] ?? $inquiry->status,
                     'createdAt' => $inquiry->created_at?->format('Y.m.d'),
                     'hasReply' => filled($inquiry->admin_reply),
+                    'reply' => $inquiry->admin_reply,
                 ])
                 ->values(),
         ]);

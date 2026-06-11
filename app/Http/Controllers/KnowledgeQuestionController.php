@@ -11,19 +11,20 @@ use Inertia\Response;
 
 class KnowledgeQuestionController extends Controller
 {
-    public function index(): Response
+    public function index(Request $request): Response
     {
         return Inertia::render('Knowledge/Index', [
             'questions' => KnowledgeQuestion::query()
                 ->latest()
                 ->take(30)
-                ->get(['id', 'status', 'title', 'created_at'])
+                ->get(['id', 'user_id', 'status', 'title', 'created_at'])
                 ->map(fn (KnowledgeQuestion $question) => [
                     'id' => $question->id,
                     'status' => $question->status->value,
                     'statusLabel' => $this->statusLabel($question->status),
                     'title' => $question->title,
                     'createdAt' => $question->created_at?->format('Y-m-d'),
+                    'isMine' => $request->user()?->id === $question->user_id,
                 ]),
         ]);
     }

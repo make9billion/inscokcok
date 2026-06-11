@@ -18,3 +18,116 @@
         letter-spacing: 0;
     }
 }
+
+@layer components {
+    .insurance-hero-gradient {
+        background:
+            radial-gradient(circle at 11% 10%, rgba(48, 75, 255, 0.68), transparent 30%),
+            radial-gradient(circle at 86% 72%, rgba(244, 123, 32, 0.58), transparent 34%),
+            radial-gradient(circle at 72% 18%, rgba(112, 49, 188, 0.34), transparent 32%),
+            radial-gradient(circle at 52% 72%, rgba(9, 20, 73, 0.72), transparent 44%),
+            linear-gradient(135deg, #061833 0%, #0b1747 42%, #1b1030 76%, #f47b20 150%);
+    }
+
+    .point-mall-hero-gradient {
+        background:
+            linear-gradient(90deg, rgba(6, 18, 48, 0.42), rgba(3, 18, 75, 0.08)),
+            url('../images/point-mall/hero-bg.jpg') center / cover no-repeat;
+    }
+
+    .hero-image-motion {
+        animation: hero-image-enter 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .hero-image-motion img {
+        animation: hero-image-float 5.8s ease-in-out 900ms infinite;
+        transform-origin: 50% 100%;
+    }
+
+    .insurance-logo-track {
+        animation: insurance-logo-marquee 70s linear infinite;
+    }
+
+    .consultation-feed-track {
+        animation: consultation-feed-marquee 30s linear infinite;
+    }
+
+    .scroll-reveal {
+        opacity: 0;
+        transform: translateY(34px);
+        transition:
+            opacity 1200ms cubic-bezier(0.16, 1, 0.3, 1),
+            transform 1200ms cubic-bezier(0.16, 1, 0.3, 1);
+        transition-delay: var(--reveal-delay, 0ms);
+        will-change: opacity, transform;
+    }
+
+    .scroll-reveal.reveal-from-left {
+        transform: translateX(-56px);
+    }
+
+    .scroll-reveal.reveal-from-right {
+        transform: translateX(56px);
+    }
+
+    .scroll-reveal.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes hero-image-enter {
+    0% {
+        opacity: 0;
+        transform: translateY(26px) scale(0.96);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes hero-image-float {
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-10px) rotate(-0.6deg);
+    }
+}
+
+@keyframes insurance-logo-marquee {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes consultation-feed-marquee {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-image-motion,
+    .hero-image-motion img,
+    .insurance-logo-track,
+    .consultation-feed-track,
+    .scroll-reveal {
+        animation: none;
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}

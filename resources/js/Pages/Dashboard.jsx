@@ -227,7 +227,12 @@ export default function Dashboard({
                                             <ul className="divide-y divide-gray-100">
                                                 {recentQuestions.map((question) => (
                                                     <li key={question.id} className="px-5 py-4">
-                                                        <p className="line-clamp-2 text-sm font-semibold text-gray-900">{question.title}</p>
+                                                        <Link href={route('knowledge.questions.show', question.id)} className="group block">
+                                                            <p className="line-clamp-2 text-sm font-semibold text-gray-900 transition group-hover:text-blue-600">
+                                                                {question.title}
+                                                            </p>
+                                                            <p className="mt-1 text-xs font-semibold text-blue-600">답변 확인하기</p>
+                                                        </Link>
                                                         <div className="mt-2 flex items-center justify-between gap-3 text-xs text-gray-500">
                                                             <span>{question.createdAt}</span>
                                                             <span>{questionStatusLabel[question.status] ?? question.status}</span>

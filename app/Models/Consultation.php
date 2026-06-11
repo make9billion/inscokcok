@@ -19,6 +19,7 @@ class Consultation extends Model
         'user_id',
         'assigned_planner_id',
         'type',
+        'source',
         'status',
         'applicant_name',
         'phone',

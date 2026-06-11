@@ -28,6 +28,11 @@ return [
         'key' => env('RESEND_KEY'),
     ],
 
+    'toss_payments' => [
+        'client_key' => env('TOSS_PAYMENTS_CLIENT_KEY'),
+        'secret_key' => env('TOSS_PAYMENTS_SECRET_KEY'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

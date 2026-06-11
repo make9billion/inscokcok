@@ -1,41 +1,68 @@
-import { Head, Link } from '@inertiajs/react';
-import { ChevronRight } from 'lucide-react';
+import { Head } from '@inertiajs/react';
+import { ChevronDown } from 'lucide-react';
+import { useState } from 'react';
 
+import CustomerHeaderNav from '@/Components/CustomerHeaderNav';
 import PublicLayout from '@/Layouts/PublicLayout';
 
 export default function Notices({ auth, notices = [] }) {
+    const [openId, setOpenId] = useState(null);
+
     return (
         <PublicLayout auth={auth}>
             <Head title="공지사항" />
 
             <section className="border-b border-toss-grey200 bg-toss-grey50">
-                <div className="mx-auto max-w-5xl px-5 py-14 sm:px-6 lg:px-8">
-                    <p className="text-sm font-semibold text-toss-blue">Notice</p>
-                    <h1 className="mt-3 text-3xl font-bold text-toss-grey900">공지사항</h1>
-                    <p className="mt-3 text-sm leading-6 text-toss-grey600">
-                        보험CC 서비스 운영과 혜택 안내를 확인하세요.
+                <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
+                    <p className="text-sm font-black text-[#f47b20]">Notice</p>
+                    <h1 className="mt-2 text-2xl font-black leading-tight text-toss-grey900 sm:text-3xl">공지사항</h1>
+                    <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-toss-grey500">
+                        보험콕콕 서비스 운영과 혜택 안내를 확인하세요.
                     </p>
+                    <CustomerHeaderNav />
                 </div>
             </section>
 
-            <section className="mx-auto max-w-5xl px-5 py-12 sm:px-6 lg:px-8">
-                <div className="divide-y divide-toss-grey200 rounded-lg border border-toss-grey200 bg-white">
-                    {notices.length ? notices.map((notice) => (
-                        <Link
-                            key={notice.id}
-                            href={`/customer/notices/${notice.id}`}
-                            className="flex items-center justify-between gap-4 px-5 py-5 transition hover:bg-toss-grey50"
-                        >
-                            <span>
-                                <span className="block text-base font-semibold text-toss-grey900">{notice.title}</span>
-                                <span className="mt-1 block text-xs text-toss-grey500">{notice.publishedAt}</span>
-                            </span>
-                            <ChevronRight className="size-5 shrink-0 text-toss-grey500" />
-                        </Link>
-                    )) : (
-                        <p className="px-5 py-10 text-sm text-toss-grey500">등록된 공지사항이 없습니다.</p>
-                    )}
-                </div>
+            <section className="mx-auto max-w-6xl px-5 py-12 sm:px-6 lg:px-8">
+                {notices.length ? (
+                    <div className="divide-y divide-toss-grey200 border-y border-toss-grey200">
+                        {notices.map((notice) => {
+                            const isOpen = openId === notice.id;
+
+                            return (
+                                <article key={notice.id} className="py-8">
+                                    <button
+                                        type="button"
+                                        className="flex w-full items-start justify-between gap-6 text-left"
+                                        aria-expanded={isOpen}
+                                        onClick={() => setOpenId(isOpen ? null : notice.id)}
+                                    >
+                                        <span className="min-w-0">
+                                            <span className="text-sm font-black text-[#f47b20]">{notice.publishedAt}</span>
+                                            <span className="mt-3 block text-lg font-black leading-tight text-toss-grey900 sm:text-xl">
+                                                {notice.title}
+                                            </span>
+                                        </span>
+                                        <ChevronDown
+                                            className={`mt-2 size-8 shrink-0 text-toss-grey500 transition ${isOpen ? 'rotate-180' : ''}`}
+                                            strokeWidth={2.2}
+                                        />
+                                    </button>
+
+                                    {isOpen && (
+                                        <div className="mt-7">
+                                            <p className="whitespace-pre-line text-sm font-semibold leading-7 text-toss-grey600">
+                                                {notice.body}
+                                            </p>
+                                        </div>
+                                    )}
+                                </article>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <p className="py-14 text-lg font-black text-toss-grey500">등록된 공지사항이 없습니다.</p>
+                )}
             </section>
         </PublicLayout>
     );

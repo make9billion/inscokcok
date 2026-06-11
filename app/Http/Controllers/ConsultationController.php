@@ -16,6 +16,7 @@ class ConsultationController extends Controller
         Consultation::create([
             'user_id' => $request->user()?->id,
             'type' => $validated['type'],
+            'source' => $validated['source'] ?? 'main',
             'status' => ConsultationStatus::Received,
             'applicant_name' => $validated['applicant_name'],
             'phone' => $validated['phone'],

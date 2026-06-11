@@ -12,6 +12,7 @@ export const customerCenterLinks = [
     { label: 'FAQ', href: '/customer/faq' },
     { label: '문의하기', href: '/customer/inquiries' },
     { label: '회사소개', href: '/customer/company' },
+    { label: '제휴문의', href: '/partnership' },
 ];
 
 export const primaryNavigation = [
@@ -27,7 +28,7 @@ export const primaryNavigation = [
     { label: '포인트몰', href: '/point-mall' },
     {
         label: '고객센터',
-        href: '/customer',
+        href: '/customer/notices',
         children: customerCenterLinks,
     },
 ];

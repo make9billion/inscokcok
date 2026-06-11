@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="보험콕콕 favicon">
+  <defs>
+    <linearGradient id="mark" x1="8" y1="8" x2="52" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffad3d"/>
+      <stop offset="0.55" stop-color="#ff8a12"/>
+      <stop offset="1" stop-color="#f47b20"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="150%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#12284a" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <path
+    d="M12 9h31c7.2 0 13 5.8 13 13v12c0 7.2-5.8 13-13 13H30.5l-9.2 7.4c-2.1 1.7-5.2.2-5.2-2.5V47H12C4.8 47 0 41.2 0 34V22C0 14.8 4.8 9 12 9Z"
+    transform="translate(3 1)"
+    fill="url(#mark)"
+    filter="url(#softShadow)"
+  />
+  <path
+    d="M23.3 31.7 17 25.4c-1.7-1.7-1.7-4.4 0-6.1s4.4-1.7 6.1 0l3.4 3.4 11.2-11.2c1.7-1.7 4.4-1.7 6.1 0s1.7 4.4 0 6.1L29.5 31.7c-1.7 1.7-4.5 1.7-6.2 0Z"
+    transform="translate(4 7)"
+    fill="#fff"
+  />
+</svg>

@@ -34,6 +34,7 @@ class PointMallOrder extends Model
         'address_line1',
         'address_line2',
         'delivery_memo',
+        'tracking_number',
         'ordered_at',
         'cancelled_at',
     ];

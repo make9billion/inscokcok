@@ -66,7 +66,7 @@ class ConsultationManagementController extends Controller
         return response()->stream(function () use ($request, $filters) {
             $handle = fopen('php://output', 'w');
             fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
-            fputcsv($handle, ['접수일', '이름', '연락처', '상품', '상태', '담당자', '메모']);
+            fputcsv($handle, ['접수일', '구분', '이름', '연락처', '상품', '상태', '담당자', '메모']);
 
             $this->filteredConsultationQuery($request, $filters)
                 ->oldest()
@@ -74,6 +74,7 @@ class ConsultationManagementController extends Controller
                     foreach ($consultations as $consultation) {
                         fputcsv($handle, [
                             $consultation->created_at?->format('Y-m-d H:i'),
+                            $this->sourceLabel($consultation->source ?? 'main'),
                             $consultation->applicant_name,
                             $consultation->phone,
                             $consultation->interested_product,
@@ -359,6 +360,8 @@ class ConsultationManagementController extends Controller
         return [
             'id' => $consultation->id,
             'type' => $consultation->type->value,
+            'source' => $consultation->source ?? 'main',
+            'sourceLabel' => $this->sourceLabel($consultation->source ?? 'main'),
             'status' => $consultation->status->value,
             'statusLabel' => $this->statusLabel($consultation->status),
             'applicantName' => $consultation->applicant_name,
@@ -381,6 +384,14 @@ class ConsultationManagementController extends Controller
                 'createdAt' => $log->created_at?->format('Y-m-d H:i'),
             ])->values() ?? [],
         ];
+    }
+
+    private function sourceLabel(?string $source): string
+    {
+        return match ($source) {
+            'product' => '상품',
+            default => '메인',
+        };
     }
 
     private function statusLabel(ConsultationStatus $status): string

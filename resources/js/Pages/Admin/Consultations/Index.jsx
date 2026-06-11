@@ -13,6 +13,11 @@ const statusStyles = {
     consultation_cancelled: 'bg-slate-100 text-slate-700',
 };
 
+const sourceStyles = {
+    main: 'bg-orange-50 text-orange-700',
+    product: 'bg-blue-50 text-blue-700',
+};
+
 export default function Index({ consultations, filters, statusOptions, planners = [], productOptions = [] }) {
     const user = usePage().props.auth.user;
     const [search, setSearch] = useState(filters.search ?? '');
@@ -123,9 +128,9 @@ export default function Index({ consultations, filters, statusOptions, planners 
                                     </a>
                                 </div>
 
-                                <form onSubmit={applyFilters} className="grid gap-2 md:grid-cols-2 xl:grid-cols-6">
+                                <form onSubmit={applyFilters} className="grid gap-2 md:grid-cols-2 xl:grid-cols-12">
                                     <label className="sr-only" htmlFor="consultation-search">이름, 연락처, 상품 검색</label>
-                                    <div className="relative xl:col-span-2">
+                                    <div className="relative xl:col-span-3">
                                         <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
                                         <input
                                             id="consultation-search"
@@ -137,7 +142,7 @@ export default function Index({ consultations, filters, statusOptions, planners 
                                         />
                                     </div>
 
-                                    <select value={status} onChange={(event) => setStatus(event.target.value)} className="h-10 rounded-lg border-gray-300 text-sm focus:border-toss-blue focus:ring-toss-blue">
+                                    <select value={status} onChange={(event) => setStatus(event.target.value)} className="h-10 rounded-lg border-gray-300 text-sm focus:border-toss-blue focus:ring-toss-blue xl:col-span-2">
                                         <option value="">전체 상태</option>
                                         {statusOptions.map((option) => (
                                             <option key={option.value} value={option.value}>{option.label}</option>
@@ -145,7 +150,7 @@ export default function Index({ consultations, filters, statusOptions, planners 
                                     </select>
 
                                     {isAdmin && (
-                                        <select value={assignedPlannerId} onChange={(event) => setAssignedPlannerId(event.target.value)} className="h-10 rounded-lg border-gray-300 text-sm focus:border-toss-blue focus:ring-toss-blue">
+                                        <select value={assignedPlannerId} onChange={(event) => setAssignedPlannerId(event.target.value)} className="h-10 rounded-lg border-gray-300 text-sm focus:border-toss-blue focus:ring-toss-blue xl:col-span-2">
                                             <option value="">전체 담당자</option>
                                             <option value="unassigned">미배정</option>
                                             {planners.map((planner) => (
@@ -154,19 +159,20 @@ export default function Index({ consultations, filters, statusOptions, planners 
                                         </select>
                                     )}
 
-                                    <select value={product} onChange={(event) => setProduct(event.target.value)} className="h-10 rounded-lg border-gray-300 text-sm focus:border-toss-blue focus:ring-toss-blue">
+                                    <select value={product} onChange={(event) => setProduct(event.target.value)} className="h-10 rounded-lg border-gray-300 text-sm focus:border-toss-blue focus:ring-toss-blue xl:col-span-2">
                                         <option value="">전체 상품</option>
                                         {productOptions.map((option) => (
                                             <option key={option} value={option}>{option}</option>
                                         ))}
                                     </select>
 
-                                    <div className="grid grid-cols-2 gap-2">
+                                    <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 xl:col-span-3">
                                         <input type="date" value={dateFrom} onChange={(event) => setDateFrom(event.target.value)} className="h-10 rounded-lg border-gray-300 text-sm focus:border-toss-blue focus:ring-toss-blue" />
+                                        <span className="text-sm font-semibold text-gray-400">~</span>
                                         <input type="date" value={dateTo} onChange={(event) => setDateTo(event.target.value)} className="h-10 rounded-lg border-gray-300 text-sm focus:border-toss-blue focus:ring-toss-blue" />
                                     </div>
 
-                                    <div className="flex gap-2 xl:col-start-6">
+                                    <div className="flex gap-2 xl:col-span-2 xl:col-start-11">
                                         <button type="submit" className="h-10 flex-1 rounded-lg bg-gray-900 px-4 text-sm font-semibold text-white transition hover:bg-gray-700">
                                             검색
                                         </button>
@@ -219,7 +225,7 @@ export default function Index({ consultations, filters, statusOptions, planners 
                                                 aria-label="전체 선택"
                                             />
                                         </th>
-                                        {['접수일', '이름', '연락처', '상품', '상태', '담당'].map((label) => (
+                                        {['접수일', '구분', '이름', '연락처', '상품', '상태', '담당'].map((label) => (
                                             <th key={label} scope="col" className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
                                                 {label}
                                             </th>
@@ -239,6 +245,11 @@ export default function Index({ consultations, filters, statusOptions, planners 
                                                 />
                                             </td>
                                             <td className="whitespace-nowrap px-5 py-4 text-sm text-gray-500">{consultation.createdAt}</td>
+                                            <td className="whitespace-nowrap px-5 py-4 text-sm">
+                                                <span className={`rounded-lg px-2 py-1 font-semibold ${sourceStyles[consultation.source] ?? 'bg-gray-100 text-gray-700'}`}>
+                                                    {consultation.sourceLabel}
+                                                </span>
+                                            </td>
                                             <td className="whitespace-nowrap px-5 py-4 text-sm font-semibold text-gray-900">
                                                 <Link href={route('admin.consultations.show', consultation.id)} className="hover:text-toss-blue">
                                                     {consultation.applicantName}

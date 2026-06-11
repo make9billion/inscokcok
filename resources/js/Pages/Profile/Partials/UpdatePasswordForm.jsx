@@ -48,12 +48,11 @@ export default function UpdatePasswordForm({ className = '' }) {
         <section className={className}>
             <header>
                 <h2 className="text-lg font-medium text-gray-900">
-                    Update Password
+                    비밀번호 변경
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-600">
-                    Ensure your account is using a long, random password to stay
-                    secure.
+                    안전한 계정 사용을 위해 비밀번호를 주기적으로 변경해 주세요.
                 </p>
             </header>
 
@@ -61,7 +60,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                 <div>
                     <InputLabel
                         htmlFor="current_password"
-                        value="Current Password"
+                        value="현재 비밀번호"
                     />
 
                     <TextInput
@@ -83,7 +82,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="password" value="New Password" />
+                    <InputLabel htmlFor="password" value="새 비밀번호" />
 
                     <TextInput
                         id="password"
@@ -101,7 +100,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                 <div>
                     <InputLabel
                         htmlFor="password_confirmation"
-                        value="Confirm Password"
+                        value="새 비밀번호 확인"
                     />
 
                     <TextInput
@@ -122,7 +121,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
+                    <PrimaryButton disabled={processing}>저장</PrimaryButton>
 
                     <Transition
                         show={recentlySuccessful}
@@ -132,7 +131,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                         leaveTo="opacity-0"
                     >
                         <p className="text-sm text-gray-600">
-                            Saved.
+                            저장되었습니다.
                         </p>
                     </Transition>
                 </div>

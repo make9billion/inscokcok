@@ -11,4 +11,6 @@ enum PointMallOrderStatus: string
     case Delivered = 'delivered';
     case Cancelled = 'cancelled';
     case Refunded = 'refunded';
+    case ExchangeRequested = 'exchange_requested';
+    case ReturnRequested = 'return_requested';
 }

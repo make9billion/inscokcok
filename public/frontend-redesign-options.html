@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>보험콕콕 홈페이지 리디자인 방향</title>
+  <style>
+    :root {
+      color: #191f28;
+      background: #f4f6f9;
+      font-family: "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 40px 18px; }
+    main { max-width: 1180px; margin: 0 auto; }
+    .eyebrow { color: #2563eb; font-weight: 800; font-size: 14px; margin-bottom: 10px; }
+    h1 { margin: 0; font-size: clamp(28px, 4vw, 44px); line-height: 1.18; letter-spacing: 0; }
+    .lead { margin: 16px 0 28px; max-width: 760px; color: #4e5968; font-size: 17px; line-height: 1.7; }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .card { border: 1px solid #e5e8eb; border-radius: 18px; background: white; overflow: hidden; box-shadow: 0 12px 32px rgba(25,31,40,.06); }
+    .preview { height: 310px; padding: 20px; }
+    .body { padding: 22px; border-top: 1px solid #eef1f5; }
+    .body h2 { margin: 0; font-size: 21px; }
+    .body p { margin: 10px 0 0; color: #6b7684; line-height: 1.65; font-size: 15px; }
+    .tag { display: inline-flex; margin-top: 16px; padding: 8px 12px; border-radius: 999px; background: #eef4ff; color: #1d4ed8; font-size: 13px; font-weight: 800; }
+    .mock { height: 100%; border-radius: 18px; overflow: hidden; border: 1px solid rgba(0,0,0,.06); }
+    .a { background: #f7fbff; padding: 22px; display: grid; grid-template-columns: 1.05fr .75fr; gap: 16px; }
+    .b { background: #fff; padding: 22px; }
+    .c { background: #f9faf7; padding: 22px; display: grid; grid-template-columns: .85fr 1fr; gap: 16px; }
+    .pill { height: 20px; border-radius: 999px; background: #dcecff; }
+    .line { height: 12px; border-radius: 999px; background: #cbd5e1; }
+    .title { height: 34px; border-radius: 10px; background: #1f2a44; }
+    .blue { background: #2563eb; }
+    .panel { border-radius: 20px; background: #fff; padding: 17px; border: 1px solid #dde8f7; box-shadow: 0 16px 38px rgba(37,99,235,.12); }
+    .btn { height: 38px; border-radius: 11px; background: #1f2a44; }
+    .soft { background: #eff4fa; }
+    .story-img { border-radius: 20px; background: linear-gradient(145deg,#d9e8ff,#fff4df); position: relative; }
+    .story-img:before { content: ""; position: absolute; left: 24px; bottom: 24px; width: 82px; height: 82px; border-radius: 50%; background: white; border: 1px solid #eadfcf; }
+    .story-img:after { content: ""; position: absolute; right: 20px; top: 22px; width: 58px; height: 58px; border-radius: 18px; background: rgba(255,255,255,.65); }
+    .note { margin-top: 26px; padding: 18px 20px; border-radius: 14px; background: #fff; border: 1px solid #e5e8eb; color: #4e5968; line-height: 1.65; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .preview { height: 280px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">보험콕콕 프론트엔드 리디자인</div>
+    <h1>딱딱한 홈페이지를 더 신뢰감 있고 부드럽게 다듬는 방향</h1>
+    <p class="lead">관리자 기능은 안정화됐으니, 이제 방문자가 처음 들어왔을 때 상담을 맡기고 싶게 만드는 화면 리듬을 다시 잡는 단계입니다. 아래 3가지 중 가장 끌리는 방향을 골라주세요.</p>
+
+    <div class="grid">
+      <section class="card">
+        <div class="preview">
+          <div class="mock a">
+            <div style="display:flex;flex-direction:column;justify-content:center;gap:12px">
+              <div class="pill" style="width:94px"></div>
+              <div class="title" style="width:84%"></div>
+              <div class="title blue" style="width:64%"></div>
+              <div class="line" style="width:78%"></div>
+              <div class="line" style="width:58%;background:#d8e2ee"></div>
+              <div style="display:flex;gap:8px;margin-top:12px">
+                <div class="btn blue" style="width:110px"></div>
+                <div class="btn" style="width:92px;background:#fff;border:1px solid #cfd9e8"></div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="title" style="height:22px;width:72%;margin-bottom:16px"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div class="btn soft"></div><div class="btn soft"></div><div class="btn soft"></div><div class="btn soft"></div>
+              </div>
+              <div class="btn" style="margin-top:16px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="body">
+          <h2>A. 따뜻한 상담 중심</h2>
+          <p>보험 전문가에게 맡기는 느낌입니다. 부드러운 파스텔, 넓은 여백, 상담 신청 폼을 신뢰감 있게 강조합니다.</p>
+          <span class="tag">추천: 상담 전환 강화</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="preview">
+          <div class="mock b">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px">
+              <div class="title" style="width:98px;height:22px"></div>
+              <div style="display:flex;gap:8px"><div class="line" style="width:54px"></div><div class="line" style="width:54px"></div><div class="line blue" style="width:54px"></div></div>
+            </div>
+            <div class="title" style="width:70%;height:42px;margin-bottom:12px"></div>
+            <div class="title blue" style="width:48%;height:42px;margin-bottom:18px"></div>
+            <div class="line" style="width:72%;margin-bottom:8px"></div>
+            <div class="line" style="width:52%;background:#d1d6db"></div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:30px">
+              <div class="btn soft" style="height:58px"></div><div class="btn soft" style="height:58px"></div><div class="btn soft" style="height:58px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="body">
+          <h2>B. 토스식 미니멀</h2>
+          <p>가장 정돈되고 빠른 느낌입니다. 흰 배경, 짧은 문장, 명확한 CTA, 기능을 깔끔한 정보 구조로 보여줍니다.</p>
+          <span class="tag">추천: 깔끔함/신뢰감</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="preview">
+          <div class="mock c">
+            <div class="story-img"></div>
+            <div style="display:flex;flex-direction:column;justify-content:center;gap:12px">
+              <div class="pill" style="width:74px;background:#ebd8ba"></div>
+              <div class="title" style="width:88%;background:#2b3440"></div>
+              <div class="title" style="width:70%;background:#2b3440"></div>
+              <div class="line" style="width:82%;background:#b8afa3"></div>
+              <div class="line" style="width:56%;background:#d8d0c2"></div>
+              <div class="btn blue" style="width:130px;border-radius:999px;margin-top:10px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="body">
+          <h2>C. 브랜드 스토리형</h2>
+          <p>좀 더 감성적이고 부드러운 보험 브랜드입니다. 이미지와 스토리로 친근함을 만들고 상담으로 이어갑니다.</p>
+          <span class="tag">추천: 브랜드 인상 강화</span>
+        </div>
+      </section>
+    </div>
+
+    <div class="note">
+      제 추천은 <strong>A + B 혼합</strong>입니다. 전체 정보 구조는 토스처럼 깔끔하게, 히어로와 상담 신청 영역은 더 따뜻하게 가져가면 보험 사이트에 필요한 신뢰감과 전환력을 같이 챙길 수 있습니다.
+    </div>
+  </main>
+</body>
+</html>

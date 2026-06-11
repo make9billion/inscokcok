@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
 
+import CustomerHeaderNav from '@/Components/CustomerHeaderNav';
 import PublicLayout from '@/Layouts/PublicLayout';
 import companyHistoryImage from '../../../images/company/01.png';
 import companyOrganizationImage from '../../../images/company/02.png';
@@ -28,10 +29,11 @@ export default function Company({
             <Head title={title} />
 
             <section className="border-b border-toss-grey200 bg-toss-grey50">
-                <div className="mx-auto max-w-5xl px-5 py-14 sm:px-6 lg:px-8">
-                    <p className="text-sm font-semibold text-toss-blue">About</p>
-                    <h1 className="mt-3 text-3xl font-bold text-toss-grey900">{title}</h1>
-                    <p className="mt-3 max-w-2xl text-sm leading-6 text-toss-grey600">{description}</p>
+                <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
+                    <p className="text-sm font-black text-[#f47b20]">About</p>
+                    <h1 className="mt-2 text-2xl font-black leading-tight text-toss-grey900 sm:text-3xl">{title}</h1>
+                    <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-toss-grey500">{description}</p>
+                    <CustomerHeaderNav />
                 </div>
             </section>
 

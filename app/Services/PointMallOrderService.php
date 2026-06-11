@@ -5,6 +5,9 @@ namespace App\Services;
 use App\Enums\PointMallOrderStatus;
 use App\Models\PointMallOrder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class PointMallOrderService
 {
@@ -14,8 +17,12 @@ class PointMallOrderService
 
     public function cancelAndRefund(PointMallOrder $order): PointMallOrder
     {
+        $order->loadMissing(['items.product', 'user']);
+
+        $this->cancelTossPaymentIfNeeded($order);
+
         return DB::transaction(function () use ($order) {
-            $order->loadMissing(['items.product', 'user']);
+            $order->refresh()->loadMissing(['items.product', 'user']);
 
             if (in_array($order->status, [PointMallOrderStatus::Cancelled, PointMallOrderStatus::Refunded], true)) {
                 return $order;
@@ -35,9 +42,11 @@ class PointMallOrderService
                     : ($order->used_points > 0
                     ? PointMallOrderStatus::Refunded
                     : PointMallOrderStatus::Cancelled),
-                'payment_status' => in_array($order->payment_status, ['ready', 'requested'], true)
+                'payment_status' => $order->payment_key
                     ? 'cancelled'
-                    : $order->payment_status,
+                    : (in_array($order->payment_status, ['ready', 'requested'], true)
+                    ? 'cancelled'
+                    : $order->payment_status),
                 'cancelled_at' => now(),
             ]);
 
@@ -72,5 +81,37 @@ class PointMallOrderService
 
             return $order->refresh();
         });
+    }
+
+    private function cancelTossPaymentIfNeeded(PointMallOrder $order): void
+    {
+        if ($order->cash_payment_amount <= 0 || ! $order->payment_key) {
+            return;
+        }
+
+        if (in_array($order->payment_status, ['cancelled', 'canceled'], true)) {
+            return;
+        }
+
+        $secretKey = config('services.toss_payments.secret_key');
+
+        if (! $secretKey) {
+            throw ValidationException::withMessages([
+                'order' => '토스페이먼츠 시크릿 키가 설정되어 있지 않아 결제 취소를 진행할 수 없습니다.',
+            ]);
+        }
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Basic '.base64_encode($secretKey.':'),
+            'Idempotency-Key' => 'point-mall-cancel-'.$order->id.'-'.Str::uuid(),
+        ])->post("https://api.tosspayments.com/v1/payments/{$order->payment_key}/cancel", [
+            'cancelReason' => '포인트몰 주문 취소',
+        ]);
+
+        if ($response->failed()) {
+            throw ValidationException::withMessages([
+                'order' => $response->json('message') ?? '토스페이먼츠 결제 취소에 실패했습니다.',
+            ]);
+        }
     }
 }

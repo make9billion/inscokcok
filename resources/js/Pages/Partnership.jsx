@@ -1,6 +1,7 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { Handshake } from 'lucide-react';
 
+import CustomerHeaderNav from '@/Components/CustomerHeaderNav';
 import PublicLayout from '@/Layouts/PublicLayout';
 
 export default function Partnership({ auth }) {
@@ -27,12 +28,13 @@ export default function Partnership({ auth }) {
             <Head title="제휴문의" />
 
             <section className="border-b border-toss-grey200 bg-toss-grey50">
-                <div className="mx-auto max-w-6xl px-5 py-14 sm:px-6 lg:px-8">
-                    <p className="text-sm font-semibold text-toss-blue">Partnership</p>
-                    <h1 className="mt-3 text-3xl font-bold text-toss-grey900">제휴문의</h1>
-                    <p className="mt-3 max-w-2xl text-sm leading-6 text-toss-grey600">
+                <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 lg:px-8">
+                    <p className="text-sm font-black text-[#f47b20]">Partnership</p>
+                    <h1 className="mt-2 text-2xl font-black leading-tight text-toss-grey900 sm:text-3xl">제휴문의</h1>
+                    <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-toss-grey500">
                         보험 상담, 고객 혜택, 포인트몰, 마케팅 제휴 제안을 남겨주시면 담당자가 확인 후 연락드립니다.
                     </p>
+                    <CustomerHeaderNav />
                 </div>
             </section>
 
@@ -43,7 +45,6 @@ export default function Partnership({ auth }) {
                     </span>
                     <h2 className="mt-5 text-xl font-bold text-toss-grey900">제휴 검토 안내</h2>
                     <div className="mt-5 space-y-4 text-sm leading-7 text-toss-grey600">
-                        <p>접수된 제휴문의는 관리자 문의함의 `제휴 문의` 말머리로 등록됩니다.</p>
                         <p>회사 소개, 제안 목적, 예상 운영 방식, 연락 가능한 시간대를 함께 적어주시면 더 빠르게 검토할 수 있습니다.</p>
                     </div>
                 </aside>

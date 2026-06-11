@@ -2,28 +2,59 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
     Bell,
+    ChevronDown,
     ChevronRight,
     Gift,
     MessageSquareText,
-    ShieldCheck,
     ShoppingBag,
     Sparkles,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+import ConsultationConsentPanel, { ConsultationConsentPolicyView } from '@/Components/ConsultationConsentPanel';
 import PublicLayout from '@/Layouts/PublicLayout';
+import cancerHeroImage from '../../images/hero/bohum-cancer.png';
+import cancerCardImage from '../../images/hero/backup-banner-card-20260607/bohum-cancer.png';
+import careHeroImage from '../../images/hero/bohum-care.png';
+import careCardImage from '../../images/hero/backup-banner-card-20260607/bohum-care.png';
+import childHeroImage from '../../images/hero/bohum-child.png';
+import childCardImage from '../../images/hero/backup-banner-card-20260607/bohum-child.png';
+import dentalHeroImage from '../../images/hero/bohum-dental.png';
+import dentalCardImage from '../../images/hero/backup-banner-card-20260607/bohum-dental.png';
+import diseaseAccidentHeroImage from '../../images/hero/bohum-disease-accident.png';
+import diseaseAccidentCardImage from '../../images/hero/backup-banner-card-20260607/bohum-disease-accident.png';
+import liveConsultingImage from '../../images/hero/bohum-live-consulting.png';
+import petHeroImage from '../../images/hero/bohum-pet.png';
+import petCardImage from '../../images/hero/backup-banner-card-20260607/bohum-pet.png';
+
+const insuranceLogoModules = import.meta.glob('../../images/ins-com-logo/*.png', {
+    eager: true,
+    import: 'default',
+    query: '?url',
+});
+
+const insuranceCompanyLogos = Object.entries(insuranceLogoModules)
+    .sort(([firstPath], [secondPath]) => firstPath.localeCompare(secondPath, 'ko-KR', { numeric: true }))
+    .map(([path, src]) => {
+        const fileName = path.split('/').pop() ?? '';
+
+        return {
+            name: fileName.replace(/^\d+\s?/, '').replace(/\.png$/i, ''),
+            src,
+        };
+    });
 
 const heroSlides = [
     {
         label: '암보험',
         product: '암보험',
         kicker: '암 보장 한 번에 확인',
-        title: '암보험, 꼭 가입한 걸까요?',
+        title: '암보험, 내 보장 충분할까요?',
         description: '진단비와 치료비 보장을 현재 상황에 맞춰 점검해드립니다.',
         tags: ['암 진단비', '중복보장 체크', '보장분석'],
-        tone: 'bg-[#edf7f7]',
+        tone: 'bg-[#f7f7f7]',
         accent: 'text-[#6676b8]',
-        badge: 'CANCER',
+        image: cancerHeroImage,
     },
     {
         label: '치매/간병보험',
@@ -32,9 +63,9 @@ const heroSlides = [
         title: '치매/간병보험, 가족 부담까지 생각합니다.',
         description: '간병비, 요양, 치매 관련 보장을 가족 상황에 맞춰 정리합니다.',
         tags: ['간병비', '치매보장', '부모님 상담'],
-        tone: 'bg-[#f0faf6]',
+        tone: 'bg-[#faf5fb]',
         accent: 'text-[#39806c]',
-        badge: 'CARE',
+        image: careHeroImage,
     },
     {
         label: '질병/상해보험',
@@ -43,9 +74,9 @@ const heroSlides = [
         title: '질병과 상해, 빈틈없이 준비하세요.',
         description: '입원비, 수술비, 후유장해 보장을 생활 패턴과 예산에 맞춰 비교합니다.',
         tags: ['입원비', '수술비', '후유장해'],
-        tone: 'bg-[#eef3fb]',
+        tone: 'bg-[#f3f7fc]',
         accent: 'text-[#51657e]',
-        badge: 'HEALTH',
+        image: diseaseAccidentHeroImage,
     },
     {
         label: '치아보험',
@@ -54,9 +85,9 @@ const heroSlides = [
         title: '치아보험, 필요한 치료 중심으로.',
         description: '보존치료, 보철치료, 임플란트 보장을 나이와 치료 계획에 맞춰 확인합니다.',
         tags: ['보존치료', '보철치료', '임플란트'],
-        tone: 'bg-[#fff8ec]',
+        tone: 'bg-[#fdf6ea]',
         accent: 'text-[#c06d2b]',
-        badge: 'DENTAL',
+        image: dentalHeroImage,
     },
     {
         label: '펫보험',
@@ -65,9 +96,9 @@ const heroSlides = [
         title: '펫보험, 병원비 걱정을 가볍게.',
         description: '통원, 입원, 수술비 보장을 반려동물의 나이와 생활 패턴에 맞춰 비교합니다.',
         tags: ['통원치료', '수술비', '반려생활'],
-        tone: 'bg-[#f8f5ff]',
+        tone: 'bg-[#f7f8f1]',
         accent: 'text-[#6b5bb8]',
-        badge: 'PET',
+        image: petHeroImage,
     },
     {
         label: '어린이보험',
@@ -76,17 +107,60 @@ const heroSlides = [
         title: '어린이보험, 필요한 때를 놓치지 않게.',
         description: '영유아부터 청소년기까지 치료비, 진단비, 생활 보장을 비교합니다.',
         tags: ['영유아 상담', '성장기 보장', '부모 부담 절감'],
-        tone: 'bg-[#eef8ff]',
+        tone: 'bg-[#f2f7fd]',
         accent: 'text-[#2f76a8]',
-        badge: 'KIDS',
+        image: childHeroImage,
+    },
+];
+
+const productCardStyles = [
+    {
+        description: '진단비와 치료비 보장을 한 번에 확인',
+        image: cancerCardImage,
+        routeName: 'insurance.cancer',
+        tone: 'bg-[#fff7ef]',
+    },
+    {
+        description: '간병비와 치매 보장을 가족 상황에 맞게',
+        image: careCardImage,
+        routeName: 'insurance.dementia-care',
+        tone: 'bg-[#fbf4fc]',
+    },
+    {
+        description: '입원, 수술, 상해 보장을 빈틈없이 점검',
+        image: diseaseAccidentCardImage,
+        routeName: 'insurance.disease-accident',
+        tone: 'bg-[#f1f7ff]',
+    },
+    {
+        description: '치료 계획에 맞춘 치아 보장 확인',
+        image: dentalCardImage,
+        routeName: 'insurance.dental',
+        tone: 'bg-[#fff8ec]',
+    },
+    {
+        description: '반려동물 병원비 부담을 가볍게',
+        image: petCardImage,
+        routeName: 'insurance.pet',
+        tone: 'bg-[#f6f8ef]',
+    },
+    {
+        description: '성장 단계별 필요한 보장을 비교',
+        image: childCardImage,
+        routeName: 'insurance.child',
+        tone: 'bg-[#f1f7ff]',
     },
 ];
 
 const rollingReceiptRows = [
-    { name: '김*아', product: '암보험', status: '상담사 배정 완료', time: '1분 전' },
-    { name: '박*준', product: '질병/상해보험', status: '보장 분석 중', time: '4분 전' },
-    { name: '이*지', product: '치매/간병보험', status: '전화 상담 예약', time: '8분 전' },
-    { name: '최*미', product: '펫보험', status: '접수 확인', time: '12분 전' },
+    { name: '김*아', product: '암보험', status: '상담사 배정 완료', tone: 'bg-[#ffd1ad] text-[#8a3500]' },
+    { name: '박*준', product: '질병/상해보험', status: '보장 분석 중', tone: 'bg-[#c5ddff] text-[#0f3970]' },
+    { name: '이*지', product: '치매/간병보험', status: '전화 상담 예약', tone: 'bg-[#dcc5f4] text-[#4e2175]' },
+    { name: '최*미', product: '펫보험', status: '접수 확인', tone: 'bg-[#c8eeb4] text-[#295517]' },
+    { name: '정*호', product: '치아보험', status: '상담 접수 완료', tone: 'bg-[#ffe59b] text-[#745000]' },
+    { name: '윤*서', product: '어린이보험', status: '담당자 확인 중', tone: 'bg-[#bfe8ff] text-[#064c70]' },
+    { name: '한*민', product: '암보험', status: '보험료 비교 중', tone: 'bg-[#ffc1cf] text-[#7e1b36]' },
+    { name: '오*린', product: '질병/상해보험', status: '맞춤 상담 대기', tone: 'bg-[#ccd6ff] text-[#203580]' },
 ];
 
 const fallbackFaqs = [
@@ -102,12 +176,6 @@ const fallbackFaqs = [
         question: '포인트는 어디에 사용할 수 있나요?',
         answer: '상담 참여와 이벤트로 적립된 포인트는 포인트몰 상품 교환에 사용할 수 있습니다.',
     },
-];
-
-const pointMallProducts = [
-    { title: '모바일 커피 쿠폰', points: '4,500P', tag: '교환 1위' },
-    { title: '편의점 금액권', points: '10,000P', tag: '인기' },
-    { title: '건강검진 할인권', points: '18,000P', tag: '건강관리' },
 ];
 
 const events = [
@@ -139,6 +207,8 @@ const fallbackNotices = [
     { title: '포인트몰 일부 상품 교환 지연 안내', date: '2026.05.20', href: '/customer/notices' },
 ];
 
+const formatNumber = (value) => new Intl.NumberFormat('ko-KR').format(value ?? 0);
+
 const formatPhone = (value) => {
     const digits = value.replace(/\D/g, '').replace(/^010/, '').slice(0, 8);
     const middle = digits.slice(0, 4);
@@ -147,6 +217,22 @@ const formatPhone = (value) => {
     if (!middle) return '010-';
     if (!last) return `010-${middle}`;
     return `010-${middle}-${last}`;
+};
+
+const renderHeroTitle = (title) => {
+    const commaIndex = title.indexOf(',');
+
+    if (commaIndex === -1) {
+        return title;
+    }
+
+    return (
+        <>
+            {title.slice(0, commaIndex + 1)}
+            <br />
+            {title.slice(commaIndex + 1).trim()}
+        </>
+    );
 };
 
 function SectionHeader({ eyebrow, title, description, href }) {
@@ -195,9 +281,12 @@ function BannerStrip({ icon: Icon, title, description, href }) {
     );
 }
 
-export default function Welcome({ auth, cms = {} }) {
+export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMallProducts = [] }) {
     const { flash } = usePage().props;
     const [activeSlide, setActiveSlide] = useState(0);
+    const [isAutoPaused, setIsAutoPaused] = useState(false);
+    const [openMainFaq, setOpenMainFaq] = useState(null);
+    const [activeConsentPolicy, setActiveConsentPolicy] = useState(null);
     const activeProduct = heroSlides[activeSlide];
     const cmsNotices = cms.notices?.length
         ? cms.notices.map((notice) => ({
@@ -213,8 +302,10 @@ export default function Welcome({ auth, cms = {} }) {
           }))
         : fallbackFaqs;
     const cmsMainBanner = cms.mainBanners?.[0] ?? null;
+    const visiblePointMallProducts = mainPointMallProducts.slice(0, 4);
     const form = useForm({
         type: 'product',
+        source: 'main',
         applicant_name: '',
         phone: '010-',
         interested_product: activeProduct.product,
@@ -224,6 +315,10 @@ export default function Welcome({ auth, cms = {} }) {
     });
 
     useEffect(() => {
+        if (isAutoPaused) {
+            return undefined;
+        }
+
         const timer = window.setInterval(() => {
             setActiveSlide((current) => {
                 const next = (current + 1) % heroSlides.length;
@@ -233,9 +328,36 @@ export default function Welcome({ auth, cms = {} }) {
         }, 5200);
 
         return () => window.clearInterval(timer);
+    }, [isAutoPaused]);
+
+    useEffect(() => {
+        const revealItems = Array.from(document.querySelectorAll('.scroll-reveal'));
+
+        if (!('IntersectionObserver' in window)) {
+            revealItems.forEach((item) => item.classList.add('is-visible'));
+            return undefined;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    } else {
+                        entry.target.classList.remove('is-visible');
+                    }
+                });
+            },
+            { threshold: 0.2 },
+        );
+
+        revealItems.forEach((item) => observer.observe(item));
+
+        return () => observer.disconnect();
     }, []);
 
     const selectSlide = (index) => {
+        setIsAutoPaused(true);
         setActiveSlide(index);
         form.setData('interested_product', heroSlides[index].product);
     };
@@ -258,24 +380,31 @@ export default function Welcome({ auth, cms = {} }) {
         <PublicLayout auth={auth}>
             <Head title="보험CC" />
 
-            <section className="hero-stage relative overflow-hidden bg-[#edf7f7]" aria-label="보험상품 상담 신청">
-                <div className="hero-viewport relative mx-auto min-h-[620px] max-w-[1320px] lg:h-[620px]">
-                    <div className="overflow-hidden lg:h-full">
-                        <div
-                            className="hero-track flex h-full transition-transform duration-500 ease-out"
-                            style={{ transform: `translateX(-${activeSlide * 100}%)` }}
-                        >
-                            {heroSlides.map((slide) => (
+            <section
+                className={`hero-stage relative overflow-hidden transition-colors duration-700 ease-out ${activeProduct.tone}`}
+                aria-label="보험상품 상담 신청"
+            >
+                <div className="hero-viewport relative mx-auto min-h-[720px] max-w-[1320px] lg:h-[720px]">
+                    <div className="relative min-h-[590px] lg:h-full">
+                        {heroSlides.map((slide, index) => {
+                            const isActive = activeSlide === index;
+
+                            return (
                                 <article
                                     key={slide.label}
-                                    className={`relative min-h-[520px] w-full shrink-0 px-5 py-12 sm:px-10 lg:h-[620px] lg:px-[118px] lg:py-[72px] lg:pr-[470px] ${slide.tone}`}
+                                    aria-hidden={!isActive}
+                                    className={`absolute inset-0 px-5 py-14 transition-all duration-1000 ease-out sm:px-10 lg:px-[118px] lg:py-[86px] lg:pr-[500px] ${
+                                        isActive
+                                            ? 'z-10 translate-y-0 scale-100 opacity-100'
+                                            : 'z-0 translate-y-4 scale-[0.985] opacity-0'
+                                    }`}
                                 >
                                     <div className="relative z-10 max-w-2xl">
-                                        <span className="text-xl font-black text-[#111111]">{slide.kicker}</span>
-                                        <h1 className="mt-8 text-4xl font-black leading-tight text-[#111111] lg:text-5xl">
-                                            {slide.title}
+                                        <span className="text-2xl font-black text-[#f47b20] lg:text-3xl">{slide.kicker}</span>
+                                        <h1 className="mt-9 text-4xl font-black leading-tight text-[#111111] lg:text-6xl">
+                                            {renderHeroTitle(slide.title)}
                                         </h1>
-                                        <p className={`mt-4 max-w-2xl text-2xl font-black leading-snug lg:text-4xl ${slide.accent}`}>
+                                        <p className={`mt-5 max-w-2xl text-2xl font-black leading-snug lg:text-4xl ${slide.accent}`}>
                                             {slide.description}
                                         </p>
                                         <div className="mt-7 flex flex-wrap gap-2">
@@ -290,34 +419,32 @@ export default function Welcome({ auth, cms = {} }) {
                                         </div>
                                     </div>
 
-                                    <div className="pointer-events-none absolute bottom-10 right-[430px] hidden w-[210px] rounded-[34px] bg-white p-6 text-center shadow-[0_30px_80px_rgba(22,36,58,0.18)] lg:block">
-                                        <div className="mx-auto grid size-20 place-items-center rounded-full border-4 border-[#16243a] text-xl font-black text-[#16243a]">
-                                            <ShieldCheck className="size-9" strokeWidth={1.8} />
-                                        </div>
-                                        <strong className="mt-6 block text-lg font-black tracking-widest text-[#081a33]">
-                                            {slide.badge}
-                                        </strong>
+                                    <div className="hero-image-motion pointer-events-none absolute bottom-0 right-[424px] hidden w-[468px] lg:block">
+                                        <img
+                                            src={slide.image}
+                                            alt=""
+                                            className="h-auto w-full object-contain"
+                                        />
                                     </div>
                                 </article>
-                            ))}
-                        </div>
+                            );
+                        })}
                     </div>
 
-                    <div className="hero-dots absolute bottom-7 left-5 z-10 flex gap-2 sm:left-10 lg:bottom-14 lg:left-[118px]">
-                        {heroSlides.map((slide, index) => (
-                            <button
-                                key={slide.label}
-                                type="button"
-                                aria-label={`${slide.label} 배너 보기`}
-                                onClick={() => selectSlide(index)}
-                                className={`h-2.5 rounded-full transition-all ${
-                                    activeSlide === index ? 'w-7 bg-[#081a33]' : 'w-2.5 bg-[#c3c7c7]'
-                                }`}
+                    <aside className="consult-panel relative z-20 mx-auto -mt-10 flex min-h-[520px] w-[min(100%-24px,430px)] flex-col rounded-[20px] bg-white/90 px-7 py-6 backdrop-blur lg:absolute lg:right-[18px] lg:top-[92px] lg:mt-0 lg:w-[414px]">
+                        {activeConsentPolicy ? (
+                            <ConsultationConsentPolicyView
+                                policyKey={activeConsentPolicy}
+                                accent="#f47b20"
+                                bodyClassName="max-h-[390px]"
+                                onBack={() => setActiveConsentPolicy(null)}
+                                onAgree={() => {
+                                    form.setData(activeConsentPolicy === 'privacy' ? 'privacy_agreement' : 'third_party_agreement', true);
+                                    setActiveConsentPolicy(null);
+                                }}
                             />
-                        ))}
-                    </div>
-
-                    <aside className="consult-panel relative z-20 mx-auto -mt-6 w-[min(100%-24px,430px)] rounded-[20px] border-4 border-[#081a33] bg-white/95 px-7 py-6 shadow-[0_18px_44px_rgba(22,36,58,0.11)] lg:absolute lg:right-[18px] lg:top-[66px] lg:mt-0 lg:w-[414px]">
+                        ) : (
+                            <>
                         <div className="product-tabs grid grid-cols-3 gap-2" aria-label="보험상품 선택">
                             {heroSlides.map((slide, index) => (
                                 <button
@@ -325,10 +452,10 @@ export default function Welcome({ auth, cms = {} }) {
                                     type="button"
                                     aria-pressed={form.data.interested_product === slide.product}
                                     onClick={() => selectSlide(index)}
-                                    className={`min-h-8 rounded-full border-2 border-[#081a33] px-2 text-xs font-black transition ${
+                                    className={`min-h-10 rounded-full border-2 border-[#12284a] px-3 text-sm font-black transition ${
                                         form.data.interested_product === slide.product
-                                            ? 'bg-[#081a33] text-white'
-                                            : 'bg-white text-[#222222] hover:bg-[#081a33] hover:text-white'
+                                            ? 'bg-[#f47b20] text-white border-[#f47b20]'
+                                            : 'bg-white text-[#12284a] hover:border-[#f47b20] hover:bg-[#fff4eb] hover:text-[#d85f00]'
                                     }`}
                                 >
                                     {slide.label}
@@ -336,7 +463,7 @@ export default function Welcome({ auth, cms = {} }) {
                             ))}
                             <Link
                                 href="/insurance-checkup"
-                                className="col-span-3 inline-flex min-h-10 items-center justify-center rounded-full border-2 border-[#081a33] bg-[#eef3fb] px-3 text-sm font-black text-[#081a33] transition hover:bg-[#081a33] hover:text-white"
+                                className="col-span-3 inline-flex min-h-12 items-center justify-center rounded-full border-2 border-[#12284a] bg-[#f7fbff] px-4 text-base font-black text-[#12284a] transition hover:border-[#f47b20] hover:bg-[#fff4eb] hover:text-[#d85f00]"
                             >
                                 보험점검
                             </Link>
@@ -344,8 +471,8 @@ export default function Welcome({ auth, cms = {} }) {
 
                         <form onSubmit={submit} className="lead-form mt-5 grid gap-3">
                             <div className="text-center">
-                                <strong className="inline-block border-b-4 border-[#333333] pb-1 text-2xl font-black text-[#333333]">
-                                    어떤 상품이 필요하신가요?
+                                <strong className="inline-block border-b-[3px] border-[#f47b20] pb-1 text-xl font-black text-[#12284a]">
+                                    간편상담 신청하기
                                 </strong>
                             </div>
 
@@ -355,19 +482,19 @@ export default function Welcome({ auth, cms = {} }) {
                                 </div>
                             )}
 
-                            <label className="grid gap-1 text-xs font-bold text-[#555555]">
+                            <label className="grid gap-1 text-sm font-bold text-[#344056]">
                                 이름
                                 <input
                                     type="text"
                                     value={form.data.applicant_name}
                                     onChange={(event) => form.setData('applicant_name', event.target.value)}
                                     placeholder="이름"
-                                    className="h-9 border-0 border-b border-[#d5d5d5] bg-transparent px-1 text-sm text-[#222222] focus:border-[#081a33] focus:ring-0"
+                                    className="h-11 border-0 border-b border-[#cfd6df] bg-transparent px-1 text-base font-semibold text-[#12284a] placeholder:text-[#8a95a6] focus:border-[#f47b20] focus:ring-0"
                                 />
                                 <FieldError message={form.errors.applicant_name} />
                             </label>
 
-                            <label className="grid gap-1 text-xs font-bold text-[#555555]">
+                            <label className="grid gap-1 text-sm font-bold text-[#344056]">
                                 휴대폰번호
                                 <input
                                     type="tel"
@@ -380,37 +507,38 @@ export default function Welcome({ auth, cms = {} }) {
                                             form.setData('phone', '010-');
                                         }
                                     }}
-                                    className="h-9 border-0 border-b border-[#d5d5d5] bg-transparent px-1 text-sm text-[#222222] focus:border-[#081a33] focus:ring-0"
+                                    className="h-11 border-0 border-b border-[#cfd6df] bg-transparent px-1 text-base font-semibold text-[#12284a] placeholder:text-[#8a95a6] focus:border-[#f47b20] focus:ring-0"
                                 />
                                 <FieldError message={form.errors.phone} />
                             </label>
 
-                            <label className="mt-1 flex items-center gap-2 text-sm font-black text-[#222222]">
-                                <input
-                                    type="checkbox"
-                                    checked={form.data.privacy_agreement}
-                                    onChange={(event) => form.setData('privacy_agreement', event.target.checked)}
-                                    className="size-6 rounded border-[#d5d5d5] text-[#081a33] focus:ring-[#081a33]"
-                                />
-                                개인정보 수집 및 이용동의
-                            </label>
-                            <FieldError message={form.errors.privacy_agreement} />
-
-                            <label className="flex items-center gap-2 text-sm font-black text-[#222222]">
-                                <input
-                                    type="checkbox"
-                                    checked={form.data.third_party_agreement}
-                                    onChange={(event) => form.setData('third_party_agreement', event.target.checked)}
-                                    className="size-6 rounded border-[#d5d5d5] text-[#081a33] focus:ring-[#081a33]"
-                                />
-                                제3자 정보제공 동의
-                            </label>
-                            <FieldError message={form.errors.third_party_agreement} />
+                            <ConsultationConsentPanel
+                                onViewPolicy={setActiveConsentPolicy}
+                                checkboxClassName="size-6 rounded border-[#cfd6df] text-[#f47b20] focus:ring-[#f47b20]"
+                                agreements={[
+                                    {
+                                        field: 'privacy_agreement',
+                                        policyKey: 'privacy',
+                                        label: '개인정보 수집 및 이용동의',
+                                        checked: form.data.privacy_agreement,
+                                        onChange: (checked) => form.setData('privacy_agreement', checked),
+                                        error: form.errors.privacy_agreement,
+                                    },
+                                    {
+                                        field: 'third_party_agreement',
+                                        policyKey: 'thirdParty',
+                                        label: '제3자 정보제공 동의',
+                                        checked: form.data.third_party_agreement,
+                                        onChange: (checked) => form.setData('third_party_agreement', checked),
+                                        error: form.errors.third_party_agreement,
+                                    },
+                                ]}
+                            />
 
                             <button
                                 type="submit"
                                 disabled={form.processing}
-                                className="min-h-12 rounded-lg bg-[#081a33] text-base font-black text-white transition hover:bg-[#0f2b52] disabled:opacity-60"
+                                className="min-h-[52px] rounded-lg bg-[#f47b20] text-lg font-black text-white transition hover:bg-[#d85f00] disabled:opacity-60"
                             >
                                 {form.processing ? '접수 중' : '빠른 상담신청'}
                             </button>
@@ -418,19 +546,85 @@ export default function Welcome({ auth, cms = {} }) {
                                 입력하신 정보는 상담 목적 외에 사용하지 않습니다.
                             </p>
                         </form>
+                            </>
+                        )}
                     </aside>
                 </div>
             </section>
 
-            <section className="mx-auto my-12 grid max-w-6xl grid-cols-2 gap-3 px-5 sm:grid-cols-4 lg:grid-cols-8">
-                {[...heroSlides.map((slide) => slide.label), '보장분석', '포인트몰'].map((label) => (
-                    <button key={label} type="button" className="grid place-items-center gap-2">
-                        <span className="grid size-16 place-items-center rounded-full bg-[#eeeeee] text-xl font-black text-[#081a33] shadow-[inset_0_0_0_8px_#f7f7f7]">
-                            {label.slice(0, 1)}
-                        </span>
-                        <strong className="text-sm font-black text-[#333333]">{label}</strong>
-                    </button>
-                ))}
+            <section className="overflow-hidden bg-white" aria-label="제휴 보험사 로고">
+                <div className="insurance-logo-marquee flex py-5">
+                    {[0, 1].map((group) => (
+                        <div
+                            key={group}
+                            className="insurance-logo-track flex min-w-max shrink-0 items-center gap-12 px-6"
+                            aria-hidden={group === 1}
+                        >
+                            {insuranceCompanyLogos.map((logo) => (
+                                <div
+                                    key={`${group}-${logo.name}`}
+                                    className="flex h-12 min-w-[150px] items-center justify-center"
+                                >
+                                    <img
+                                        src={logo.src}
+                                        alt={group === 0 ? logo.name : ''}
+                                        className="max-h-10 w-auto max-w-[150px] object-contain"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            <section className="bg-[#f7f8fb] py-20">
+                <div className="mx-auto max-w-6xl px-5 sm:px-6">
+                <div className="scroll-reveal mb-9 max-w-3xl">
+                    <p className="text-lg font-black text-[#f47b20]">보험상품 바로가기</p>
+                    <h2 className="mt-3 text-4xl font-black leading-tight text-[#171827]">
+                        비교해서 나에게 맞는 보험을 콕콕 알려드릴게요.
+                    </h2>
+                    <p className="mt-4 text-lg font-semibold leading-8 text-[#667085]">
+                        필요한 보장은 채우고 불필요한 보험료는 줄일 수 있도록 상품별 핵심 보장을 쉽게 확인해보세요.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 gap-9 sm:grid-cols-2">
+                    {heroSlides.map((slide, index) => {
+                        const card = productCardStyles[index];
+
+                        return (
+                            <Link
+                                key={slide.label}
+                                href={route(card.routeName)}
+                                className="scroll-reveal group overflow-hidden rounded-2xl bg-white text-left shadow-[0_20px_50px_rgba(22,36,58,0.09)] transition hover:-translate-y-1 hover:shadow-[0_30px_70px_rgba(22,36,58,0.15)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f47b20]"
+                                style={{ '--reveal-delay': `${index * 130}ms` }}
+                            >
+                                <span className={`block h-[330px] overflow-hidden ${card.tone}`}>
+                                    <img
+                                        src={card.image}
+                                        alt=""
+                                        className="h-full w-full object-cover object-[right_center] transition duration-500 group-hover:scale-105"
+                                    />
+                                </span>
+                                <span className="flex min-h-[164px] items-center justify-between gap-6 bg-white px-8 py-8">
+                                    <span className="min-w-0">
+                                        <strong className="block text-3xl font-black leading-tight text-[#171827]">
+                                            {slide.label}
+                                        </strong>
+                                        <span className="mt-5 block text-lg font-semibold leading-7 text-[#667085]">
+                                            {card.description}
+                                        </span>
+                                    </span>
+                                    <span className="grid size-14 shrink-0 place-items-center rounded-full border-2 border-[#4a4d5f] text-[#4a4d5f] transition group-hover:border-[#f47b20] group-hover:bg-[#f47b20] group-hover:text-white">
+                                        <ArrowRight className="size-7 transition group-hover:translate-x-1" strokeWidth={1.8} />
+                                    </span>
+                                </span>
+                            </Link>
+                        );
+                    })}
+                </div>
+                </div>
             </section>
 
             <section className="border-y border-toss-grey200 bg-toss-grey50">
@@ -460,71 +654,145 @@ export default function Welcome({ auth, cms = {} }) {
                 </div>
             </section>
 
-            <section className="bg-white">
-                <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
-                    <SectionHeader
-                        eyebrow="Live"
-                        title="실시간 상담 접수 현황"
-                        description="최근 접수 흐름을 간단히 보여드립니다."
-                    />
-                    <div className="mt-8 grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-                        {rollingReceiptRows.map((row) => (
-                            <div key={`${row.name}-${row.time}`} className="rounded-lg border border-toss-grey200 bg-white p-4">
-                                <div className="flex items-center justify-between gap-3">
-                                    <span className="text-sm font-semibold text-toss-grey900">{row.name}</span>
-                                    <span className="text-xs text-toss-grey500">{row.time}</span>
-                                </div>
-                                <p className="mt-3 text-sm text-toss-grey600">{row.product}</p>
-                                <p className="mt-1 text-sm font-semibold text-toss-blue">{row.status}</p>
+            <section className="overflow-hidden bg-[#fff8f0]">
+                <div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 sm:px-6 lg:grid-cols-[25fr_75fr] lg:items-center lg:px-8">
+                    <div className="scroll-reveal reveal-from-left flex items-end justify-center lg:justify-start">
+                        <img src={liveConsultingImage} alt="" className="h-80 w-auto object-contain sm:h-96 lg:h-[430px]" />
+                    </div>
+
+                    <div className="scroll-reveal reveal-from-right min-w-0">
+                        <div className="mb-7">
+                            <p className="text-lg font-black text-[#f47b20]">실시간 상담 접수현황</p>
+                            <h2 className="mt-3 text-3xl font-black leading-tight text-[#171827] sm:text-4xl">
+                                지금도 고객님의 보험 고민을 콕 집어 상담하고 있어요.
+                            </h2>
+                        </div>
+
+                        <div className="relative overflow-hidden py-3">
+                            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#fff8f0] to-transparent" />
+                            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#fff8f0] to-transparent" />
+                            <div className="consultation-feed-track flex w-max gap-4 px-6">
+                                {[0, 1].map((group) =>
+                                    rollingReceiptRows.map((row) => (
+                                        <div
+                                            key={`${group}-${row.name}-${row.product}-${row.status}`}
+                                            className={`flex h-[168px] w-[280px] shrink-0 flex-col justify-between rounded-3xl p-6 ${row.tone}`}
+                                            aria-hidden={group === 1}
+                                        >
+                                            <div className="flex items-start justify-between gap-4">
+                                                <span className="rounded-full bg-white/70 px-4 py-2 text-sm font-black shadow-sm">
+                                                    {row.product}
+                                                </span>
+                                                <span className="text-sm font-black opacity-70">{row.name}님</span>
+                                            </div>
+                                            <p className="text-2xl font-black leading-tight">{row.status}</p>
+                                        </div>
+                                    )),
+                                )}
                             </div>
-                        ))}
+                        </div>
                     </div>
                 </div>
             </section>
-
             <section className="bg-toss-grey50">
-                <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
-                    <SectionHeader
-                        eyebrow="FAQ"
-                        title="자주 묻는 질문"
-                        description="상담 전에 가장 많이 확인하는 내용을 모았습니다."
-                        href="/customer/faq"
-                    />
-                    <div className="space-y-3">
-                        {cmsFaqs.map((faq) => (
-                            <div key={faq.question} className="rounded-lg border border-toss-grey200 bg-white p-5">
-                                <h3 className="text-base font-semibold text-toss-grey900">{faq.question}</h3>
-                                <p className="mt-2 text-sm leading-6 text-toss-grey600">{faq.answer}</p>
-                            </div>
-                        ))}
+                <div className="mx-auto max-w-4xl px-5 py-16 sm:px-6 lg:px-8">
+                    <div className="text-center">
+                        <p className="text-sm font-semibold text-toss-blue">FAQ</p>
+                        <h2 className="mt-2 text-2xl font-bold leading-8 text-toss-grey900">자주 묻는 질문</h2>
+                        <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-toss-grey600">
+                            상담 전에 가장 많이 확인하는 내용을 모았습니다.
+                        </p>
+                        <Link
+                            href="/customer/faq"
+                            className="mt-4 inline-flex items-center justify-center gap-1 text-sm font-semibold text-toss-grey700 transition hover:text-toss-grey900"
+                        >
+                            더보기
+                            <ChevronRight className="size-4" strokeWidth={1.8} />
+                        </Link>
                     </div>
-                </div>
-            </section>
 
-            <section className="bg-white">
-                <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
-                    <SectionHeader
-                        eyebrow="Point Mall"
-                        title="포인트몰 인기 상품"
-                        description="적립 포인트로 교환하기 좋은 상품을 먼저 보여드립니다."
-                        href="/point-mall"
-                    />
-                    <div className="mt-8 grid gap-4 md:grid-cols-3">
-                        {pointMallProducts.map((product) => (
-                            <div key={product.title} className="rounded-lg border border-toss-grey200 bg-white p-5">
-                                <div className="flex items-center justify-between gap-3">
-                                    <ShoppingBag className="size-6 text-toss-grey700" strokeWidth={1.8} />
-                                    <span className="rounded-lg bg-toss-grey100 px-2 py-1 text-xs font-semibold text-toss-grey700">
-                                        {product.tag}
-                                    </span>
-                                </div>
-                                <h3 className="mt-5 text-base font-semibold text-toss-grey900">{product.title}</h3>
-                                <p className="mt-2 text-xl font-bold tabular-nums text-toss-grey900">{product.points}</p>
-                            </div>
-                        ))}
+                    <div className="mt-9 divide-y divide-toss-grey200 border-y border-toss-grey200">
+                        {cmsFaqs.map((faq, index) => {
+                            const isOpen = openMainFaq === index;
+
+                            return (
+                                <article key={faq.question} className="py-5">
+                                    <button
+                                        type="button"
+                                        className="flex w-full items-start justify-between gap-5 text-left"
+                                        aria-expanded={isOpen}
+                                        onClick={() => setOpenMainFaq(isOpen ? null : index)}
+                                    >
+                                        <span className="flex gap-3">
+                                            <span className="text-base font-black text-[#f47b20]">Q</span>
+                                            <span className="text-base font-bold leading-7 text-toss-grey900">
+                                                {faq.question}
+                                            </span>
+                                        </span>
+                                        <ChevronDown
+                                            className={`mt-1 size-5 shrink-0 text-toss-grey500 transition ${isOpen ? 'rotate-180' : ''}`}
+                                            strokeWidth={2}
+                                        />
+                                    </button>
+
+                                    {isOpen && (
+                                        <div className="mt-4 flex gap-3">
+                                            <span className="text-base font-black text-toss-blue">A</span>
+                                            <p className="whitespace-pre-line text-sm font-semibold leading-7 text-toss-grey600">
+                                                {faq.answer}
+                                            </p>
+                                        </div>
+                                    )}
+                                </article>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
+            {visiblePointMallProducts.length > 0 && (
+                <section className="bg-white">
+                    <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
+                        <SectionHeader
+                            eyebrow="Point Mall"
+                            title="포인트몰 추천 상품"
+                            description="상담과 이벤트로 모은 포인트를 원하는 상품으로 교환해보세요."
+                            href="/point-mall"
+                        />
+                        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                            {visiblePointMallProducts.map((product) => (
+                                <Link
+                                    key={product.id}
+                                    href={route('point-mall.products.show', product.slug)}
+                                    className="group overflow-hidden rounded-[22px] border border-toss-grey200 bg-white transition hover:-translate-y-1 hover:border-[#f47b20]/40"
+                                >
+                                    <span className="flex aspect-square items-center justify-center bg-[#f3f5f8] text-toss-grey400">
+                                        {product.imagePath ? (
+                                            <img
+                                                src={`/storage/${product.imagePath}`}
+                                                alt=""
+                                                className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                                            />
+                                        ) : (
+                                            <ShoppingBag className="size-12" strokeWidth={1.5} />
+                                        )}
+                                    </span>
+                                    <span className="block p-5">
+                                        <span className="rounded-full bg-[#fff4e8] px-3 py-1 text-xs font-black text-[#f47b20]">
+                                            {product.categoryName ?? '포인트 상품'}
+                                        </span>
+                                        <strong className="mt-4 line-clamp-2 block text-base font-black leading-6 text-toss-grey900">
+                                            {product.name}
+                                        </strong>
+                                        <span className="mt-3 block text-xl font-black tabular-nums text-[#12284a]">
+                                            {formatNumber(product.pointPrice)}P
+                                        </span>
+                                    </span>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
 
             <section className="bg-toss-grey50">
                 <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">

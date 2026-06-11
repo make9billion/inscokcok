@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Enums\ConsultationType;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
 class StoreConsultationRequest extends FormRequest
@@ -17,6 +18,7 @@ class StoreConsultationRequest extends FormRequest
     {
         return [
             'type' => ['required', new Enum(ConsultationType::class)],
+            'source' => ['nullable', Rule::in(['main', 'product'])],
             'applicant_name' => ['required', 'string', 'max:80'],
             'phone' => ['required', 'string', 'max:30'],
             'birth_date' => ['nullable', 'date'],

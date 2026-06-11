@@ -41,7 +41,9 @@ class RegisteredUserController extends Controller
             'postal_code' => 'nullable|string|max:20',
             'address_line1' => 'nullable|string|max:255',
             'address_line2' => 'nullable|string|max:255',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', 'confirmed', Rules\Password::min(6)],
+            'terms_agreement' => ['accepted'],
+            'privacy_agreement' => ['accepted'],
         ]);
 
         $user = User::create([
