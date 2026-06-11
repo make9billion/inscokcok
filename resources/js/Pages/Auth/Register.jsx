@@ -55,13 +55,13 @@ function Field({ label, error, children }) {
 function SocialButton({ provider, label, className, href = null }) {
     if (href) {
         return (
-            <Link
+            <a
                 href={href}
                 className={`mx-auto flex min-h-16 w-full items-center justify-between rounded-2xl px-5 text-base font-black transition hover:-translate-y-0.5 ${className}`}
             >
                 <span>{label}</span>
                 <ChevronRight className="size-5" strokeWidth={2.4} />
-            </Link>
+            </a>
         );
     }
 
