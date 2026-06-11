@@ -1,6 +1,7 @@
 import ProductDescriptionEditor from '@/Components/Admin/ProductDescriptionEditor';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import { useEffect } from 'react';
 
 const emptyProduct = {
     point_mall_category_id: '',
@@ -56,6 +57,12 @@ function CheckGroup({ form }) {
 
 export default function ProductCreate({ categories }) {
     const form = useForm(emptyProduct);
+
+    useEffect(() => {
+        if (!form.data.point_mall_category_id && categories.length > 0) {
+            form.setData('point_mall_category_id', String(categories[0].id));
+        }
+    }, [categories]);
 
     const submit = (event) => {
         event.preventDefault();

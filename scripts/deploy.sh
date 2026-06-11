@@ -35,6 +35,9 @@ log "DB 마이그레이션"
 log "기본 이벤트 데이터 동기화"
 "$PHP_BIN" artisan db:seed --class=EventSeeder --force
 
+log "포인트몰 카테고리 데이터 동기화"
+"$PHP_BIN" artisan db:seed --class=PointMallCategorySeeder --force
+
 log "스토리지 링크 확인"
 "$PHP_BIN" artisan storage:link || true
 
