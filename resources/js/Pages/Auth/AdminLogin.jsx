@@ -17,7 +17,7 @@ export default function AdminLogin({ status }) {
     };
 
     return (
-        <GuestLayout>
+        <GuestLayout logoVariant="admin">
             <Head title="관리자 로그인" />
 
             <div className="mx-auto w-full max-w-md">

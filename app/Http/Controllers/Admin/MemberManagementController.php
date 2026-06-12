@@ -29,6 +29,7 @@ class MemberManagementController extends Controller
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%");
             }))
+            ->with('socialAccounts:id,user_id,provider')
             ->withCount(['consultations', 'knowledgeQuestions', 'pointMallOrders'])
             ->withSum('pointLedgerEntries as point_balance', 'points')
             ->latest()
@@ -38,6 +39,7 @@ class MemberManagementController extends Controller
                 'name' => $member->name,
                 'email' => $member->email,
                 'phone' => $member->phone,
+                'signupProvider' => $this->signupProvider($member),
                 'birthDate' => $member->birth_date?->format('Y-m-d'),
                 'gender' => $member->gender,
                 'postalCode' => $member->postal_code,
@@ -217,5 +219,23 @@ class MemberManagementController extends Controller
             'orderCount' => $member->point_mall_orders_count,
             'joinedAt' => $member->created_at?->format('Y-m-d'),
         ];
+    }
+
+    private function signupProvider(User $member): string
+    {
+        $providers = $member->socialAccounts
+            ->pluck('provider')
+            ->map(fn ($provider) => (string) $provider)
+            ->all();
+
+        if (in_array('kakao', $providers, true)) {
+            return 'kakao';
+        }
+
+        if (in_array('naver', $providers, true)) {
+            return 'naver';
+        }
+
+        return 'email';
     }
 }

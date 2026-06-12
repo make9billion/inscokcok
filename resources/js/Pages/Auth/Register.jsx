@@ -18,6 +18,8 @@ import {
 import { useState } from 'react';
 
 import characterUrl from '../../../images/hero/bohum-live-consulting.png';
+import kakaoLogoUrl from '../../../images/logo/logo_kakao.png';
+import naverLogoUrl from '../../../images/logo/logo_naver.png';
 
 const policyContent = {
     terms: {
@@ -52,15 +54,28 @@ function Field({ label, error, children }) {
     );
 }
 
-function SocialButton({ provider, label, className, href = null }) {
+function SocialButton({ provider, label, className, href = null, icon = null, iconClassName = '' }) {
+    const content = (
+        <>
+            <span className="inline-flex items-center gap-3">
+                {icon && (
+                    <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white">
+                        <img src={icon} alt="" className={`max-h-6 max-w-6 object-contain ${iconClassName}`} />
+                    </span>
+                )}
+                {label}
+            </span>
+            <ChevronRight className="size-5" strokeWidth={2.4} />
+        </>
+    );
+
     if (href) {
         return (
             <a
                 href={href}
                 className={`mx-auto flex min-h-16 w-full items-center justify-between rounded-2xl px-5 text-base font-black transition hover:-translate-y-0.5 ${className}`}
             >
-                <span>{label}</span>
-                <ChevronRight className="size-5" strokeWidth={2.4} />
+                {content}
             </a>
         );
     }
@@ -71,8 +86,7 @@ function SocialButton({ provider, label, className, href = null }) {
             onClick={() => alert(`${provider} 간편가입은 실제 소셜 로그인 연동 단계에서 연결할 수 있습니다.`)}
             className={`mx-auto flex min-h-16 w-full items-center justify-between rounded-2xl px-5 text-base font-black transition hover:-translate-y-0.5 ${className}`}
         >
-            <span>{label}</span>
-            <ChevronRight className="size-5" strokeWidth={2.4} />
+            {content}
         </button>
     );
 }
@@ -209,9 +223,8 @@ export default function Register() {
                     {mode === 'select' ? (
                         <div className="flex flex-1 flex-col justify-center">
                             <div className="mx-auto grid w-full max-w-[548px] gap-3">
-                                <SocialButton provider="카카오" label="카카오로 시작하기" href={route('social.kakao.redirect')} className="bg-[#fee500] text-[#191600]" />
-                                <SocialButton provider="네이버" label="네이버로 시작하기" href={route('social.naver.redirect')} className="bg-[#03c75a] text-white" />
-                                <SocialButton provider="구글" label="구글로 시작하기" className="border border-gray-200 bg-white text-gray-900" />
+                                <SocialButton provider="카카오" label="카카오로 시작하기" href={route('social.kakao.redirect')} className="bg-[#fee500] text-[#191600]" icon={kakaoLogoUrl} />
+                                <SocialButton provider="네이버" label="네이버로 시작하기" href={route('social.naver.redirect')} className="bg-[#03c75a] text-white" icon={naverLogoUrl} iconClassName="naver-logo-green" />
                                 <button
                                     type="button"
                                     onClick={() => setMode('email')}

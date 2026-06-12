@@ -1,12 +1,12 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Link } from '@inertiajs/react';
 
-export default function GuestLayout({ children, wide = false }) {
+export default function GuestLayout({ children, wide = false, logoVariant = 'default' }) {
     return (
         <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-4 sm:justify-center sm:pt-0">
             <div>
                 <Link href="/">
-                    <ApplicationLogo className="h-14 max-w-48 object-contain" />
+                    <ApplicationLogo variant={logoVariant} className={logoVariant === 'admin' ? 'h-20 max-w-64 object-contain' : 'h-14 max-w-48 object-contain'} />
                 </Link>
             </div>
 

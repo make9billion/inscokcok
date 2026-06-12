@@ -21,7 +21,7 @@ export default function AdminRegister() {
     };
 
     return (
-        <GuestLayout>
+        <GuestLayout logoVariant="admin">
             <Head title="관리자 가입 신청" />
 
             <div className="mx-auto w-full max-w-xl">

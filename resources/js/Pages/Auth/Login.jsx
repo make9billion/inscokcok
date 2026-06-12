@@ -5,6 +5,8 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
+import kakaoLogoUrl from '../../../images/logo/logo_kakao.png';
+import naverLogoUrl from '../../../images/logo/logo_naver.png';
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -35,15 +37,21 @@ export default function Login({ status, canResetPassword }) {
 
             <a
                 href={route('social.kakao.redirect')}
-                className="mb-5 flex h-12 w-full items-center justify-center rounded-xl bg-[#fee500] text-sm font-bold text-[#191600] transition hover:-translate-y-0.5"
+                className="mb-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#fee500] text-sm font-bold text-[#191600] transition hover:-translate-y-0.5"
             >
+                <span className="grid size-8 place-items-center rounded-full bg-white">
+                    <img src={kakaoLogoUrl} alt="" className="max-h-5 max-w-5 object-contain" />
+                </span>
                 카카오로 로그인
             </a>
 
             <a
                 href={route('social.naver.redirect')}
-                className="mb-5 flex h-12 w-full items-center justify-center rounded-xl bg-[#03c75a] text-sm font-bold text-white transition hover:-translate-y-0.5"
+                className="mb-5 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#03c75a] text-sm font-bold text-white transition hover:-translate-y-0.5"
             >
+                <span className="grid size-8 place-items-center rounded-full bg-white">
+                    <img src={naverLogoUrl} alt="" className="naver-logo-green max-h-5 max-w-5 object-contain" />
+                </span>
                 네이버로 로그인
             </a>
 

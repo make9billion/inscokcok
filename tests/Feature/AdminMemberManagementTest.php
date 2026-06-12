@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\PointLedgerType;
 use App\Models\AdminAuditLog;
 use App\Models\PointLedgerEntry;
+use App\Models\SocialAccount;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -30,6 +31,10 @@ class AdminMemberManagementTest extends TestCase
             'address_line1' => '서울시 강남구',
             'address_line2' => '101호',
         ]);
+        SocialAccount::factory()->for($member)->create([
+            'provider' => 'kakao',
+            'provider_id' => 'kakao-member-id',
+        ]);
         PointLedgerEntry::factory()->for($member)->create([
             'type' => PointLedgerType::Earned,
             'points' => 3000,
@@ -40,6 +45,7 @@ class AdminMemberManagementTest extends TestCase
             ->where('members.0.name', '홍길동')
             ->where('members.0.email', 'member@example.com')
             ->where('members.0.phone', '010-1234-5678')
+            ->where('members.0.signupProvider', 'kakao')
             ->where('members.0.address', '서울시 강남구 101호')
             ->where('members.0.pointBalance', 3000)
             ->where('canAdjustPoints', true)

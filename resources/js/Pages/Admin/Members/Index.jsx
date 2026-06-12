@@ -1,8 +1,43 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { Download, Search } from 'lucide-react';
+import { Download, Mail, Search } from 'lucide-react';
+import kakaoLogoUrl from '../../../../images/logo/logo_kakao.png';
+import naverLogoUrl from '../../../../images/logo/logo_naver.png';
 
 const formatNumber = (value) => new Intl.NumberFormat('ko-KR').format(value ?? 0);
+
+function SignupProviderBadge({ provider = 'email' }) {
+    if (provider === 'kakao') {
+        return (
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#fee500]/70 px-2.5 py-1 text-xs font-black text-[#191600]">
+                <span className="grid size-6 place-items-center rounded-full bg-white">
+                    <img src={kakaoLogoUrl} alt="" className="max-h-4 max-w-4 object-contain" />
+                </span>
+                카카오
+            </span>
+        );
+    }
+
+    if (provider === 'naver') {
+        return (
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#03c75a]/10 px-2.5 py-1 text-xs font-black text-[#03a84e]">
+                <span className="grid size-6 place-items-center rounded-full bg-white">
+                    <img src={naverLogoUrl} alt="" className="naver-logo-green max-h-4 max-w-4 object-contain" />
+                </span>
+                네이버
+            </span>
+        );
+    }
+
+    return (
+        <span className="inline-flex items-center gap-2 rounded-full bg-white px-2.5 py-1 text-xs font-black text-gray-700 ring-1 ring-gray-200">
+            <span className="grid size-6 place-items-center rounded-full bg-white text-gray-600 ring-1 ring-gray-200">
+                <Mail className="size-3.5" strokeWidth={2.4} />
+            </span>
+            이메일
+        </span>
+    );
+}
 
 export default function Index({ members = [], filters = {}, recentAdjustments = [] }) {
     const { flash } = usePage().props;
@@ -45,11 +80,14 @@ export default function Index({ members = [], filters = {}, recentAdjustments = 
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-100">
                                 <thead className="bg-gray-50">
-                                    <tr>{['이름', '이메일', '연락처', '포인트', '상담', '질문', '주문', '가입일'].map((label) => <th key={label} className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">{label}</th>)}</tr>
+                                    <tr>{['가입구분', '이름', '이메일', '연락처', '포인트', '상담', '질문', '주문', '가입일'].map((label) => <th key={label} className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">{label}</th>)}</tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 bg-white">
                                     {members.map((member) => (
                                         <tr key={member.id} className="hover:bg-gray-50">
+                                            <td className="whitespace-nowrap px-5 py-4">
+                                                <SignupProviderBadge provider={member.signupProvider} />
+                                            </td>
                                             <td className="whitespace-nowrap px-5 py-4 text-sm font-semibold text-gray-900"><Link href={route('admin.members.show', member.id)} className="hover:text-blue-700">{member.name}</Link></td>
                                             <td className="whitespace-nowrap px-5 py-4 text-sm text-gray-600">{member.email}</td>
                                             <td className="whitespace-nowrap px-5 py-4 text-sm text-gray-600">{member.phone || '-'}</td>

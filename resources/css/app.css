@@ -52,6 +52,10 @@
         animation: consultation-feed-marquee 30s linear infinite;
     }
 
+    .naver-logo-green {
+        filter: brightness(0) saturate(100%) invert(43%) sepia(85%) saturate(1174%) hue-rotate(104deg) brightness(94%) contrast(100%);
+    }
+
     .scroll-reveal {
         opacity: 0;
         transform: translateY(34px);
