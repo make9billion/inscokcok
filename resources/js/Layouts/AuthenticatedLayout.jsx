@@ -65,7 +65,7 @@ function AdminSidebar({ user, className = '' }) {
                         <Link
                             key={routeName}
                             href={route(routeName)}
-                            className={`rounded-md px-3 py-2 text-sm font-semibold transition ${
+                            className={`rounded-md px-3 py-2 text-base font-semibold transition ${
                                 active
                                     ? 'bg-blue-50 text-blue-700'
                                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
