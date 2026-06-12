@@ -60,10 +60,10 @@ export default function Dashboard({
             action: '보험점검 신청',
         },
         {
-            label: 'Q&A',
+            label: '보험지식인',
             value: `${formatNumber(summary?.questionCount)}건`,
             href: '/knowledge',
-            action: '지식인 보기',
+            action: '보험지식인 보기',
         },
         {
             label: '주문 내역',
@@ -87,7 +87,7 @@ export default function Dashboard({
                                 <p className="text-sm font-medium text-blue-600">회원 마이페이지</p>
                                 <h1 className="mt-2 text-2xl font-bold leading-8 text-gray-900">마이페이지</h1>
                                 <p className="mt-2 text-sm leading-6 text-gray-600">
-                                    상담, 포인트, 주문, Q&A 현황을 한 화면에서 확인하세요.
+                                    상담, 포인트, 주문, 보험지식인 현황을 한 화면에서 확인하세요.
                                 </p>
                             </div>
 
@@ -218,7 +218,7 @@ export default function Dashboard({
 
                                     <div className="rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
                                         <div className="flex items-center justify-between gap-4 border-b border-gray-100 px-5 py-4">
-                                            <h3 className="text-base font-semibold text-gray-900">최근 Q&A</h3>
+                                            <h3 className="text-base font-semibold text-gray-900">최근 보험지식인</h3>
                                             <Link href="/knowledge" className="text-sm font-semibold text-blue-600 hover:text-blue-700">
                                                 전체보기
                                             </Link>
@@ -241,7 +241,7 @@ export default function Dashboard({
                                                 ))}
                                             </ul>
                                         ) : (
-                                            <EmptyState>아직 Q&A 내역이 없습니다.</EmptyState>
+                                            <EmptyState>아직 보험지식인 내역이 없습니다.</EmptyState>
                                         )}
                                     </div>
                                 </section>
@@ -252,7 +252,7 @@ export default function Dashboard({
                                 <div className="mt-4 grid gap-2">
                                     {[
                                         ['보험점검 신청', '/insurance-checkup'],
-                                        ['지식인 Q&A', '/knowledge'],
+                                        ['보험지식인', '/knowledge'],
                                         ['포인트몰', '/point-mall'],
                                         ['포인트몰 주문내역', '/mypage/point-mall/orders'],
                                         ['프로필 수정', '/profile'],
