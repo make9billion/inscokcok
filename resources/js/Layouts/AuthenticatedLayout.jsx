@@ -53,7 +53,7 @@ function AdminSidebar({ user, className = '' }) {
         <aside className={`border-r border-gray-200 bg-white ${className}`}>
             <div className="flex h-16 items-center border-b border-gray-100 px-5">
                 <Link href="/" className="inline-flex items-center">
-                    <ApplicationLogo variant="admin" className="block h-12 max-w-40 object-contain" />
+                    <ApplicationLogo variant="admin" className="block h-10 max-w-36 object-contain" />
                 </Link>
             </div>
 

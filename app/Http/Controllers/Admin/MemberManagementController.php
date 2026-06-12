@@ -10,6 +10,7 @@ use App\Services\AdminAuditLogger;
 use App\Services\PointLedgerService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -21,6 +22,7 @@ class MemberManagementController extends Controller
         $this->authorizeAdmin($request);
 
         $search = trim((string) $request->query('search', ''));
+        $hasSocialAccountsTable = Schema::hasTable('social_accounts');
 
         $members = User::query()
             ->where('role', 'member')
@@ -29,7 +31,7 @@ class MemberManagementController extends Controller
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%");
             }))
-            ->with('socialAccounts:id,user_id,provider')
+            ->when($hasSocialAccountsTable, fn ($query) => $query->with('socialAccounts:id,user_id,provider'))
             ->withCount(['consultations', 'knowledgeQuestions', 'pointMallOrders'])
             ->withSum('pointLedgerEntries as point_balance', 'points')
             ->latest()
@@ -39,7 +41,7 @@ class MemberManagementController extends Controller
                 'name' => $member->name,
                 'email' => $member->email,
                 'phone' => $member->phone,
-                'signupProvider' => $this->signupProvider($member),
+                'signupProvider' => $hasSocialAccountsTable ? $this->signupProvider($member) : 'email',
                 'birthDate' => $member->birth_date?->format('Y-m-d'),
                 'gender' => $member->gender,
                 'postalCode' => $member->postal_code,

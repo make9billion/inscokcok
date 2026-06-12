@@ -8,6 +8,7 @@ use App\Models\PointLedgerEntry;
 use App\Models\SocialAccount;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class AdminMemberManagementTest extends TestCase
@@ -49,6 +50,19 @@ class AdminMemberManagementTest extends TestCase
             ->where('members.0.address', '서울시 강남구 101호')
             ->where('members.0.pointBalance', 3000)
             ->where('canAdjustPoints', true)
+        );
+    }
+
+    public function test_admin_member_list_falls_back_to_email_when_social_accounts_table_is_missing(): void
+    {
+        $admin = User::factory()->admin()->create();
+        User::factory()->create(['email' => 'member@example.com']);
+
+        Schema::drop('social_accounts');
+
+        $this->actingAs($admin)->get('/admin/members')->assertOk()->assertInertia(fn ($page) => $page
+            ->component('Admin/Members/Index')
+            ->where('members.0.signupProvider', 'email')
         );
     }
 

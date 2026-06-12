@@ -228,7 +228,7 @@ export default function Register() {
                                 <button
                                     type="button"
                                     onClick={() => setMode('email')}
-                                    className="mx-auto flex min-h-16 w-full items-center justify-between rounded-2xl bg-[#12284a] px-5 text-base font-black text-white transition hover:-translate-y-0.5"
+                                    className="mx-auto flex min-h-16 w-full items-center justify-between rounded-2xl border border-gray-200 bg-white px-5 text-base font-black text-[#12284a] transition hover:-translate-y-0.5 hover:bg-gray-50"
                                 >
                                     <span className="inline-flex items-center gap-2">
                                         <Mail className="size-5" />
