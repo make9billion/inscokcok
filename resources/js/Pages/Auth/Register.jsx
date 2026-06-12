@@ -210,7 +210,7 @@ export default function Register() {
                         <div className="flex flex-1 flex-col justify-center">
                             <div className="mx-auto grid w-full max-w-[548px] gap-3">
                                 <SocialButton provider="카카오" label="카카오로 시작하기" href={route('social.kakao.redirect')} className="bg-[#fee500] text-[#191600]" />
-                                <SocialButton provider="네이버" label="네이버로 시작하기" className="bg-[#03c75a] text-white" />
+                                <SocialButton provider="네이버" label="네이버로 시작하기" href={route('social.naver.redirect')} className="bg-[#03c75a] text-white" />
                                 <SocialButton provider="구글" label="구글로 시작하기" className="border border-gray-200 bg-white text-gray-900" />
                                 <button
                                     type="button"

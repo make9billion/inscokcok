@@ -40,6 +40,13 @@ export default function Login({ status, canResetPassword }) {
                 카카오로 로그인
             </a>
 
+            <a
+                href={route('social.naver.redirect')}
+                className="mb-5 flex h-12 w-full items-center justify-center rounded-xl bg-[#03c75a] text-sm font-bold text-white transition hover:-translate-y-0.5"
+            >
+                네이버로 로그인
+            </a>
+
             <form onSubmit={submit}>
                 <div>
                     <InputLabel htmlFor="email" value="아이디 또는 이메일" />

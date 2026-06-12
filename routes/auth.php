@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
 use App\Http\Controllers\Auth\KakaoAuthenticatedSessionController;
+use App\Http\Controllers\Auth\NaverAuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -42,6 +43,12 @@ Route::middleware('guest')->group(function () {
 
     Route::get('auth/kakao/callback', [KakaoAuthenticatedSessionController::class, 'callback'])
         ->name('social.kakao.callback');
+
+    Route::get('auth/naver/redirect', [NaverAuthenticatedSessionController::class, 'redirect'])
+        ->name('social.naver.redirect');
+
+    Route::get('auth/naver/callback', [NaverAuthenticatedSessionController::class, 'callback'])
+        ->name('social.naver.callback');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
