@@ -9,10 +9,12 @@ import {
     MessageSquareText,
     ShoppingBag,
     Sparkles,
+    X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import ConsultationConsentPanel, { ConsultationConsentPolicyView } from '@/Components/ConsultationConsentPanel';
+import Modal from '@/Components/Modal';
 import PublicLayout from '@/Layouts/PublicLayout';
 import eventBannerOne from '../../images/events/event-banner-1.jpg';
 import eventBannerTwo from '../../images/events/event-banner-2.jpg';
@@ -290,6 +292,7 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
     const [isAutoPaused, setIsAutoPaused] = useState(false);
     const [openMainFaq, setOpenMainFaq] = useState(null);
     const [activeConsentPolicy, setActiveConsentPolicy] = useState(null);
+    const [isMobileConsultModalOpen, setIsMobileConsultModalOpen] = useState(false);
     const activeProduct = heroSlides[activeSlide];
     const cmsNotices = cms.notices?.length
         ? cms.notices.map((notice) => ({
@@ -369,14 +372,25 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
         event.preventDefault();
         form.post(route('consultations.store'), {
             preserveScroll: true,
-            onSuccess: () =>
+            onSuccess: () => {
                 form.reset(
                     'applicant_name',
                     'preferred_contact_time',
                     'privacy_agreement',
                     'third_party_agreement',
-                ),
+                );
+
+                if (isMobileConsultModalOpen) {
+                    closeMobileConsultModal();
+                }
+            },
         });
+    };
+
+    const closeMobileConsultModal = () => {
+        setIsMobileConsultModalOpen(false);
+        setActiveConsentPolicy(null);
+        form.clearErrors();
     };
 
     return (
@@ -384,10 +398,10 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
             <Head title="보험콕콕" />
 
             <section
-                className={`hero-stage relative hidden overflow-hidden transition-colors duration-700 ease-out md:block ${activeProduct.tone}`}
+                className={`hero-stage relative overflow-hidden transition-colors duration-700 ease-out ${activeProduct.tone}`}
                 aria-label="보험상품 상담 신청"
             >
-                <div className="hero-viewport relative mx-auto min-h-[720px] max-w-[1320px] lg:h-[720px]">
+                <div className="hero-viewport relative mx-auto min-h-[620px] max-w-[1320px] md:min-h-[720px] lg:h-[720px]">
                     <div className="relative min-h-[590px] lg:h-full">
                         {heroSlides.map((slide, index) => {
                             const isActive = activeSlide === index;
@@ -396,18 +410,18 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
                                 <article
                                     key={slide.label}
                                     aria-hidden={!isActive}
-                                    className={`absolute inset-0 px-5 py-14 transition-all duration-1000 ease-out sm:px-10 lg:px-[118px] lg:py-[86px] lg:pr-[500px] ${
+                                    className={`absolute inset-0 px-5 py-12 pb-64 transition-all duration-1000 ease-out sm:px-10 md:pb-14 lg:px-[118px] lg:py-[86px] lg:pr-[500px] ${
                                         isActive
                                             ? 'z-10 translate-y-0 scale-100 opacity-100'
                                             : 'z-0 translate-y-4 scale-[0.985] opacity-0'
                                     }`}
                                 >
                                     <div className="relative z-10 max-w-2xl">
-                                        <span className="text-2xl font-black text-[#f47b20] lg:text-3xl">{slide.kicker}</span>
-                                        <h1 className="mt-9 text-4xl font-black leading-tight text-[#111111] lg:text-6xl">
+                                        <span className="text-lg font-black text-[#f47b20] sm:text-2xl lg:text-3xl">{slide.kicker}</span>
+                                        <h1 className="mt-6 text-4xl font-black leading-tight text-[#111111] sm:mt-9 lg:text-6xl">
                                             {renderHeroTitle(slide.title)}
                                         </h1>
-                                        <p className={`mt-5 max-w-2xl text-2xl font-black leading-snug lg:text-4xl ${slide.accent}`}>
+                                        <p className={`mt-5 max-w-2xl text-xl font-black leading-snug sm:text-2xl lg:text-4xl ${slide.accent}`}>
                                             {slide.description}
                                         </p>
                                         <div className="mt-7 flex flex-wrap gap-2">
@@ -422,7 +436,7 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
                                         </div>
                                     </div>
 
-                                    <div className="hero-image-motion pointer-events-none absolute bottom-0 right-[424px] hidden w-[468px] lg:block">
+                                    <div className="hero-image-motion pointer-events-none absolute bottom-0 right-0 w-[68%] max-w-[310px] sm:max-w-[380px] lg:right-[424px] lg:w-[468px] lg:max-w-none">
                                         <img
                                             src={slide.image}
                                             alt=""
@@ -434,7 +448,7 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
                         })}
                     </div>
 
-                    <aside className="consult-panel relative z-20 mx-auto -mt-10 flex min-h-[520px] w-[min(100%-24px,430px)] flex-col rounded-[20px] bg-white/90 px-7 py-6 backdrop-blur lg:absolute lg:right-[18px] lg:top-[92px] lg:mt-0 lg:w-[414px]">
+                    <aside className="consult-panel relative z-20 mx-auto -mt-10 hidden min-h-[520px] w-[min(100%-24px,430px)] flex-col rounded-[20px] bg-white/90 px-7 py-6 backdrop-blur md:flex lg:absolute lg:right-[18px] lg:top-[92px] lg:mt-0 lg:w-[414px]">
                         {activeConsentPolicy ? (
                             <ConsultationConsentPolicyView
                                 policyKey={activeConsentPolicy}
@@ -598,7 +612,7 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
                             <Link
                                 key={banner.alt}
                                 href={banner.href}
-                                className="group mx-auto h-[200px] w-full max-w-[500px] overflow-hidden rounded-[24px] bg-white ring-1 ring-white/70 transition hover:-translate-y-1 hover:ring-[#f47b20]/40"
+                                className="group mx-auto aspect-[5/2] w-full max-w-[500px] overflow-hidden rounded-[24px] bg-white ring-1 ring-white/70 transition hover:-translate-y-1 hover:ring-[#f47b20]/40"
                             >
                                 <img
                                     src={banner.src}
@@ -632,7 +646,6 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
                                 key={slide.label}
                                 href={route(card.routeName)}
                                 className="scroll-reveal group overflow-hidden rounded-2xl bg-white text-left shadow-[0_20px_50px_rgba(22,36,58,0.09)] transition hover:-translate-y-1 hover:shadow-[0_30px_70px_rgba(22,36,58,0.15)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f47b20]"
-                                style={{ '--reveal-delay': `${index * 130}ms` }}
                             >
                                 <span className={`block h-[330px] overflow-hidden ${card.tone}`}>
                                     <img
@@ -831,14 +844,132 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
             )}
 
             <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/40 bg-white/88 px-4 py-3 backdrop-blur md:hidden">
-                <Link
-                    href="/insurance-checkup"
+                <button
+                    type="button"
+                    onClick={() => setIsMobileConsultModalOpen(true)}
                     className="inline-flex min-h-[56px] w-full items-center justify-center gap-2 rounded-2xl bg-[#f47b20] text-base font-black text-white transition active:scale-[0.99]"
                 >
                     <Headphones className="size-5" strokeWidth={2.4} />
                     보험 상담신청
-                </Link>
+                </button>
             </div>
+
+            <Modal show={isMobileConsultModalOpen} maxWidth="lg" onClose={closeMobileConsultModal}>
+                <div className="p-5">
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <p className="text-sm font-black text-[#f47b20]">빠른 상담신청</p>
+                            <h2 className="mt-1 text-2xl font-black text-[#12284a]">필요한 보험을 선택해 주세요</h2>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={closeMobileConsultModal}
+                            className="grid size-10 shrink-0 place-items-center rounded-full bg-toss-grey100 text-toss-grey600"
+                            aria-label="닫기"
+                        >
+                            <X className="size-5" />
+                        </button>
+                    </div>
+
+                    {activeConsentPolicy ? (
+                        <div className="mt-5 min-h-[520px]">
+                            <ConsultationConsentPolicyView
+                                policyKey={activeConsentPolicy}
+                                accent="#f47b20"
+                                bodyClassName="max-h-[380px]"
+                                onBack={() => setActiveConsentPolicy(null)}
+                                onAgree={() => {
+                                    form.setData(activeConsentPolicy === 'privacy' ? 'privacy_agreement' : 'third_party_agreement', true);
+                                    setActiveConsentPolicy(null);
+                                }}
+                            />
+                        </div>
+                    ) : (
+                        <form onSubmit={submit} className="mt-5 grid gap-4">
+                            <div className="grid grid-cols-3 gap-2" aria-label="보험종류 선택">
+                                {heroSlides.map((slide, index) => (
+                                    <button
+                                        key={slide.label}
+                                        type="button"
+                                        aria-pressed={form.data.interested_product === slide.product}
+                                        onClick={() => selectSlide(index)}
+                                        className={`min-h-11 rounded-xl border px-2 text-xs font-black leading-tight transition ${
+                                            form.data.interested_product === slide.product
+                                                ? 'border-[#f47b20] bg-[#f47b20] text-white'
+                                                : 'border-[#d8dee8] bg-white text-[#12284a]'
+                                        }`}
+                                    >
+                                        {slide.label}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <label className="grid gap-1 text-sm font-bold text-[#344056]">
+                                    이름
+                                    <input
+                                        type="text"
+                                        value={form.data.applicant_name}
+                                        onChange={(event) => form.setData('applicant_name', event.target.value)}
+                                        placeholder="이름"
+                                        className="h-11 rounded-xl border-toss-grey200 bg-toss-grey50 text-sm font-semibold focus:border-[#f47b20] focus:ring-[#f47b20]"
+                                    />
+                                    <FieldError message={form.errors.applicant_name} />
+                                </label>
+
+                                <label className="grid gap-1 text-sm font-bold text-[#344056]">
+                                    연락처
+                                    <input
+                                        type="tel"
+                                        value={form.data.phone}
+                                        inputMode="numeric"
+                                        autoComplete="tel"
+                                        onChange={(event) => form.setData('phone', formatPhone(event.target.value))}
+                                        onFocus={() => {
+                                            if (!form.data.phone.startsWith('010-')) {
+                                                form.setData('phone', '010-');
+                                            }
+                                        }}
+                                        className="h-11 rounded-xl border-toss-grey200 bg-toss-grey50 text-sm font-semibold focus:border-[#f47b20] focus:ring-[#f47b20]"
+                                    />
+                                    <FieldError message={form.errors.phone} />
+                                </label>
+                            </div>
+
+                            <ConsultationConsentPanel
+                                onViewPolicy={setActiveConsentPolicy}
+                                checkboxClassName="size-5 rounded border-[#cfd6df] text-[#f47b20] focus:ring-[#f47b20]"
+                                agreements={[
+                                    {
+                                        field: 'privacy_agreement',
+                                        policyKey: 'privacy',
+                                        label: '개인정보 수집 및 이용동의',
+                                        checked: form.data.privacy_agreement,
+                                        onChange: (checked) => form.setData('privacy_agreement', checked),
+                                        error: form.errors.privacy_agreement,
+                                    },
+                                    {
+                                        field: 'third_party_agreement',
+                                        policyKey: 'thirdParty',
+                                        label: '제3자 정보제공 동의',
+                                        checked: form.data.third_party_agreement,
+                                        onChange: (checked) => form.setData('third_party_agreement', checked),
+                                        error: form.errors.third_party_agreement,
+                                    },
+                                ]}
+                            />
+
+                            <button
+                                type="submit"
+                                disabled={form.processing}
+                                className="min-h-[52px] rounded-2xl bg-[#f47b20] text-base font-black text-white transition disabled:opacity-60"
+                            >
+                                {form.processing ? '접수 중' : '상담신청 완료하기'}
+                            </button>
+                        </form>
+                    )}
+                </div>
+            </Modal>
 
             {false && (
             <section className="bg-toss-grey50">

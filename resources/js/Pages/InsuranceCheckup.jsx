@@ -139,7 +139,7 @@ export default function InsuranceCheckup({ auth }) {
             </div>
 
             <Modal show={isConsultModalOpen} maxWidth="lg" onClose={closeConsultModal}>
-                <div className="min-h-[720px] p-6 sm:p-7">
+                <div className="p-5 sm:min-h-[720px] sm:p-7">
                     <div className="flex items-start justify-between gap-5">
                         <div>
                             <p className="text-sm font-black text-[#f47b20]">보험점검 접수</p>
@@ -176,8 +176,8 @@ export default function InsuranceCheckup({ auth }) {
                         </div>
                     ) : (
                         <form onSubmit={submit}>
-                            <div className="mt-7 grid gap-4 sm:grid-cols-2">
-                                <label className="grid gap-1 text-sm font-bold text-toss-grey700">
+                            <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-7 sm:gap-4">
+                                <label className="col-span-2 grid gap-1 text-sm font-bold text-toss-grey700">
                                     이름
                                     <input
                                         type="text"
@@ -231,7 +231,7 @@ export default function InsuranceCheckup({ auth }) {
                                     <FieldError message={form.errors.current_monthly_premium} />
                                 </label>
 
-                                <label className="grid gap-1 text-sm font-bold text-toss-grey700 sm:col-span-2">
+                                <label className="grid gap-1 text-sm font-bold text-toss-grey700">
                                     희망 연락 시간
                                     <input
                                         type="text"
@@ -243,7 +243,7 @@ export default function InsuranceCheckup({ auth }) {
                                     <FieldError message={form.errors.preferred_contact_time} />
                                 </label>
 
-                                <label className="grid gap-1 text-sm font-bold text-toss-grey700 sm:col-span-2">
+                                <label className="col-span-2 grid gap-1 text-sm font-bold text-toss-grey700">
                                     상담 메모
                                     <textarea
                                         rows="3"
@@ -255,7 +255,7 @@ export default function InsuranceCheckup({ auth }) {
                                     <FieldError message={form.errors.memo} />
                                 </label>
 
-                                <div className="sm:col-span-2">
+                                <div className="col-span-2">
                                     <ConsultationConsentPanel
                                         onViewPolicy={setActiveConsentPolicy}
                                         checkboxClassName="mt-1 rounded border-toss-grey300 text-[#f47b20] focus:ring-[#f47b20]"
