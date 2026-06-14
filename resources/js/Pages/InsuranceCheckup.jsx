@@ -176,20 +176,20 @@ export default function InsuranceCheckup({ auth }) {
                         </div>
                     ) : (
                         <form onSubmit={submit}>
-                            <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-7 sm:gap-4">
-                                <label className="col-span-2 grid gap-1 text-sm font-bold text-toss-grey700">
+                            <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-3 sm:mt-7 sm:gap-4">
+                                <label className="col-span-2 grid min-w-0 gap-1 text-sm font-bold text-toss-grey700">
                                     이름
                                     <input
                                         type="text"
                                         value={form.data.applicant_name}
                                         onChange={(event) => form.setData('applicant_name', event.target.value)}
-                                        className="rounded-xl border-toss-grey200 bg-toss-grey50 text-sm focus:border-[#f47b20] focus:ring-[#f47b20]"
+                                        className="min-w-0 rounded-xl border-toss-grey200 bg-toss-grey50 text-sm focus:border-[#f47b20] focus:ring-[#f47b20]"
                                         placeholder="이름을 입력해주세요"
                                     />
                                     <FieldError message={form.errors.applicant_name} />
                                 </label>
 
-                                <label className="grid gap-1 text-sm font-bold text-toss-grey700">
+                                <label className="grid min-w-0 gap-1 text-sm font-bold text-toss-grey700">
                                     연락처
                                     <input
                                         type="tel"
@@ -201,55 +201,55 @@ export default function InsuranceCheckup({ auth }) {
                                                 form.setData('phone', '010-');
                                             }
                                         }}
-                                        className="rounded-xl border-toss-grey200 bg-toss-grey50 text-sm focus:border-[#f47b20] focus:ring-[#f47b20]"
+                                        className="min-w-0 rounded-xl border-toss-grey200 bg-toss-grey50 text-sm focus:border-[#f47b20] focus:ring-[#f47b20]"
                                         placeholder="010-0000-0000"
                                     />
                                     <FieldError message={form.errors.phone} />
                                 </label>
 
-                                <label className="grid gap-1 text-sm font-bold text-toss-grey700">
+                                <label className="grid min-w-0 gap-1 text-sm font-bold text-toss-grey700">
                                     생년월일
                                     <input
                                         type="date"
                                         value={form.data.birth_date}
                                         onChange={(event) => form.setData('birth_date', event.target.value)}
-                                        className="rounded-xl border-toss-grey200 bg-toss-grey50 text-sm focus:border-[#f47b20] focus:ring-[#f47b20]"
+                                        className="min-w-0 rounded-xl border-toss-grey200 bg-toss-grey50 text-sm focus:border-[#f47b20] focus:ring-[#f47b20]"
                                     />
                                     <FieldError message={form.errors.birth_date} />
                                 </label>
 
-                                <label className="grid gap-1 text-sm font-bold text-toss-grey700">
+                                <label className="grid min-w-0 gap-1 text-sm font-bold text-toss-grey700">
                                     현재 월 보험료
                                     <input
                                         type="number"
                                         min="0"
                                         value={form.data.current_monthly_premium}
                                         onChange={(event) => form.setData('current_monthly_premium', event.target.value)}
-                                        className="rounded-xl border-toss-grey200 bg-toss-grey50 text-sm focus:border-[#f47b20] focus:ring-[#f47b20]"
+                                        className="min-w-0 rounded-xl border-toss-grey200 bg-toss-grey50 text-sm focus:border-[#f47b20] focus:ring-[#f47b20]"
                                         placeholder="예: 120000"
                                     />
                                     <FieldError message={form.errors.current_monthly_premium} />
                                 </label>
 
-                                <label className="grid gap-1 text-sm font-bold text-toss-grey700">
+                                <label className="grid min-w-0 gap-1 text-sm font-bold text-toss-grey700">
                                     희망 연락 시간
                                     <input
                                         type="text"
                                         value={form.data.preferred_contact_time}
                                         onChange={(event) => form.setData('preferred_contact_time', event.target.value)}
-                                        className="rounded-xl border-toss-grey200 bg-toss-grey50 text-sm focus:border-[#f47b20] focus:ring-[#f47b20]"
+                                        className="min-w-0 rounded-xl border-toss-grey200 bg-toss-grey50 text-sm focus:border-[#f47b20] focus:ring-[#f47b20]"
                                         placeholder="예: 평일 오후 2시 이후"
                                     />
                                     <FieldError message={form.errors.preferred_contact_time} />
                                 </label>
 
-                                <label className="col-span-2 grid gap-1 text-sm font-bold text-toss-grey700">
+                                <label className="col-span-2 grid min-w-0 gap-1 text-sm font-bold text-toss-grey700">
                                     상담 메모
                                     <textarea
                                         rows="3"
                                         value={form.data.memo}
                                         onChange={(event) => form.setData('memo', event.target.value)}
-                                        className="rounded-xl border-toss-grey200 bg-toss-grey50 text-sm focus:border-[#f47b20] focus:ring-[#f47b20]"
+                                        className="min-w-0 rounded-xl border-toss-grey200 bg-toss-grey50 text-sm focus:border-[#f47b20] focus:ring-[#f47b20]"
                                         placeholder="현재 가입한 보험이나 궁금한 점을 적어주세요."
                                     />
                                     <FieldError message={form.errors.memo} />

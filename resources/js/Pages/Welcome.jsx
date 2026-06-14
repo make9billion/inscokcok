@@ -904,7 +904,7 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
                                 ))}
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid gap-3">
                                 <label className="grid gap-1 text-sm font-bold text-[#344056]">
                                     이름
                                     <input
