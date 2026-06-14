@@ -127,10 +127,10 @@ export default function StaticImagePage({ auth, title, description, images }) {
 
             {isInsurancePage ? (
                 <section className="insurance-hero-gradient overflow-hidden">
-                    <div className="mx-auto max-w-6xl px-5 py-12 text-white sm:px-6 lg:px-8">
-                        <h1 className="text-center text-3xl font-black tracking-normal sm:text-4xl">{displayTitle}</h1>
+                    <div className="mx-auto max-w-6xl px-5 py-8 text-white sm:px-6 sm:py-12 lg:px-8">
+                        <h1 className="text-center text-2xl font-black tracking-normal sm:text-3xl lg:text-4xl">{displayTitle}</h1>
 
-                        <nav className="mt-9 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6" aria-label="보험상품 이동">
+                        <nav className="mt-6 grid grid-cols-3 gap-2 sm:mt-9 sm:grid-cols-3 sm:gap-3 lg:grid-cols-6" aria-label="보험상품 이동">
                             {insuranceTabs.map((tab) => {
                                 const Icon = tab.icon;
                                 const isActive = currentUrl.startsWith(tab.href);
@@ -141,20 +141,20 @@ export default function StaticImagePage({ auth, title, description, images }) {
                                         href={tab.href}
                                         className={
                                             isActive
-                                                ? 'group flex min-h-24 flex-col items-center justify-center gap-2 rounded-2xl bg-white px-3 text-center text-[#12284a] shadow-[0_20px_45px_rgba(0,0,0,0.18)] transition'
-                                                : 'group flex min-h-24 flex-col items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-3 text-center text-white/82 backdrop-blur transition hover:border-white/40 hover:bg-white/18 hover:text-white'
+                                                ? 'group flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-xl bg-white px-2 text-center text-[#12284a] shadow-[0_16px_34px_rgba(0,0,0,0.16)] transition sm:min-h-24 sm:gap-2 sm:rounded-2xl sm:px-3'
+                                                : 'group flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-xl border border-white/20 bg-white/10 px-2 text-center text-white/82 backdrop-blur transition hover:border-white/40 hover:bg-white/18 hover:text-white sm:min-h-24 sm:gap-2 sm:rounded-2xl sm:px-3'
                                         }
                                     >
                                         <span
                                             className={
                                                 isActive
-                                                    ? 'grid size-10 place-items-center rounded-full bg-[#f47b20] text-white'
-                                                    : 'grid size-10 place-items-center rounded-full bg-white/12 text-white transition group-hover:bg-white/18'
+                                                    ? 'grid size-8 place-items-center rounded-full bg-[#f47b20] text-white sm:size-10'
+                                                    : 'grid size-8 place-items-center rounded-full bg-white/12 text-white transition group-hover:bg-white/18 sm:size-10'
                                             }
                                         >
-                                            <Icon className="size-5" strokeWidth={2.1} />
+                                            <Icon className="size-4 sm:size-5" strokeWidth={2.1} />
                                         </span>
-                                        <span className="text-sm font-black leading-tight">{tab.label}</span>
+                                        <span className="text-xs font-black leading-tight sm:text-sm">{tab.label}</span>
                                     </Link>
                                 );
                             })}

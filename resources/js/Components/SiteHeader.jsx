@@ -102,6 +102,7 @@ function AuthLinks({ auth, mobile = false, dark = false }) {
 
 export default function SiteHeader({ auth, dark = false, insuranceHeader = false, pointMallHeader = false }) {
     const [isOpen, setIsOpen] = useState(false);
+    const [openMobileMenus, setOpenMobileMenus] = useState({});
     const [isThemedScrolled, setIsThemedScrolled] = useState(false);
     const hasThemedHeader = insuranceHeader || pointMallHeader;
     const themedHeaderClass = pointMallHeader ? 'point-mall-hero-gradient' : 'insurance-hero-gradient';
@@ -122,6 +123,12 @@ export default function SiteHeader({ auth, dark = false, insuranceHeader = false
 
         return () => window.removeEventListener('scroll', updateHeaderTone);
     }, [hasThemedHeader]);
+
+    useEffect(() => {
+        if (!isOpen) {
+            setOpenMobileMenus({});
+        }
+    }, [isOpen]);
 
     return (
         <header
@@ -168,37 +175,58 @@ export default function SiteHeader({ auth, dark = false, insuranceHeader = false
                 <div className={useDarkHeader ? `border-t border-white/10 ${hasThemedHeader ? themedHeaderClass : 'bg-[#070b14]'} lg:hidden` : 'border-t border-toss-grey200 bg-white lg:hidden'}>
                     <nav className="mx-auto max-w-7xl px-5 py-4 sm:px-6" aria-label="모바일 메뉴">
                         <div className="space-y-1">
-                            {primaryNavigation.map((item) => (
-                                <div key={item.href}>
-                                    <Link
-                                        href={item.href}
-                                        className={
-                                            useDarkHeader
-                                                ? 'block rounded-md px-3 py-2 text-base font-semibold text-white/80 transition hover:bg-white/10'
-                                                : 'block rounded-md px-3 py-2 text-base font-semibold text-toss-grey800 transition hover:bg-toss-grey50'
-                                        }
-                                    >
-                                        {item.label}
-                                    </Link>
-                                    {item.children && (
-                                        <div className={useDarkHeader ? 'mt-1 space-y-1 border-l border-white/10 pl-3' : 'mt-1 space-y-1 border-l border-toss-grey200 pl-3'}>
-                                            {item.children.map((child) => (
-                                                <Link
-                                                    key={child.href}
-                                                    href={child.href}
-                                                    className={
-                                                        useDarkHeader
-                                                            ? 'block rounded-md px-3 py-2 text-[15px] text-white/60 transition hover:bg-white/10 hover:text-white'
-                                                            : 'block rounded-md px-3 py-2 text-[15px] text-toss-grey600 transition hover:bg-toss-grey50 hover:text-toss-grey900'
-                                                    }
-                                                >
-                                                    {child.label}
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
+                            {primaryNavigation.map((item) => {
+                                const isSubmenuOpen = Boolean(openMobileMenus[item.href]);
+                                const topLevelClass = useDarkHeader
+                                    ? 'rounded-md px-3 py-2 text-base font-semibold text-white/80 transition hover:bg-white/10'
+                                    : 'rounded-md px-3 py-2 text-base font-semibold text-toss-grey800 transition hover:bg-toss-grey50';
+
+                                return (
+                                    <div key={item.href}>
+                                        {item.children ? (
+                                            <button
+                                                type="button"
+                                                className={`flex w-full items-center justify-between gap-3 text-left ${topLevelClass}`}
+                                                aria-expanded={isSubmenuOpen}
+                                                onClick={() =>
+                                                    setOpenMobileMenus((menus) => ({
+                                                        ...menus,
+                                                        [item.href]: !menus[item.href],
+                                                    }))
+                                                }
+                                            >
+                                                <span>{item.label}</span>
+                                                <ChevronDown
+                                                    className={`size-4 transition ${isSubmenuOpen ? 'rotate-180' : ''}`}
+                                                    strokeWidth={1.9}
+                                                />
+                                            </button>
+                                        ) : (
+                                            <Link href={item.href} className={`block ${topLevelClass}`}>
+                                                {item.label}
+                                            </Link>
+                                        )}
+
+                                        {item.children && isSubmenuOpen && (
+                                            <div className={useDarkHeader ? 'mt-1 space-y-1 border-l border-white/10 pl-3' : 'mt-1 space-y-1 border-l border-toss-grey200 pl-3'}>
+                                                {item.children.map((child) => (
+                                                    <Link
+                                                        key={child.href}
+                                                        href={child.href}
+                                                        className={
+                                                            useDarkHeader
+                                                                ? 'block rounded-md px-3 py-2 text-[15px] text-white/60 transition hover:bg-white/10 hover:text-white'
+                                                                : 'block rounded-md px-3 py-2 text-[15px] text-toss-grey600 transition hover:bg-toss-grey50 hover:text-toss-grey900'
+                                                        }
+                                                    >
+                                                        {child.label}
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
 
                         <div className={useDarkHeader ? 'mt-4 border-t border-white/10 pt-4' : 'mt-4 border-t border-toss-grey200 pt-4'}>

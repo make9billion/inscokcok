@@ -5,6 +5,7 @@ import {
     ChevronDown,
     ChevronRight,
     Gift,
+    Headphones,
     MessageSquareText,
     ShoppingBag,
     Sparkles,
@@ -383,7 +384,7 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
             <Head title="보험콕콕" />
 
             <section
-                className={`hero-stage relative overflow-hidden transition-colors duration-700 ease-out ${activeProduct.tone}`}
+                className={`hero-stage relative hidden overflow-hidden transition-colors duration-700 ease-out md:block ${activeProduct.tone}`}
                 aria-label="보험상품 상담 신청"
             >
                 <div className="hero-viewport relative mx-auto min-h-[720px] max-w-[1320px] lg:h-[720px]">
@@ -793,7 +794,7 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
                             description="상담과 이벤트로 모은 포인트를 원하는 상품으로 교환해보세요."
                             href="/point-mall"
                         />
-                        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
                             {visiblePointMallProducts.map((product) => (
                                 <Link
                                     key={product.id}
@@ -828,6 +829,16 @@ export default function Welcome({ auth, cms = {}, pointMallProducts: mainPointMa
                     </div>
                 </section>
             )}
+
+            <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/40 bg-white/88 px-4 py-3 backdrop-blur md:hidden">
+                <Link
+                    href="/insurance-checkup"
+                    className="inline-flex min-h-[56px] w-full items-center justify-center gap-2 rounded-2xl bg-[#f47b20] text-base font-black text-white transition active:scale-[0.99]"
+                >
+                    <Headphones className="size-5" strokeWidth={2.4} />
+                    보험 상담신청
+                </Link>
+            </div>
 
             {false && (
             <section className="bg-toss-grey50">
