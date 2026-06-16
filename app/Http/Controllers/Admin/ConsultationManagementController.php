@@ -39,7 +39,7 @@ class ConsultationManagementController extends Controller
         return Inertia::render('Admin/Consultations/Index', [
             'consultations' => $this->filteredConsultationQuery($request, $filters)
                 ->latest()
-                ->take(50)
+                ->take(20)
                 ->get()
                 ->map(fn (Consultation $consultation) => $this->serializeConsultation($consultation)),
             'filters' => $filters,

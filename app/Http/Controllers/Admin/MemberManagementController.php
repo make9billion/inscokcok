@@ -35,6 +35,7 @@ class MemberManagementController extends Controller
             ->withCount(['consultations', 'knowledgeQuestions', 'pointMallOrders'])
             ->withSum('pointLedgerEntries as point_balance', 'points')
             ->latest()
+            ->take(20)
             ->get()
             ->map(fn (User $member) => [
                 'id' => $member->id,
@@ -113,32 +114,40 @@ class MemberManagementController extends Controller
         $this->authorizeAdmin($request);
 
         $search = trim((string) $request->query('search', ''));
+        $hasSocialAccountsTable = Schema::hasTable('social_accounts');
+
         $members = $this->memberQuery($search)
+            ->when($hasSocialAccountsTable, fn ($query) => $query->with('socialAccounts:id,user_id,provider'))
             ->withSum('pointLedgerEntries as point_balance', 'points')
             ->latest()
             ->get();
 
-        return response()->streamDownload(function () use ($members) {
+        return response()->streamDownload(function () use ($members, $hasSocialAccountsTable) {
             $handle = fopen('php://output', 'w');
+
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+
             fputcsv($handle, [
-                'name',
-                'email',
-                'phone',
-                'birth_date',
-                'gender',
-                'postal_code',
-                'address',
-                'point_balance',
-                'joined_at',
+                '가입구분',
+                '이름',
+                '이메일',
+                '연락처',
+                '생년월일',
+                '성별',
+                '우편번호',
+                '주소',
+                '보유포인트',
+                '가입일',
             ]);
 
             foreach ($members as $member) {
                 fputcsv($handle, [
+                    $hasSocialAccountsTable ? $this->signupProviderLabel($member) : '이메일',
                     $member->name,
                     $member->email,
                     $member->phone,
-                    $member->birth_date?->format('Y-m-d'),
-                    $member->gender,
+                    $member->birth_date?->format('Y-m-d') ?? '',
+                    $this->genderLabel($member->gender),
                     $member->postal_code,
                     trim(collect([$member->address_line1, $member->address_line2])->filter()->implode(' ')),
                     (int) ($member->point_balance ?? 0),
@@ -147,8 +156,9 @@ class MemberManagementController extends Controller
             }
 
             fclose($handle);
-        }, 'members.csv', [
+        }, 'members-'.now()->format('Ymd').'.csv', [
             'Content-Type' => 'text/csv; charset=UTF-8',
+            'Cache-Control' => 'no-store, no-cache',
         ]);
     }
 
@@ -239,5 +249,23 @@ class MemberManagementController extends Controller
         }
 
         return 'email';
+    }
+
+    private function signupProviderLabel(User $member): string
+    {
+        return match ($this->signupProvider($member)) {
+            'kakao' => '카카오',
+            'naver' => '네이버',
+            default => '이메일',
+        };
+    }
+
+    private function genderLabel(?string $gender): string
+    {
+        return match ($gender) {
+            'male' => '남성',
+            'female' => '여성',
+            default => '',
+        };
     }
 }
