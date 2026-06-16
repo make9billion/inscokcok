@@ -1,4 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AdminPagination from '@/Components/AdminPagination';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Download, Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -18,7 +19,7 @@ const sourceStyles = {
     product: 'bg-blue-50 text-blue-700',
 };
 
-export default function Index({ consultations, filters, statusOptions, planners = [], productOptions = [] }) {
+export default function Index({ consultations, pagination, filters, statusOptions, planners = [], productOptions = [] }) {
     const user = usePage().props.auth.user;
     const [search, setSearch] = useState(filters.search ?? '');
     const [status, setStatus] = useState(filters.status ?? '');
@@ -272,6 +273,7 @@ export default function Index({ consultations, filters, statusOptions, planners 
                         {consultations.length === 0 && (
                             <div className="px-5 py-12 text-center text-sm text-gray-500">조건에 맞는 상담 접수가 없습니다.</div>
                         )}
+                        <AdminPagination pagination={pagination} />
                     </div>
                 </div>
             </div>

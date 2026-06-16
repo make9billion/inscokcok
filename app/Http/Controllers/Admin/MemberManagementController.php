@@ -35,8 +35,11 @@ class MemberManagementController extends Controller
             ->withCount(['consultations', 'knowledgeQuestions', 'pointMallOrders'])
             ->withSum('pointLedgerEntries as point_balance', 'points')
             ->latest()
-            ->take(20)
-            ->get()
+            ->paginate(20)
+            ->withQueryString();
+
+        $serializedMembers = $members
+            ->getCollection()
             ->map(fn (User $member) => [
                 'id' => $member->id,
                 'name' => $member->name,
@@ -56,7 +59,8 @@ class MemberManagementController extends Controller
             ->values();
 
         return Inertia::render('Admin/Members/Index', [
-            'members' => $members,
+            'members' => $serializedMembers,
+            'pagination' => $this->paginationData($members),
             'filters' => ['search' => $search],
             'canAdjustPoints' => $request->user()?->isAdmin() ?? false,
             'recentAdjustments' => PointLedgerEntry::query()
@@ -267,5 +271,15 @@ class MemberManagementController extends Controller
             'female' => '여성',
             default => '',
         };
+    }
+
+    private function paginationData($paginator): array
+    {
+        return [
+            'from' => $paginator->firstItem(),
+            'to' => $paginator->lastItem(),
+            'total' => $paginator->total(),
+            'links' => $paginator->linkCollection()->values(),
+        ];
     }
 }

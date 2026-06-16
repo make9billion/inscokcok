@@ -35,13 +35,17 @@ class ConsultationManagementController extends Controller
 
         $user = $request->user();
         $filters = $this->normalizedFilters($validated);
+        $consultations = $this->filteredConsultationQuery($request, $filters)
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
 
         return Inertia::render('Admin/Consultations/Index', [
-            'consultations' => $this->filteredConsultationQuery($request, $filters)
-                ->latest()
-                ->take(20)
-                ->get()
-                ->map(fn (Consultation $consultation) => $this->serializeConsultation($consultation)),
+            'consultations' => $consultations
+                ->getCollection()
+                ->map(fn (Consultation $consultation) => $this->serializeConsultation($consultation))
+                ->values(),
+            'pagination' => $this->paginationData($consultations),
             'filters' => $filters,
             'planners' => $this->plannerOptions($request),
             'productOptions' => $this->productOptions($request),
@@ -405,5 +409,15 @@ class ConsultationManagementController extends Controller
             ConsultationStatus::Completed => '상담완료',
             ConsultationStatus::ConsultationCancelled => '상담취소',
         };
+    }
+
+    private function paginationData($paginator): array
+    {
+        return [
+            'from' => $paginator->firstItem(),
+            'to' => $paginator->lastItem(),
+            'total' => $paginator->total(),
+            'links' => $paginator->linkCollection()->values(),
+        ];
     }
 }

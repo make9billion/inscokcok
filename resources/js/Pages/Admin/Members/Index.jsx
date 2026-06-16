@@ -1,4 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AdminPagination from '@/Components/AdminPagination';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { Download, Mail, Search } from 'lucide-react';
 import kakaoLogoUrl from '../../../../images/logo/logo_kakao.png';
@@ -39,7 +40,7 @@ function SignupProviderBadge({ provider = 'email' }) {
     );
 }
 
-export default function Index({ members = [], filters = {}, recentAdjustments = [] }) {
+export default function Index({ members = [], pagination, filters = {}, recentAdjustments = [] }) {
     const { flash } = usePage().props;
     const searchForm = useForm({ search: filters.search ?? '' });
     const exportHref = `${route('admin.members.export')}${filters.search ? `?search=${encodeURIComponent(filters.search)}` : ''}`;
@@ -102,6 +103,7 @@ export default function Index({ members = [], filters = {}, recentAdjustments = 
                             </table>
                             {members.length === 0 && <div className="px-5 py-12 text-center text-sm text-gray-500">조회된 회원이 없습니다.</div>}
                         </div>
+                        <AdminPagination pagination={pagination} />
                     </section>
 
                     <section className="rounded-lg bg-white shadow-sm ring-1 ring-gray-200">
