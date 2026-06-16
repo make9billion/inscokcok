@@ -89,7 +89,7 @@ export default function AuthenticatedLayout({ header, children }) {
     return (
         <div className="min-h-screen bg-gray-100">
             <div className={hasAdminShell ? 'lg:grid lg:min-h-screen lg:grid-cols-[240px_1fr]' : ''}>
-                {hasAdminShell && <AdminSidebar user={user} className="hidden lg:block" />}
+                {hasAdminShell && <AdminSidebar user={user} className="hidden lg:sticky lg:top-0 lg:block lg:h-screen lg:self-start lg:overflow-y-auto" />}
 
                 <div className="min-w-0">
                     <nav className="border-b border-gray-100 bg-white">
