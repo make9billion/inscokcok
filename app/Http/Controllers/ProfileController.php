@@ -18,9 +18,21 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): Response
     {
+        $socialProviders = $request->user()
+            ->socialAccounts()
+            ->pluck('provider')
+            ->map(fn (string $provider) => match ($provider) {
+                'kakao' => '카카오',
+                'naver' => '네이버',
+                default => $provider,
+            })
+            ->values();
+
         return Inertia::render('Profile/Edit', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
+            'socialProviders' => $socialProviders,
+            'requiresPasswordForDeletion' => $socialProviders->isEmpty(),
         ]);
     }
 
@@ -45,14 +57,18 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validate([
-            'password' => ['required', 'current_password'],
-        ]);
-
         $user = $request->user();
+        $hasSocialAccount = $user->socialAccounts()->exists();
+
+        if (! $hasSocialAccount) {
+            $request->validate([
+                'password' => ['required', 'current_password'],
+            ]);
+        }
 
         Auth::logout();
 
+        $user->socialAccounts()->delete();
         $user->delete();
 
         $request->session()->invalidate();
